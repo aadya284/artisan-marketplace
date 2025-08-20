@@ -102,12 +102,20 @@ const InteractiveIndiaMap = () => {
   return (
     <section className="py-32 bg-gradient-to-br from-orange-50 via-blue-50 to-amber-50 relative overflow-hidden">
       {/* Subtle Indian motifs background */}
-      <div 
-        className="absolute inset-0 opacity-5"
+      <div
+        className="absolute inset-0 opacity-3"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23FF9933' fill-opacity='0.1'%3E%3Cpath d='m0 40 40-40H0v40z'/%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='paisley' x='0' y='0' width='60' height='60' patternUnits='userSpaceOnUse'%3E%3Cpath d='M30,15 Q20,5 10,15 Q15,25 30,15 Z' fill='%23FF9933' fill-opacity='0.08'/%3E%3Cpath d='M50,35 Q40,25 30,35 Q35,45 50,35 Z' fill='%234B0082' fill-opacity='0.06'/%3E%3Ccircle cx='45' cy='10' r='3' fill='%23CD853F' fill-opacity='0.05'/%3E%3Ccircle cx='15' cy='50' r='2' fill='%23FF9933' fill-opacity='0.07'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23paisley)'/%3E%3C/svg%3E")`,
         }}
       />
+
+      {/* Additional decorative elements */}
+      <div className="absolute top-10 left-10 w-20 h-20 opacity-10">
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-orange-400 to-amber-600 blur-xl"></div>
+      </div>
+      <div className="absolute bottom-20 right-20 w-32 h-32 opacity-8">
+        <div className="w-full h-full rounded-full bg-gradient-to-tl from-indigo-500 to-purple-600 blur-2xl"></div>
+      </div>
       
       <div className="container mx-auto relative z-10">
         <div className="text-center mb-16">

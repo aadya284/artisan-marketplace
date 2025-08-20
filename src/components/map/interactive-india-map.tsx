@@ -94,7 +94,7 @@ const stateCrafts = {
 };
 
 const InteractiveIndiaMap = () => {
-  const [selectedState, setSelectedState] = useState<string | null>("uttar-pradesh");
+  const [selectedState, setSelectedState] = useState<string | null>("rajasthan");
   const [hoveredState, setHoveredState] = useState<string | null>(null);
 
   const selectedCraft = selectedState ? stateCrafts[selectedState as keyof typeof stateCrafts] : null;

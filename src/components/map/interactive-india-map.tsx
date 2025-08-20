@@ -404,28 +404,67 @@ const InteractiveIndiaMap = () => {
                       >
                         {selectedCraft.artisan}
                       </h5>
-                      <p className="text-sm text-gray-600 leading-relaxed" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                      <p
+                        className="text-sm text-gray-700 leading-relaxed"
+                        style={{ fontFamily: 'Poppins, sans-serif' }}
+                      >
                         {selectedCraft.artisanStory}
                       </p>
                     </div>
                   </div>
 
-                  <div className="mb-6">
-                    <h4 className="font-semibold mb-2 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                  {/* Price Section */}
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <h4
+                      className="font-bold mb-2 text-gray-800 text-lg flex items-center gap-2"
+                      style={{ fontFamily: 'Rajdhani, sans-serif' }}
+                    >
+                      <span className="text-xl">💰</span>
                       Price Range
                     </h4>
-                    <p className="text-2xl font-bold" style={{ color: selectedCraft.color }}>
+                    <p
+                      className="text-3xl font-bold mb-1"
+                      style={{
+                        color: selectedCraft.color,
+                        fontFamily: 'Rajdhani, sans-serif'
+                      }}
+                    >
                       {selectedCraft.price}
+                    </p>
+                    <p className="text-xs text-gray-500" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                      Handcrafted with traditional techniques
                     </p>
                   </div>
 
-                  <Button 
-                    className="w-full text-white hover:opacity-90 transition-opacity"
-                    style={{ backgroundColor: selectedCraft.color }}
+                  {/* Enhanced Buy Now Button */}
+                  <Button
+                    className="w-full text-white font-bold py-4 text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg border-2 border-transparent hover:border-white/20"
+                    style={{
+                      backgroundColor: selectedCraft.color,
+                      fontFamily: 'Rajdhani, sans-serif',
+                      boxShadow: `0 4px 15px ${selectedCraft.color}40`
+                    }}
                   >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Buy Now
+                    <ShoppingCart className="w-5 h-5 mr-3" />
+                    Buy Authentic {selectedCraft.craft}
+                    <span className="ml-2 text-xl">→</span>
                   </Button>
+
+                  {/* Trust indicators */}
+                  <div className="flex items-center justify-center gap-4 text-xs text-gray-500 pt-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    <span className="flex items-center gap-1">
+                      <span className="text-green-500">✓</span>
+                      Authentic Craft
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-blue-500">🛡️</span>
+                      Secure Payment
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="text-orange-500">📦</span>
+                      Fast Shipping
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

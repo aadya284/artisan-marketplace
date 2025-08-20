@@ -50,7 +50,7 @@ const ThreeColumnImageCards = () => {
               <div className="p-6">
                 <h3 className="mb-3 text-xl font-semibold text-marketplace-text-primary font-display">{category.title}</h3>
                 <p className="text-marketplace-text-secondary mb-6 leading-relaxed">{category.description}</p>
-                <Button 
+                <Button
                   className="w-full bg-marketplace-primary hover:bg-marketplace-secondary text-primary-foreground font-medium rounded-lg"
                   size="default"
                 >

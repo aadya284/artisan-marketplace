@@ -46,7 +46,7 @@ const stateCrafts = {
   "odisha": {
     name: "Odisha",
     craft: "Pattachitra",
-    icon: "🖼️",
+    icon: "🖼���",
     description: "Traditional scroll paintings depicting religious themes and folk tales",
     artisan: "Jagannath Mohapatra",
     artisanStory: "From the temple town of Puri, Jagannath creates intricate Pattachitra paintings on palm leaves and cloth. His family has been practicing this art for seven generations.",
@@ -120,114 +120,110 @@ const InteractiveIndiaMap = () => {
                 Interactive Map of India
               </h3>
               
-              {/* Simplified SVG Map */}
+              {/* Physical India Map */}
               <div className="relative">
-                <svg viewBox="0 0 800 600" className="w-full h-auto">
-                  {/* Rajasthan */}
-                  <path
-                    d="M100 150 L250 150 L250 280 L100 280 Z"
-                    fill={selectedState === "rajasthan" ? "#CD853F" : hoveredState === "rajasthan" ? "#DEB887" : "#F5E6D3"}
-                    stroke="#CD853F"
-                    strokeWidth="2"
-                    className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                    onClick={() => setSelectedState("rajasthan")}
-                    onMouseEnter={() => setHoveredState("rajasthan")}
-                    onMouseLeave={() => setHoveredState(null)}
-                  />
-                  <text x="175" y="220" textAnchor="middle" className="text-sm font-medium fill-gray-700" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Rajasthan
-                  </text>
+                <img
+                  src="https://cdn.builder.io/api/v1/image/assets%2Ff1ce823622ae4b55a2cc7cc1ca8532c5%2F53cc67aca27645c2a236e9cbd125da04?format=webp&width=800"
+                  alt="Physical Map of India"
+                  className="w-full h-auto rounded-lg shadow-lg"
+                />
 
-                  {/* Uttar Pradesh */}
-                  <path
-                    d="M250 150 L450 150 L450 250 L250 250 Z"
-                    fill={selectedState === "uttar-pradesh" ? "#FF9933" : hoveredState === "uttar-pradesh" ? "#FFB366" : "#FFF0E6"}
-                    stroke="#FF9933"
-                    strokeWidth="2"
-                    className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                    onClick={() => setSelectedState("uttar-pradesh")}
-                    onMouseEnter={() => setHoveredState("uttar-pradesh")}
-                    onMouseLeave={() => setHoveredState(null)}
-                  />
-                  <text x="350" y="205" textAnchor="middle" className="text-sm font-medium fill-gray-700" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Uttar Pradesh
-                  </text>
+                {/* Clickable State Overlays */}
+                {/* Uttar Pradesh */}
+                <div
+                  className="absolute cursor-pointer transition-all duration-300 hover:bg-orange-400/20 rounded-lg"
+                  style={{
+                    top: '26%',
+                    left: '42%',
+                    width: '18%',
+                    height: '12%',
+                    backgroundColor: selectedState === "uttar-pradesh" ? 'rgba(255, 153, 51, 0.3)' : 'transparent'
+                  }}
+                  onClick={() => setSelectedState("uttar-pradesh")}
+                  onMouseEnter={() => setHoveredState("uttar-pradesh")}
+                  onMouseLeave={() => setHoveredState(null)}
+                  title="Uttar Pradesh - Banarasi Silk"
+                />
 
-                  {/* Bihar */}
-                  <path
-                    d="M450 150 L550 150 L550 220 L450 220 Z"
-                    fill={selectedState === "bihar" ? "#4B0082" : hoveredState === "bihar" ? "#663399" : "#E6E0FF"}
-                    stroke="#4B0082"
-                    strokeWidth="2"
-                    className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                    onClick={() => setSelectedState("bihar")}
-                    onMouseEnter={() => setHoveredState("bihar")}
-                    onMouseLeave={() => setHoveredState(null)}
-                  />
-                  <text x="500" y="190" textAnchor="middle" className="text-sm font-medium fill-gray-700" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Bihar
-                  </text>
+                {/* Bihar */}
+                <div
+                  className="absolute cursor-pointer transition-all duration-300 hover:bg-indigo-400/20 rounded-lg"
+                  style={{
+                    top: '38%',
+                    left: '60%',
+                    width: '12%',
+                    height: '8%',
+                    backgroundColor: selectedState === "bihar" ? 'rgba(75, 0, 130, 0.3)' : 'transparent'
+                  }}
+                  onClick={() => setSelectedState("bihar")}
+                  onMouseEnter={() => setHoveredState("bihar")}
+                  onMouseLeave={() => setHoveredState(null)}
+                  title="Bihar - Madhubani Paintings"
+                />
 
-                  {/* West Bengal */}
-                  <path
-                    d="M550 150 L650 150 L650 250 L550 250 Z"
-                    fill={selectedState === "west-bengal" ? "#CD853F" : hoveredState === "west-bengal" ? "#DEB887" : "#F5E6D3"}
-                    stroke="#CD853F"
-                    strokeWidth="2"
-                    className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                    onClick={() => setSelectedState("west-bengal")}
-                    onMouseEnter={() => setHoveredState("west-bengal")}
-                    onMouseLeave={() => setHoveredState(null)}
-                  />
-                  <text x="600" y="205" textAnchor="middle" className="text-sm font-medium fill-gray-700" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    West Bengal
-                  </text>
+                {/* West Bengal */}
+                <div
+                  className="absolute cursor-pointer transition-all duration-300 hover:bg-amber-400/20 rounded-lg"
+                  style={{
+                    top: '44%',
+                    left: '72%',
+                    width: '10%',
+                    height: '12%',
+                    backgroundColor: selectedState === "west-bengal" ? 'rgba(205, 133, 63, 0.3)' : 'transparent'
+                  }}
+                  onClick={() => setSelectedState("west-bengal")}
+                  onMouseEnter={() => setHoveredState("west-bengal")}
+                  onMouseLeave={() => setHoveredState(null)}
+                  title="West Bengal - Kantha Embroidery"
+                />
 
-                  {/* Andhra Pradesh */}
-                  <path
-                    d="M300 350 L450 350 L450 450 L300 450 Z"
-                    fill={selectedState === "andhra-pradesh" ? "#FF9933" : hoveredState === "andhra-pradesh" ? "#FFB366" : "#FFF0E6"}
-                    stroke="#FF9933"
-                    strokeWidth="2"
-                    className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                    onClick={() => setSelectedState("andhra-pradesh")}
-                    onMouseEnter={() => setHoveredState("andhra-pradesh")}
-                    onMouseLeave={() => setHoveredState(null)}
-                  />
-                  <text x="375" y="405" textAnchor="middle" className="text-sm font-medium fill-gray-700" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Andhra Pradesh
-                  </text>
+                {/* Andhra Pradesh */}
+                <div
+                  className="absolute cursor-pointer transition-all duration-300 hover:bg-orange-400/20 rounded-lg"
+                  style={{
+                    top: '65%',
+                    left: '48%',
+                    width: '14%',
+                    height: '12%',
+                    backgroundColor: selectedState === "andhra-pradesh" ? 'rgba(255, 153, 51, 0.3)' : 'transparent'
+                  }}
+                  onClick={() => setSelectedState("andhra-pradesh")}
+                  onMouseEnter={() => setHoveredState("andhra-pradesh")}
+                  onMouseLeave={() => setHoveredState(null)}
+                  title="Andhra Pradesh - Kalamkari Art"
+                />
 
-                  {/* Odisha */}
-                  <path
-                    d="M450 280 L550 280 L550 380 L450 380 Z"
-                    fill={selectedState === "odisha" ? "#4B0082" : hoveredState === "odisha" ? "#663399" : "#E6E0FF"}
-                    stroke="#4B0082"
-                    strokeWidth="2"
-                    className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                    onClick={() => setSelectedState("odisha")}
-                    onMouseEnter={() => setHoveredState("odisha")}
-                    onMouseLeave={() => setHoveredState(null)}
-                  />
-                  <text x="500" y="335" textAnchor="middle" className="text-sm font-medium fill-gray-700" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Odisha
-                  </text>
+                {/* Odisha */}
+                <div
+                  className="absolute cursor-pointer transition-all duration-300 hover:bg-indigo-400/20 rounded-lg"
+                  style={{
+                    top: '58%',
+                    left: '62%',
+                    width: '10%',
+                    height: '10%',
+                    backgroundColor: selectedState === "odisha" ? 'rgba(75, 0, 130, 0.3)' : 'transparent'
+                  }}
+                  onClick={() => setSelectedState("odisha")}
+                  onMouseEnter={() => setHoveredState("odisha")}
+                  onMouseLeave={() => setHoveredState(null)}
+                  title="Odisha - Pattachitra Paintings"
+                />
 
-                  {/* Kerala */}
-                  <path
-                    d="M150 450 L250 450 L250 550 L150 550 Z"
-                    fill={selectedState === "kerala" ? "#FF9933" : hoveredState === "kerala" ? "#FFB366" : "#FFF0E6"}
-                    stroke="#FF9933"
-                    strokeWidth="2"
-                    className="cursor-pointer transition-all duration-300 hover:opacity-80"
-                    onClick={() => setSelectedState("kerala")}
-                    onMouseEnter={() => setHoveredState("kerala")}
-                    onMouseLeave={() => setHoveredState(null)}
-                  />
-                  <text x="200" y="505" textAnchor="middle" className="text-sm font-medium fill-gray-700" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    Kerala
-                  </text>
-                </svg>
+                {/* Kerala */}
+                <div
+                  className="absolute cursor-pointer transition-all duration-300 hover:bg-orange-400/20 rounded-lg"
+                  style={{
+                    top: '82%',
+                    left: '38%',
+                    width: '8%',
+                    height: '12%',
+                    backgroundColor: selectedState === "kerala" ? 'rgba(255, 153, 51, 0.3)' : 'transparent'
+                  }}
+                  onClick={() => setSelectedState("kerala")}
+                  onMouseEnter={() => setHoveredState("kerala")}
+                  onMouseLeave={() => setHoveredState(null)}
+                  title="Kerala - Coir Products"
+                />
 
                 {/* Hover Tooltip */}
                 {hoveredState && stateCrafts[hoveredState as keyof typeof stateCrafts] && (

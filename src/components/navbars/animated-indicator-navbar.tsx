@@ -18,7 +18,7 @@ import {
 
 const NAV_LOGO = {
   url: "https://orchids.app",
-  src: "/next.svg",
+  src: "https://cdn.builder.io/api/v1/image/assets%2Fa3656e61a5694931a58316df40a95cae%2Ff3112465dbef47929828fdde4e76efaa?format=webp&width=800",
   alt: "KarigarSetu logo",
   title: "KarigarSetu",
 };
@@ -58,9 +58,9 @@ const AnimatedIndicatorNavbar = () => {
     <section className="py-4 bg-background border-b border-border">
       <nav className="container mx-auto flex items-center justify-between">
         {/* Left WordMark */}
-        <a href={NAV_LOGO.url} className="flex items-center gap-2">
-          <img src={NAV_LOGO.src} className="max-h-8 w-8" alt={NAV_LOGO.alt} />
-          <span className="text-lg font-semibold tracking-tighter text-foreground font-display">
+        <a href={NAV_LOGO.url} className="flex items-center gap-4">
+          <img src={NAV_LOGO.src} className="max-h-20 w-20 md:max-h-24 md:w-24" alt={NAV_LOGO.alt} />
+          <span className="text-xl font-bold tracking-tighter text-amber-800 font-display">
             {NAV_LOGO.title}
           </span>
         </a>
@@ -76,11 +76,10 @@ const AnimatedIndicatorNavbar = () => {
                   <NavigationMenuLink
                     data-nav-item={item.name}
                     onClick={() => setActiveItem(item.name)}
-                    className={`relative cursor-pointer text-sm font-medium hover:bg-transparent transition-colors ${
-                      activeItem === item.name
+                    className={`relative cursor-pointer text-sm font-medium hover:bg-transparent transition-colors ${activeItem === item.name
                         ? "text-primary"
                         : "text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     {item.name}
                   </NavigationMenuLink>
@@ -127,14 +126,12 @@ const AnimatedHamburger = ({ isOpen }: { isOpen: boolean }) => {
     <div className="group relative h-6 w-6">
       <div className="absolute inset-0">
         <Menu
-          className={`text-muted-foreground group-hover:text-foreground absolute transition-all duration-300 ${
-            isOpen ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
-          }`}
+          className={`text-muted-foreground group-hover:text-foreground absolute transition-all duration-300 ${isOpen ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
+            }`}
         />
         <X
-          className={`text-muted-foreground group-hover:text-foreground absolute transition-all duration-300 ${
-            isOpen ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"
-          }`}
+          className={`text-muted-foreground group-hover:text-foreground absolute transition-all duration-300 ${isOpen ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"
+            }`}
         />
       </div>
     </div>
@@ -167,11 +164,10 @@ const MobileNav = ({
                 <a
                   href={navItem.link}
                   onClick={() => setActiveItem(navItem.name)}
-                  className={`flex items-center border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${
-                    activeItem === navItem.name
+                  className={`flex items-center border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${activeItem === navItem.name
                       ? "border-primary text-primary"
                       : "text-muted-foreground hover:text-foreground border-transparent"
-                  }`}
+                    }`}
                 >
                   {navItem.name}
                 </a>
@@ -187,3 +183,4 @@ const MobileNav = ({
     </div>
   );
 };
+

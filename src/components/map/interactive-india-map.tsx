@@ -27,7 +27,7 @@ const stateCrafts = {
     artisan: "Sita Devi",
     artisanStory: "Sita Devi is a renowned Madhubani artist from Mithila. Her paintings tell stories of Hindu mythology and daily life, using natural pigments and traditional techniques passed down through generations.",
     image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    price: "₹2,000 - ₹25,000",
+    price: "₹2,000 - ���25,000",
     rating: 4.8,
     color: "#4B0082" // Indigo
   },
@@ -358,20 +358,50 @@ const InteractiveIndiaMap = () => {
                   ></div>
                 </div>
 
-                <div className="p-6">
-                  <h3 className="text-2xl font-bold mb-2 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
-                    {selectedCraft.craft}
-                  </h3>
-                  <p className="text-gray-600 mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    {selectedCraft.description}
-                  </p>
+                <div className="p-6 space-y-6">
+                  {/* Title Section */}
+                  <div className="border-b border-gray-100 pb-4">
+                    <h3
+                      className="text-3xl font-bold mb-3 leading-tight"
+                      style={{
+                        fontFamily: 'Rajdhani, sans-serif',
+                        color: selectedCraft.color
+                      }}
+                    >
+                      {selectedCraft.craft}
+                    </h3>
+                    <p
+                      className="text-gray-700 text-base leading-relaxed"
+                      style={{ fontFamily: 'Poppins, sans-serif' }}
+                    >
+                      {selectedCraft.description}
+                    </p>
+                  </div>
 
-                  <div className="mb-6">
-                    <h4 className="font-semibold mb-2 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                  {/* Artisan Section */}
+                  <div>
+                    <h4
+                      className="font-bold mb-3 text-gray-800 text-lg flex items-center gap-2"
+                      style={{ fontFamily: 'Rajdhani, sans-serif' }}
+                    >
+                      <span className="text-2xl">👨‍🎨</span>
                       Meet the Artisan
                     </h4>
-                    <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
-                      <h5 className="font-medium text-gray-800 mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    <div
+                      className="rounded-xl p-5 border-l-4 shadow-sm"
+                      style={{
+                        backgroundColor: `${selectedCraft.color}10`,
+                        borderLeftColor: selectedCraft.color,
+                        borderStyle: 'solid'
+                      }}
+                    >
+                      <h5
+                        className="font-bold text-gray-800 mb-2 text-lg"
+                        style={{
+                          fontFamily: 'Rajdhani, sans-serif',
+                          color: selectedCraft.color
+                        }}
+                      >
                         {selectedCraft.artisan}
                       </h5>
                       <p className="text-sm text-gray-600 leading-relaxed" style={{ fontFamily: 'Poppins, sans-serif' }}>

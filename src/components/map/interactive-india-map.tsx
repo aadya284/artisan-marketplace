@@ -20,7 +20,7 @@ const stateCrafts = {
     color: "#FF9933" // Saffron
   },
   "bihar": {
-    name: "Bihar", 
+    name: "Bihar",
     craft: "Madhubani",
     icon: "🎨",
     description: "Traditional folk paintings with vibrant colors and intricate patterns",
@@ -30,18 +30,6 @@ const stateCrafts = {
     price: "₹2,000 - ₹25,000",
     rating: 4.8,
     color: "#4B0082" // Indigo
-  },
-  "rajasthan": {
-    name: "Rajasthan",
-    craft: "Blue Pottery",
-    icon: "🏺",
-    description: "Traditional ceramic art with distinctive blue and white patterns",
-    artisan: "Kripal Singh",
-    artisanStory: "From the Pink City of Jaipur, Kripal Singh continues the 300-year-old tradition of blue pottery. His workshops blend Persian techniques with Rajasthani artistry.",
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    price: "₹500 - ₹8,000",
-    rating: 4.7,
-    color: "#CD853F" // Terracotta
   },
   "andhra-pradesh": {
     name: "Andhra Pradesh",

@@ -318,26 +318,44 @@ const InteractiveIndiaMap = () => {
                   animation: 'fadeInUp 0.6s ease-out'
                 }}
               >
-                <div className="relative h-64 overflow-hidden">
+                <div className="relative h-64 overflow-hidden group">
                   <img
                     src={selectedCraft.image}
                     alt={selectedCraft.craft}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
+                  {/* Gradient overlay for better text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20"></div>
+
                   <div className="absolute top-4 left-4">
-                    <Badge 
-                      className="text-white border-white/50"
-                      style={{ backgroundColor: selectedCraft.color }}
+                    <Badge
+                      className="text-white border-white/30 shadow-lg backdrop-blur-sm font-semibold"
+                      style={{
+                        backgroundColor: `${selectedCraft.color}E6`,
+                        fontFamily: 'Rajdhani, sans-serif'
+                      }}
                     >
-                      {selectedCraft.icon} {selectedCraft.craft}
+                      <span className="text-lg mr-2">{selectedCraft.icon}</span>
+                      {selectedCraft.craft}
                     </Badge>
                   </div>
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{selectedCraft.rating}</span>
+
+                  <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-full shadow-lg border border-white/50">
+                    <div className="flex items-center gap-2">
+                      <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
+                      <span className="text-sm font-bold text-gray-800" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                        {selectedCraft.rating}
+                      </span>
                     </div>
                   </div>
+
+                  {/* Decorative corner elements */}
+                  <div
+                    className="absolute bottom-0 right-0 w-16 h-16 opacity-20"
+                    style={{
+                      background: `linear-gradient(135deg, transparent 50%, ${selectedCraft.color} 50%)`,
+                    }}
+                  ></div>
                 </div>
 
                 <div className="p-6">

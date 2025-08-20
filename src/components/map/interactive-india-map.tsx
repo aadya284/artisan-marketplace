@@ -253,23 +253,47 @@ const InteractiveIndiaMap = () => {
                   title="Kerala - Coir Products"
                 />
 
-                {/* Hover Tooltip */}
+                {/* Enhanced Hover Tooltip */}
                 {hoveredState && stateCrafts[hoveredState as keyof typeof stateCrafts] && (
-                  <div className="absolute top-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 max-w-xs">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-2xl">{stateCrafts[hoveredState as keyof typeof stateCrafts].icon}</span>
-                      <div>
-                        <h4 className="font-semibold text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                  <div
+                    className="absolute top-4 right-4 bg-gradient-to-br from-white to-orange-50 p-4 rounded-xl shadow-2xl border border-orange-200 max-w-xs backdrop-blur-sm z-10 transform transition-all duration-300 scale-105"
+                    style={{
+                      borderLeft: `4px solid ${stateCrafts[hoveredState as keyof typeof stateCrafts].color}`,
+                      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
+                    }}
+                  >
+                    <div className="flex items-start gap-3 mb-3">
+                      <div
+                        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-md"
+                        style={{ backgroundColor: `${stateCrafts[hoveredState as keyof typeof stateCrafts].color}20` }}
+                      >
+                        <span>{stateCrafts[hoveredState as keyof typeof stateCrafts].icon}</span>
+                      </div>
+                      <div className="flex-1">
+                        <h4
+                          className="font-bold text-gray-800 text-base leading-tight mb-1"
+                          style={{
+                            fontFamily: 'Rajdhani, sans-serif',
+                            color: stateCrafts[hoveredState as keyof typeof stateCrafts].color
+                          }}
+                        >
                           {stateCrafts[hoveredState as keyof typeof stateCrafts].craft}
                         </h4>
-                        <p className="text-sm text-gray-600" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                        <p className="text-sm text-gray-600 font-medium" style={{ fontFamily: 'Poppins, sans-serif' }}>
                           {stateCrafts[hoveredState as keyof typeof stateCrafts].name}
                         </p>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-600" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                      Click to explore this craft
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-gray-500" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                        Click to explore craft
+                      </p>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-orange-400"></div>
+                        <div className="w-1 h-1 rounded-full bg-orange-300"></div>
+                        <div className="w-1 h-1 rounded-full bg-orange-200"></div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

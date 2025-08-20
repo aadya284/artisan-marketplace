@@ -308,10 +308,16 @@ const InteractiveIndiaMap = () => {
             </div>
           </div>
 
-          {/* Craft Details Panel */}
+          {/* Enhanced Craft Details Panel */}
           {selectedCraft && (
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-orange-100 sticky top-8">
+              <div
+                className="bg-gradient-to-br from-white to-orange-50/30 rounded-2xl shadow-2xl overflow-hidden border border-orange-200 sticky top-8 transform transition-all duration-500 hover:shadow-3xl"
+                style={{
+                  borderTop: `4px solid ${selectedCraft.color}`,
+                  animation: 'fadeInUp 0.6s ease-out'
+                }}
+              >
                 <div className="relative h-64 overflow-hidden">
                   <img
                     src={selectedCraft.image}

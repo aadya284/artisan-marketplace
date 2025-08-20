@@ -141,6 +141,22 @@ const InteractiveIndiaMap = () => {
                 />
 
                 {/* Clickable State Overlays */}
+                {/* Rajasthan */}
+                <div
+                  className="absolute cursor-pointer transition-all duration-300 hover:bg-amber-400/20 rounded-lg"
+                  style={{
+                    top: '32%',
+                    left: '18%',
+                    width: '20%',
+                    height: '18%',
+                    backgroundColor: selectedState === "rajasthan" ? 'rgba(205, 133, 63, 0.3)' : 'transparent'
+                  }}
+                  onClick={() => setSelectedState("rajasthan")}
+                  onMouseEnter={() => setHoveredState("rajasthan")}
+                  onMouseLeave={() => setHoveredState(null)}
+                  title="Rajasthan - Blue Pottery"
+                />
+
                 {/* Uttar Pradesh */}
                 <div
                   className="absolute cursor-pointer transition-all duration-300 hover:bg-orange-400/20 rounded-lg"

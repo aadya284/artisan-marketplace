@@ -26,5 +26,3 @@ const GradientOverlayCta = () => {
     </section>
   );
 };
-
-export { GradientOverlayCta };

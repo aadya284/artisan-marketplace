@@ -10,7 +10,7 @@ const stateCrafts = {
   "uttar-pradesh": {
     name: "Uttar Pradesh",
     craft: "Banarasi Silk",
-    icon: "🕌",
+    icon: "��",
     description: "Luxurious silk sarees with intricate gold and silver brocade work",
     artisan: "Masterji Ravi Shankar",
     artisanStory: "A third-generation weaver from Varanasi, Ravi Shankar has dedicated his life to preserving the ancient art of Banarasi silk weaving. His family workshop has been creating exquisite sarees for over 80 years.",
@@ -82,7 +82,7 @@ const stateCrafts = {
 };
 
 const InteractiveIndiaMap = () => {
-  const [selectedState, setSelectedState] = useState<string | null>("rajasthan");
+  const [selectedState, setSelectedState] = useState<string | null>("uttar-pradesh");
   const [hoveredState, setHoveredState] = useState<string | null>(null);
 
   const selectedCraft = selectedState ? stateCrafts[selectedState as keyof typeof stateCrafts] : null;

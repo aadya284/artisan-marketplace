@@ -201,7 +201,7 @@ const SocialTeamProfiles = () => {
                       backgroundImage: `url(${artisan.backgroundImage})`,
                     }}
                   />
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
+                  <div className="absolute bg-black/40 group-hover:bg-black/20 transition-colors" style={{ left: '2834px', top: '1491px', bottom: '0px', right: '0px', width: '122px' }} />
                   <div className="absolute bottom-1 left-1 right-1 text-center">
                     <p className="text-white text-xs font-medium truncate">
                       {artisan.name}

@@ -18,7 +18,7 @@ import {
 
 const NAV_LOGO = {
   url: "https://orchids.app",
-  src: "/orchids-logo.png",
+  src: "/next.svg",
   alt: "KarigarSetu logo",
   title: "KarigarSetu",
 };

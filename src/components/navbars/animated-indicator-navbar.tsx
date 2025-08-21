@@ -105,18 +105,20 @@ const AnimatedIndicatorNavbar = () => {
 
         <div className="hidden items-center gap-3 lg:flex">
           {/* Cart Icon */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="relative h-10 w-10 p-0 hover:bg-muted"
-            aria-label="Shopping Cart"
-          >
-            <ShoppingCart className="h-5 w-5 text-muted-foreground hover:text-foreground" />
-            {/* Cart counter badge */}
-            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
-              0
-            </span>
-          </Button>
+          <a href="/cart">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative h-10 w-10 p-0 hover:bg-muted"
+              aria-label="Shopping Cart"
+            >
+              <ShoppingCart className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+              {/* Cart counter badge */}
+              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                0
+              </span>
+            </Button>
+          </a>
 
           <Button
             variant="outline"

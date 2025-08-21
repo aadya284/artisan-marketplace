@@ -182,15 +182,33 @@ const MobileNav = ({
                 <a
                   href={navItem.link}
                   onClick={() => setActiveItem(navItem.name)}
-                  className={`flex items-center border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${activeItem === navItem.name
+                  className={`flex items-center gap-3 border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${activeItem === navItem.name
                       ? "border-primary text-primary"
                       : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                 >
+                  {navItem.icon && navItem.icon}
                   {navItem.name}
                 </a>
               </li>
             ))}
+
+            {/* Mobile Cart */}
+            <li className="border-l-[3px] border-transparent px-6 py-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="relative w-full justify-start gap-3 h-10"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart className="h-4 w-4" />
+                Cart
+                <span className="absolute right-3 top-2 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                  0
+                </span>
+              </Button>
+            </li>
+
             <li className="flex flex-col gap-2 px-7 py-2">
               <Button variant="outline" className="border-border text-foreground hover:bg-muted">Sign In</Button>
               <Button className="bg-primary text-primary-foreground hover:bg-marketplace-secondary">Sign Up</Button>

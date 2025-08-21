@@ -197,18 +197,20 @@ const MobileNav = ({
 
             {/* Mobile Cart */}
             <li className="border-l-[3px] border-transparent px-6 py-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="relative w-full justify-start gap-3 h-10"
-                aria-label="Shopping Cart"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                Cart
-                <span className="absolute right-3 top-2 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
-                  0
-                </span>
-              </Button>
+              <a href="/cart">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="relative w-full justify-start gap-3 h-10"
+                  aria-label="Shopping Cart"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  Cart
+                  <span className="absolute right-3 top-2 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                    0
+                  </span>
+                </Button>
+              </a>
             </li>
 
             <li className="flex flex-col gap-2 px-7 py-2">

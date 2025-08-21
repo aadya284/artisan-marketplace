@@ -45,7 +45,7 @@ export default function AiChatbotWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "Hello! I'm your Artisan Assistant. I'm here to help you discover beautiful handcrafted items, connect with talented artisans, and answer any questions you might have. How can I assist you today?",
+      content: "Hello! I'm kalabandhu, your cultural craft companion. I'm here to help you discover beautiful handcrafted items, connect with talented artisans, and learn about India's rich artistic heritage. How can I assist you today?",
       isUser: false,
       timestamp: new Date()
     }

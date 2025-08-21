@@ -24,6 +24,8 @@ const NAV_LOGO = {
 };
 const NAV_ITEMS = [
   { name: "Home", link: "/" },
+  { name: "Explore", link: "/explore", icon: <Store className="w-4 h-4" /> },
+  { name: "Exhibition", link: "/exhibition", icon: <Palette className="w-4 h-4" /> },
   { name: "About", link: "/about" },
   { name: "Contact", link: "/contact" },
 ];

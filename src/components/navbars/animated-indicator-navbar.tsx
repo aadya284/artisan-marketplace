@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, ShoppingCart, Store, Palette } from "lucide-react";
+import { Menu, X, ShoppingCart, Store, Palette, Home, Info, Phone } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";

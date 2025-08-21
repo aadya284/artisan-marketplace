@@ -112,7 +112,7 @@ export default function AiChatbotWidget() {
             {/* Header */}
             <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
               <div>
-                <h3 className="font-display font-semibold text-sm">Artisan Assistant</h3>
+                <h3 className="font-display font-semibold text-sm">kalabandhu</h3>
                 <p className="text-xs opacity-90">How can I help you today?</p>
               </div>
               <button

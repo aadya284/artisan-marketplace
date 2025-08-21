@@ -23,11 +23,11 @@ const NAV_LOGO = {
   title: "KarigarSetu",
 };
 const NAV_ITEMS = [
-  { name: "Home", link: "/" },
+  { name: "Home", link: "/", icon: <Home className="w-4 h-4" /> },
   { name: "Explore", link: "/explore", icon: <Store className="w-4 h-4" /> },
   { name: "Exhibition", link: "/exhibition", icon: <Palette className="w-4 h-4" /> },
-  { name: "About", link: "/about" },
-  { name: "Contact", link: "/contact" },
+  { name: "About", link: "/about", icon: <Info className="w-4 h-4" /> },
+  { name: "Contact", link: "/contact", icon: <Phone className="w-4 h-4" /> },
 ];
 
 const AnimatedIndicatorNavbar = () => {

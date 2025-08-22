@@ -12,8 +12,8 @@ export default function HomePage() {
     <>
       <AnimatedIndicatorNavbar />
       <TwoColumnHeroWithImage />
-      <SocialTeamProfiles />
       <TaglineSection />
+      <SocialTeamProfiles />
       <CompanyLogoTestimonials />
       <GradientOverlayCta />
       <NewsletterFooter />

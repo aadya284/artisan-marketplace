@@ -1,6 +1,6 @@
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
 import { TwoColumnHeroWithImage } from "@/components/heros/two-column-hero-with-image";
-import { InteractiveIndiaMap } from "@/components/map/interactive-india-map";
+import { VideoShowcase } from "@/components/video/video-showcase";
 import { SocialTeamProfiles } from "@/components/teams/social-team-profiles";
 import { CompanyLogoTestimonials } from "@/components/testimonials/company-logo-testimonials";
 import { GradientOverlayCta } from "@/components/cta/gradient-overlay-cta";
@@ -12,7 +12,7 @@ export default function HomePage() {
     <>
       <AnimatedIndicatorNavbar />
       <TwoColumnHeroWithImage />
-      <InteractiveIndiaMap />
+      <VideoShowcase />
       <SocialTeamProfiles />
       <CompanyLogoTestimonials />
       <GradientOverlayCta />

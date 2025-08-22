@@ -1,8 +1,8 @@
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
 import { TwoColumnHeroWithImage } from "@/components/heros/two-column-hero-with-image";
-import { HorizontalCarouselGallery } from "@/components/gallery/horizontal-carousel-gallery";
+import { TaglineSection } from "@/components/tagline/tagline-section";
+import { VideoShowcase } from "@/components/video/video-showcase";
 import { SocialTeamProfiles } from "@/components/teams/social-team-profiles";
-import { ThreeColumnImageCards } from "@/components/feature/three-column-image-cards";
 import { CompanyLogoTestimonials } from "@/components/testimonials/company-logo-testimonials";
 import { GradientOverlayCta } from "@/components/cta/gradient-overlay-cta";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
@@ -13,8 +13,8 @@ export default function HomePage() {
     <>
       <AnimatedIndicatorNavbar />
       <TwoColumnHeroWithImage />
-      <HorizontalCarouselGallery />
-      <ThreeColumnImageCards />
+      <TaglineSection />
+      <VideoShowcase />
       <SocialTeamProfiles />
       <CompanyLogoTestimonials />
       <GradientOverlayCta />

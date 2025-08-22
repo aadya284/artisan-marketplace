@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingCart, Store, Palette, Home, Info, Phone } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -18,14 +18,16 @@ import {
 
 const NAV_LOGO = {
   url: "https://orchids.app",
-  src: "/orchids-logo.png",
+  src: "https://cdn.builder.io/api/v1/image/assets%2Fa3656e61a5694931a58316df40a95cae%2Ff3112465dbef47929828fdde4e76efaa?format=webp&width=800",
   alt: "KarigarSetu logo",
   title: "KarigarSetu",
 };
 const NAV_ITEMS = [
-  { name: "Home", link: "/" },
-  { name: "About", link: "/about" },
-  { name: "Contact", link: "/contact" },
+  { name: "Home", link: "/", icon: <Home className="w-4 h-4" /> },
+  { name: "Explore", link: "/explore", icon: <Store className="w-4 h-4" /> },
+  { name: "Exhibition", link: "/exhibition", icon: <Palette className="w-4 h-4" /> },
+  { name: "About", link: "/about", icon: <Info className="w-4 h-4" /> },
+  { name: "Contact", link: "/contact", icon: <Phone className="w-4 h-4" /> },
 ];
 
 const AnimatedIndicatorNavbar = () => {
@@ -58,9 +60,9 @@ const AnimatedIndicatorNavbar = () => {
     <section className="py-4 bg-background border-b border-border">
       <nav className="container mx-auto flex items-center justify-between">
         {/* Left WordMark */}
-        <a href={NAV_LOGO.url} className="flex items-center gap-2">
-          <img src={NAV_LOGO.src} className="max-h-8 w-8" alt={NAV_LOGO.alt} />
-          <span className="text-lg font-semibold tracking-tighter text-foreground font-display">
+        <a href={NAV_LOGO.url} className="flex items-center gap-4">
+          <img src={NAV_LOGO.src} className="max-h-20 w-20 md:max-h-24 md:w-24" alt={NAV_LOGO.alt} />
+          <span className="text-xl font-bold tracking-tighter text-amber-800 font-display">
             {NAV_LOGO.title}
           </span>
         </a>
@@ -75,13 +77,14 @@ const AnimatedIndicatorNavbar = () => {
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     data-nav-item={item.name}
+                    href={item.link}
                     onClick={() => setActiveItem(item.name)}
-                    className={`relative cursor-pointer text-sm font-medium hover:bg-transparent transition-colors ${
-                      activeItem === item.name
+                    className={`relative cursor-pointer text-sm font-medium hover:bg-transparent transition-colors flex items-center gap-2 ${activeItem === item.name
                         ? "text-primary"
                         : "text-muted-foreground hover:text-foreground"
-                    }`}
+                      }`}
                   >
+                    {item.icon && item.icon}
                     {item.name}
                   </NavigationMenuLink>
                 </NavigationMenuItem>
@@ -101,6 +104,22 @@ const AnimatedIndicatorNavbar = () => {
         <MobileNav activeItem={activeItem} setActiveItem={setActiveItem} />
 
         <div className="hidden items-center gap-3 lg:flex">
+          {/* Cart Icon */}
+          <a href="/cart">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative h-10 w-10 p-0 hover:bg-muted"
+              aria-label="Shopping Cart"
+            >
+              <ShoppingCart className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+              {/* Cart counter badge */}
+              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                0
+              </span>
+            </Button>
+          </a>
+
           <Button
             variant="outline"
             size="sm"
@@ -127,14 +146,12 @@ const AnimatedHamburger = ({ isOpen }: { isOpen: boolean }) => {
     <div className="group relative h-6 w-6">
       <div className="absolute inset-0">
         <Menu
-          className={`text-muted-foreground group-hover:text-foreground absolute transition-all duration-300 ${
-            isOpen ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
-          }`}
+          className={`text-muted-foreground group-hover:text-foreground absolute transition-all duration-300 ${isOpen ? "rotate-90 opacity-0" : "rotate-0 opacity-100"
+            }`}
         />
         <X
-          className={`text-muted-foreground group-hover:text-foreground absolute transition-all duration-300 ${
-            isOpen ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"
-          }`}
+          className={`text-muted-foreground group-hover:text-foreground absolute transition-all duration-300 ${isOpen ? "rotate-0 opacity-100" : "-rotate-90 opacity-0"
+            }`}
         />
       </div>
     </div>
@@ -167,16 +184,35 @@ const MobileNav = ({
                 <a
                   href={navItem.link}
                   onClick={() => setActiveItem(navItem.name)}
-                  className={`flex items-center border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${
-                    activeItem === navItem.name
+                  className={`flex items-center gap-3 border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${activeItem === navItem.name
                       ? "border-primary text-primary"
                       : "text-muted-foreground hover:text-foreground border-transparent"
-                  }`}
+                    }`}
                 >
+                  {navItem.icon && navItem.icon}
                   {navItem.name}
                 </a>
               </li>
             ))}
+
+            {/* Mobile Cart */}
+            <li className="border-l-[3px] border-transparent px-6 py-4">
+              <a href="/cart">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="relative w-full justify-start gap-3 h-10"
+                  aria-label="Shopping Cart"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  Cart
+                  <span className="absolute right-3 top-2 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                    0
+                  </span>
+                </Button>
+              </a>
+            </li>
+
             <li className="flex flex-col gap-2 px-7 py-2">
               <Button variant="outline" className="border-border text-foreground hover:bg-muted">Sign In</Button>
               <Button className="bg-primary text-primary-foreground hover:bg-marketplace-secondary">Sign Up</Button>

@@ -1,23 +1,56 @@
 "use client";
 
 import { ArrowRight, ArrowUpRight, Palette } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
+const artVideos = [
+  {
+    src: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/f6573a0d-fab5-4352-8cd3-cbb57cb60cb9/generated_videos/close-up-cinematic-shot-of-skilled-india-5420c79a-20250820084136.mp4?",
+    title: "Traditional Indian Craftsmanship"
+  },
+  {
+    src: "https://videos.pexels.com/video-files/4683406/4683406-hd_720_1298_50fps.mp4",
+    title: "Pottery Making"
+  },
+  {
+    src: "https://videos.pexels.com/video-files/7205821/7205821-sd_960_540_24fps.mp4",
+    title: "Textile Weaving"
+  },
+  {
+    src: "https://videos.pexels.com/video-files/6720710/6720710-hd_1920_1080_25fps.mp4",
+    title: "Woodcarving Artistry"
+  }
+];
+
 const TwoColumnHeroWithImage = () => {
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [key, setKey] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentVideoIndex((prevIndex) => (prevIndex + 1) % artVideos.length);
+      setKey(prev => prev + 1); // Force video remount
+    }, 8000); // Change video every 8 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="py-32 relative overflow-hidden bg-background">
       {/* Video Background */}
       <video
-        src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/project-uploads/f6573a0d-fab5-4352-8cd3-cbb57cb60cb9/generated_videos/close-up-cinematic-shot-of-skilled-india-5420c79a-20250820084136.mp4?"
+        key={key}
+        src={artVideos[currentVideoIndex].src}
         autoPlay
         muted
         loop
         playsInline
-        className="absolute inset-0 w-full h-full object-cover z-0"
+        className="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-1000"
       />
-      
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40 z-10" />
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/20 z-20" />
@@ -59,6 +92,24 @@ const TwoColumnHeroWithImage = () => {
               Learn About Artisans
               <ArrowUpRight className="ml-2 size-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Button>
+          </div>
+
+          {/* Video Indicators */}
+          <div className="flex justify-center gap-2 mt-8">
+            {artVideos.map((_, index) => (
+              <button
+                key={index}
+                className={`h-2 rounded-full transition-all duration-300 ${currentVideoIndex === index
+                    ? "w-8 bg-white/80"
+                    : "w-2 bg-white/40 hover:bg-white/60"
+                  }`}
+                onClick={() => {
+                  setCurrentVideoIndex(index);
+                  setKey(prev => prev + 1);
+                }}
+                aria-label={`Switch to ${artVideos[index].title} video`}
+              />
+            ))}
           </div>
         </div>
       </div>

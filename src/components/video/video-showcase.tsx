@@ -2,7 +2,7 @@
 
 export function VideoShowcase() {
   return (
-    <section className="relative min-h-screen overflow-hidden">
+    <section className="relative h-[80vh] overflow-hidden">
       {/* Background Video */}
       <video
         className="absolute inset-0 w-full h-full object-cover"

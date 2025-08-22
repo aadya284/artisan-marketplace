@@ -21,12 +21,12 @@ export function VideoShowcase() {
       </video>
 
       {/* KarigarSetu Logo Overlay to hide watermark */}
-      <div className="absolute bottom-8 right-8 z-10">
-        <div className="bg-white rounded-lg p-3 shadow-lg">
+      <div className="absolute bottom-6 right-6 z-10">
+        <div className="bg-white rounded-lg p-4 shadow-xl border border-gray-200">
           <img
             src="https://cdn.builder.io/api/v1/image/assets%2Ff1ce823622ae4b55a2cc7cc1ca8532c5%2F6d422358c98e44aeb6a3f1084dad859a?format=webp&width=800"
             alt="KarigarSetu"
-            className="h-12 w-auto object-contain"
+            className="h-14 w-auto object-contain"
           />
         </div>
       </div>

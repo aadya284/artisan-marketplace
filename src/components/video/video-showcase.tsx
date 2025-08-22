@@ -2,10 +2,10 @@
 
 export function VideoShowcase() {
   return (
-    <section className="relative h-[80vh] overflow-hidden">
+    <section className="relative w-full overflow-hidden">
       {/* Background Video */}
       <video
-        className="absolute inset-0 w-full h-full object-cover"
+        className="w-full h-auto block"
         autoPlay
         loop
         muted
@@ -21,7 +21,7 @@ export function VideoShowcase() {
       </video>
 
       {/* KarigarSetu Logo Overlay to hide watermark */}
-      <div className="absolute bottom-2 right-2 z-10">
+      <div className="absolute bottom-4 right-4 z-10">
         <div className="bg-white rounded-md p-2 shadow-lg border border-gray-200">
           <img
             src="https://cdn.builder.io/api/v1/image/assets%2Ff1ce823622ae4b55a2cc7cc1ca8532c5%2Fc74c889d4e194d3cada3e8638aee3374?format=webp&width=800"

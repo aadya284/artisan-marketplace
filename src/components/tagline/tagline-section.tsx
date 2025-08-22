@@ -27,7 +27,7 @@ export function TaglineSection() {
             </div>
           </div>
 
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 tracking-tight mb-16">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight mb-16">
             <span className="bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
               From Every State,
             </span>

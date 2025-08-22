@@ -12,7 +12,7 @@ export function TaglineSection() {
           <pattern id="tagline-pattern" patternUnits="userSpaceOnUse" width="20" height="20">
             <path d="M10 10L15 5L10 0L5 5Z" fill="currentColor" />
           </pattern>
-          <rect width="100" height="100" fill="url(#tagline-pattern)" />
+         
         </svg>
       </div>
 

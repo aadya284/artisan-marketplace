@@ -127,7 +127,7 @@ export const NewsletterFooter = () => {
 
           {/* Copyright - Below on mobile, left on desktop */}
           <p className="order-2 text-center text-sm text-muted-foreground sm:text-left md:order-1">
-            © {new Date().getFullYear()} Artisan Marketplace. All rights reserved.
+            © {new Date().getFullYear()} KarigarSetu. All rights reserved.
           </p>
         </div>
       </div>

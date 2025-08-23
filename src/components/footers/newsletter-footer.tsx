@@ -42,7 +42,7 @@ export const NewsletterFooter = () => {
           <div className="w-full max-w-full sm:max-w-sm">
             <a href="#" className="inline-block">
               <h2 className="mb-6 text-2xl font-bold text-primary">
-                Artisan Marketplace
+                KarigarSetu
               </h2>
             </a>
             <p className="mb-8 text-base text-muted-foreground">

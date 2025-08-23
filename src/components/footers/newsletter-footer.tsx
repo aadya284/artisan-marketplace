@@ -95,7 +95,7 @@ export const NewsletterFooter = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="flex items-center gap-3">
               <Mail className="h-5 w-5 text-primary" />
-              <span className="text-muted-foreground">info@artisanmarketplace.com</span>
+              <span className="text-muted-foreground">contact@karigarsetu.in</span>
             </div>
             <div className="flex items-center gap-3">
               <Phone className="h-5 w-5 text-primary" />

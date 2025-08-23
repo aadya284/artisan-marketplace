@@ -3,6 +3,7 @@ import { Rajdhani } from "next/font/google";
 import "./globals.css";
 import VisualEditsMessenger from "../visual-edits/VisualEditsMessenger";
 import ErrorReporter from "@/components/ErrorReporter";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Script from "next/script";
 
 const rajdhani = Rajdhani({

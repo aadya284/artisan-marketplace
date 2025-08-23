@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { User, Palette, Mail, Lock, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
 type UserType = "user" | "artisan" | null;
@@ -15,6 +17,8 @@ export default function SignInPage() {
   const [userType, setUserType] = useState<UserType>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { signIn } = useAuth();
+  const router = useRouter();
 
   const handleRoleSelection = (type: UserType) => {
     setUserType(type);
@@ -22,18 +26,49 @@ export default function SignInPage() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual authentication logic
-    console.log("Sign in attempted", { userType, email, password });
+
+    // TODO: Replace with actual authentication API call
+    // For now, create a mock user object
+    const mockUser = {
+      id: "mock-user-id",
+      name: email.split('@')[0],
+      email: email,
+      type: userType!,
+      avatar: undefined
+    };
+
+    signIn(mockUser);
+    router.push("/");
   };
 
   const handleGoogleSignIn = () => {
     // TODO: Implement Google OAuth
-    console.log("Google sign in for", userType);
+    // For now, create a mock user
+    const mockUser = {
+      id: "google-user-id",
+      name: "Google User",
+      email: "user@gmail.com",
+      type: userType!,
+      avatar: undefined
+    };
+
+    signIn(mockUser);
+    router.push("/");
   };
 
   const handleAppleSignIn = () => {
     // TODO: Implement Apple OAuth
-    console.log("Apple sign in for", userType);
+    // For now, create a mock user
+    const mockUser = {
+      id: "apple-user-id",
+      name: "Apple User",
+      email: "user@icloud.com",
+      type: userType!,
+      avatar: undefined
+    };
+
+    signIn(mockUser);
+    router.push("/");
   };
 
   if (!userType) {

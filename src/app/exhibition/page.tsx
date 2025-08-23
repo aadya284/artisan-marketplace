@@ -355,6 +355,7 @@ export default function ExhibitionPage() {
                         className="w-full border-purple-200 text-purple-700 hover:bg-purple-50"
                         style={{ fontFamily: 'Rajdhani, sans-serif' }}
                       >
+                        {/* eslint-disable-next-line jsx-a11y/alt-text */}
                         <Image className="w-4 h-4 mr-2" />
                         View Portfolio
                       </Button>

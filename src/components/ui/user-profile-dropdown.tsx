@@ -31,9 +31,11 @@ interface ProfileDropdownProps {
 
 export const UserProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) => {
   const { signOut } = useAuth();
+  const router = useRouter();
 
   const handleSignOut = () => {
     signOut();
+    router.push("/"); // Redirect to home page after logout
   };
 
   if (user.type === "user") {

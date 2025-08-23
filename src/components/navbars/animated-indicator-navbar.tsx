@@ -20,7 +20,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { UserProfileDropdown } from "@/components/ui/user-profile-dropdown";
 
 const NAV_LOGO = {
-  url: "https://orchids.app",
+  url: "/",
   src: "https://cdn.builder.io/api/v1/image/assets%2Fa3656e61a5694931a58316df40a95cae%2Ff3112465dbef47929828fdde4e76efaa?format=webp&width=800",
   alt: "KarigarSetu logo",
   title: "KarigarSetu",

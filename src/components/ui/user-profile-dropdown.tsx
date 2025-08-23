@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,11 +13,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuth, User } from "@/contexts/AuthContext";
-import { 
-  User as UserIcon, 
-  Package, 
-  Heart, 
-  Settings, 
+import {
+  User as UserIcon,
+  Package,
+  Heart,
+  Settings,
   LogOut,
   Plus,
   BarChart3,

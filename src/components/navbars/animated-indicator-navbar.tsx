@@ -2,6 +2,7 @@
 
 import { Menu, X, ShoppingCart, Store, Palette, Home, Info, Phone } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserProfileDropdown } from "@/components/ui/user-profile-dropdown";
 
 const NAV_LOGO = {
   url: "https://orchids.app",
@@ -32,6 +35,7 @@ const NAV_ITEMS = [
 
 const AnimatedIndicatorNavbar = () => {
   const [activeItem, setActiveItem] = useState(NAV_ITEMS[0].name);
+  const { user, isAuthenticated } = useAuth();
 
   const indicatorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
@@ -105,7 +109,7 @@ const AnimatedIndicatorNavbar = () => {
 
         <div className="hidden items-center gap-3 lg:flex">
           {/* Cart Icon */}
-          <a href="/cart">
+          <Link href="/cart">
             <Button
               variant="ghost"
               size="sm"
@@ -118,21 +122,31 @@ const AnimatedIndicatorNavbar = () => {
                 0
               </span>
             </Button>
-          </a>
+          </Link>
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-10 py-2.5 text-sm font-normal border-border text-foreground hover:bg-muted"
-          >
-            Sign In
-          </Button>
-          <Button
-            size="sm"
-            className="h-10 py-2.5 text-sm font-normal bg-primary text-primary-foreground hover:bg-marketplace-secondary"
-          >
-            Sign Up
-          </Button>
+          {isAuthenticated && user ? (
+            <UserProfileDropdown user={user} />
+          ) : (
+            <>
+              <Link href="/signin">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-10 py-2.5 text-sm font-normal border-border text-foreground hover:bg-muted"
+                >
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button
+                  size="sm"
+                  className="h-10 py-2.5 text-sm font-normal bg-primary text-primary-foreground hover:bg-marketplace-secondary"
+                >
+                  Sign Up
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </nav>
     </section>
@@ -197,7 +211,7 @@ const MobileNav = ({
 
             {/* Mobile Cart */}
             <li className="border-l-[3px] border-transparent px-6 py-4">
-              <a href="/cart">
+              <Link href="/cart">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -210,13 +224,33 @@ const MobileNav = ({
                     0
                   </span>
                 </Button>
-              </a>
+              </Link>
             </li>
 
-            <li className="flex flex-col gap-2 px-7 py-2">
-              <Button variant="outline" className="border-border text-foreground hover:bg-muted">Sign In</Button>
-              <Button className="bg-primary text-primary-foreground hover:bg-marketplace-secondary">Sign Up</Button>
-            </li>
+            {isAuthenticated && user ? (
+              <li className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                  <UserProfileDropdown user={user} />
+                </div>
+              </li>
+            ) : (
+              <li className="flex flex-col gap-2 px-7 py-2">
+                <Link href="/signin">
+                  <Button variant="outline" className="w-full border-border text-foreground hover:bg-muted">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-marketplace-secondary">
+                    Sign Up
+                  </Button>
+                </Link>
+              </li>
+            )}
           </ul>
         </PopoverContent>
       </Popover>

@@ -105,7 +105,7 @@ const AnimatedIndicatorNavbar = () => {
         </NavigationMenu>
 
         {/* Mobile Menu Popover */}
-        <MobileNav activeItem={activeItem} setActiveItem={setActiveItem} />
+        <MobileNav activeItem={activeItem} setActiveItem={setActiveItem} user={user} isAuthenticated={isAuthenticated} />
 
         <div className="hidden items-center gap-3 lg:flex">
           {/* Cart Icon */}
@@ -175,9 +175,13 @@ const AnimatedHamburger = ({ isOpen }: { isOpen: boolean }) => {
 const MobileNav = ({
   activeItem,
   setActiveItem,
+  user,
+  isAuthenticated,
 }: {
   activeItem: string;
   setActiveItem: (item: string) => void;
+  user: any;
+  isAuthenticated: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 

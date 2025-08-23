@@ -3,6 +3,7 @@ import { Rajdhani } from "next/font/google";
 import "./globals.css";
 import VisualEditsMessenger from "../visual-edits/VisualEditsMessenger";
 import ErrorReporter from "@/components/ErrorReporter";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Script from "next/script";
 
 const rajdhani = Rajdhani({
@@ -36,7 +37,9 @@ export default function RootLayout({
           data-debug="true"
           data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
         />
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         <VisualEditsMessenger />
       </body>
     </html>

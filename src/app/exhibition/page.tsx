@@ -355,6 +355,7 @@ export default function ExhibitionPage() {
                         className="w-full border-purple-200 text-purple-700 hover:bg-purple-50"
                         style={{ fontFamily: 'Rajdhani, sans-serif' }}
                       >
+                        {/* eslint-disable-next-line jsx-a11y/alt-text */}
                         <Image className="w-4 h-4 mr-2" />
                         View Portfolio
                       </Button>
@@ -386,18 +387,17 @@ export default function ExhibitionPage() {
               Showcase your work, connect with art lovers, and expand your reach through our exhibition platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-white text-purple-600 hover:bg-gray-100 font-bold px-8 py-3"
+              <Button
+                size="lg"
+                className="bg-white text-purple-700 hover:bg-gray-100 font-bold px-8 py-3 shadow-lg transition-all duration-200 hover:shadow-xl"
                 style={{ fontFamily: 'Rajdhani, sans-serif' }}
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Start Your Exhibition
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="border-white text-white hover:bg-white/10 font-bold px-8 py-3"
+              <Button
+                size="lg"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-700 font-bold px-8 py-3 shadow-lg transition-all duration-200 hover:shadow-xl"
                 style={{ fontFamily: 'Rajdhani, sans-serif' }}
               >
                 Learn More

@@ -616,16 +616,24 @@ export default function ExplorePage() {
                       />
                     </Button>
 
-                    {/* Featured Badge */}
-                    {product.featured && (
-                      <Badge className="absolute top-3 left-3 bg-orange-600 text-white z-10">
-                        Featured
-                      </Badge>
-                    )}
+                    {/* Featured and Local Badges */}
+                    <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
+                      {product.featured && (
+                        <Badge className="bg-orange-600 text-white text-xs">
+                          Featured
+                        </Badge>
+                      )}
+                      {isLocalProduct(product) && (
+                        <Badge className="bg-green-600 text-white text-xs">
+                          <MapPin className="w-3 h-3 mr-1" />
+                          Local
+                        </Badge>
+                      )}
+                    </div>
 
                     {/* Discount Badge */}
                     {product.originalPrice > product.price && (
-                      <Badge className="absolute bottom-3 left-3 bg-green-600 text-white z-10">
+                      <Badge className="absolute bottom-3 left-3 bg-red-600 text-white z-10">
                         {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
                       </Badge>
                     )}

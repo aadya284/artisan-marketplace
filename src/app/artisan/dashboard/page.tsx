@@ -1,9 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
 import { useAuth } from "@/contexts/AuthContext";
-import { BarChart3, DollarSign, Package, TrendingUp } from "lucide-react";
+import { BarChart3, DollarSign, Package, TrendingUp, Wallet, Download, CreditCard } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 export default function ArtisanDashboardPage() {
   const { user } = useAuth();

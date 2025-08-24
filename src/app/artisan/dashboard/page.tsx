@@ -391,9 +391,6 @@ export default function ArtisanDashboardPage() {
               </Card>
             </div>
           </div>
-
-          {/* Message Inbox Section */}
-          <MessageInbox className="mt-8" />
         </div>
       </div>
     </>

@@ -187,7 +187,7 @@ export default function NearbyStoresPage() {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-lg border-0 text-gray-800 placeholder-gray-500 focus:ring-2 focus:ring-orange-300 focus:outline-none"
+                className="flex-1 px-4 py-3 rounded-lg border border-white/30 bg-white/20 text-white placeholder-white/80 focus:ring-2 focus:ring-white/50 focus:outline-none focus:bg-white/30"
               />
               <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50 font-semibold px-8">
                 Notify Me

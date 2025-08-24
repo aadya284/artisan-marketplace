@@ -44,6 +44,44 @@ const artisanEarnings = {
 
 export default function ArtisanDashboardPage() {
   const { user } = useAuth();
+  const [isWithdrawalDialogOpen, setIsWithdrawalDialogOpen] = useState(false);
+  const [withdrawalAmount, setWithdrawalAmount] = useState("");
+
+  const form = useForm<BankDetailsForm>({
+    defaultValues: {
+      accountHolderName: "",
+      accountNumber: "",
+      confirmAccountNumber: "",
+      ifscCode: "",
+      bankName: "",
+      branchName: "",
+      accountType: "savings"
+    }
+  });
+
+  const onSubmit = (data: BankDetailsForm) => {
+    // Validate account numbers match
+    if (data.accountNumber !== data.confirmAccountNumber) {
+      form.setError("confirmAccountNumber", {
+        type: "manual",
+        message: "Account numbers do not match"
+      });
+      return;
+    }
+
+    // Here you would normally send the data to your backend
+    console.log("Withdrawal request:", {
+      ...data,
+      amount: parseFloat(withdrawalAmount),
+      timestamp: new Date().toISOString()
+    });
+
+    // Show success message and close dialog
+    alert(`Withdrawal request of ₹${withdrawalAmount} submitted successfully! You will receive the amount in 3-5 business days.`);
+    setIsWithdrawalDialogOpen(false);
+    form.reset();
+    setWithdrawalAmount("");
+  };
 
   return (
     <>

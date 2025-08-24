@@ -24,7 +24,7 @@ export function VideoShowcase() {
       <div className="absolute bottom-4 right-4 z-10">
         <div className="bg-white rounded-md p-2 shadow-lg border border-gray-200">
           <img
-            src="https://cdn.builder.io/api/v1/image/assets%2Fe6923a1dec8343f19daee52fdef52583%2Fd78fcc1bf13049f8b0a157abe33b9124?format=webp&width=800"
+            src="https://cdn.builder.io/api/v1/image/assets%2Ff1ce823622ae4b55a2cc7cc1ca8532c5%2Fc74c889d4e194d3cada3e8638aee3374?format=webp&width=800"
             alt="KarigarSetu"
             className="h-8 w-auto object-contain"
           />

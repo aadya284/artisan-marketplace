@@ -22,7 +22,7 @@ import { UserProfileDropdown } from "@/components/ui/user-profile-dropdown";
 
 const NAV_LOGO = {
   url: "/",
-  src: "https://cdn.builder.io/api/v1/image/assets%2Fe6923a1dec8343f19daee52fdef52583%2Fd78fcc1bf13049f8b0a157abe33b9124?format=webp&width=800",
+  src: "https://cdn.builder.io/api/v1/image/assets%2Fa3656e61a5694931a58316df40a95cae%2Ff3112465dbef47929828fdde4e76efaa?format=webp&width=800",
   alt: "KarigarSetu logo",
   title: "KarigarSetu",
 };

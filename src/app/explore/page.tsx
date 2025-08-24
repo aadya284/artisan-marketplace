@@ -546,6 +546,12 @@ export default function ExplorePage() {
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                 {filteredProducts.length} Products Found
+                {locationEnabled && detectedState && selectedState === detectedState && (
+                  <Badge className="ml-3 bg-green-100 text-green-800">
+                    <MapPin className="w-3 h-3 mr-1" />
+                    Local Artworks
+                  </Badge>
+                )}
               </h2>
             </div>
 

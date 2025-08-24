@@ -236,36 +236,49 @@ export default function ExplorePage() {
                   }`}
                 >
                   <div className={`relative ${viewMode === "list" ? "w-64 flex-shrink-0" : ""}`}>
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className={`object-cover ${viewMode === "list" ? "w-full h-48" : "w-full h-64"}`}
-                    />
-                    
+                    <Link href={`/artwork/${product.id}`} className="block">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className={`object-cover transition-transform duration-300 group-hover:scale-105 ${viewMode === "list" ? "w-full h-48" : "w-full h-64"}`}
+                      />
+
+                      {/* View Details Overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <Button className="bg-white text-gray-800 hover:bg-gray-100">
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </Button>
+                      </div>
+                    </Link>
+
                     {/* Favorite Button */}
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full"
-                      onClick={() => toggleFavorite(product.id)}
+                      className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full z-10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(product.id);
+                      }}
                     >
-                      <Heart 
+                      <Heart
                         className={`w-4 h-4 ${
                           favorites.has(product.id) ? "fill-red-500 text-red-500" : "text-gray-600"
-                        }`} 
+                        }`}
                       />
                     </Button>
 
                     {/* Featured Badge */}
                     {product.featured && (
-                      <Badge className="absolute top-3 left-3 bg-orange-600 text-white">
+                      <Badge className="absolute top-3 left-3 bg-orange-600 text-white z-10">
                         Featured
                       </Badge>
                     )}
 
                     {/* Discount Badge */}
                     {product.originalPrice > product.price && (
-                      <Badge className="absolute bottom-3 left-3 bg-green-600 text-white">
+                      <Badge className="absolute bottom-3 left-3 bg-green-600 text-white z-10">
                         {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
                       </Badge>
                     )}

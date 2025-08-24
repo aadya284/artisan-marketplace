@@ -171,7 +171,40 @@ const products = [
 ];
 
 const categories = ["All", "Paintings", "Textiles", "Ceramics", "Sculptures", "Jewelry", "Woodwork"];
-const states = ["All States", "Bihar", "Rajasthan", "Uttar Pradesh", "West Bengal", "Odisha", "Kerala"];
+const states = ["All States", "Bihar", "Rajasthan", "Uttar Pradesh", "West Bengal", "Odisha", "Kerala", "Tamil Nadu", "Maharashtra", "Punjab", "Gujarat", "Chhattisgarh"];
+
+// State coordinate mapping for location detection
+const stateCoordinates = {
+  "Maharashtra": { lat: 19.7515, lng: 75.7139 },
+  "Karnataka": { lat: 15.3173, lng: 75.7139 },
+  "Tamil Nadu": { lat: 11.1271, lng: 78.6569 },
+  "Kerala": { lat: 10.8505, lng: 76.2711 },
+  "Andhra Pradesh": { lat: 15.9129, lng: 79.7400 },
+  "Telangana": { lat: 18.1124, lng: 79.0193 },
+  "Gujarat": { lat: 23.0225, lng: 72.5714 },
+  "Rajasthan": { lat: 27.0238, lng: 74.2179 },
+  "Madhya Pradesh": { lat: 22.9734, lng: 78.6569 },
+  "Uttar Pradesh": { lat: 26.8467, lng: 80.9462 },
+  "Bihar": { lat: 25.0961, lng: 85.3131 },
+  "West Bengal": { lat: 22.9868, lng: 87.8550 },
+  "Odisha": { lat: 20.9517, lng: 85.0985 },
+  "Jharkhand": { lat: 23.6102, lng: 85.2799 },
+  "Chhattisgarh": { lat: 21.2787, lng: 81.8661 },
+  "Punjab": { lat: 31.1471, lng: 75.3412 },
+  "Haryana": { lat: 29.0588, lng: 76.0856 },
+  "Himachal Pradesh": { lat: 31.1048, lng: 77.1734 },
+  "Uttarakhand": { lat: 30.0668, lng: 79.0193 },
+  "Assam": { lat: 26.2006, lng: 92.9376 },
+  "Tripura": { lat: 23.9408, lng: 91.9882 },
+  "Meghalaya": { lat: 25.4670, lng: 91.3662 },
+  "Manipur": { lat: 24.6637, lng: 93.9063 },
+  "Mizoram": { lat: 23.1645, lng: 92.9376 },
+  "Nagaland": { lat: 26.1584, lng: 94.5624 },
+  "Arunachal Pradesh": { lat: 28.2180, lng: 94.7278 },
+  "Sikkim": { lat: 27.5330, lng: 88.5122 },
+  "Goa": { lat: 15.2993, lng: 74.1240 },
+  "Delhi": { lat: 28.7041, lng: 77.1025 }
+};
 
 export default function ExplorePage() {
   const [selectedCategory, setSelectedCategory] = useState("All");

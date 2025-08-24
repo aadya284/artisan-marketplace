@@ -110,8 +110,7 @@ const AnimatedIndicatorNavbar = () => {
                 <NavigationMenuItem>
                   <NavigationMenuLink
                     data-nav-item={item.name}
-                    href={item.link}
-                    onClick={() => setActiveItem(item.name)}
+                    onClick={() => handleNavClick(item)}
                     className={`relative cursor-pointer text-sm font-medium hover:bg-transparent transition-colors flex items-center gap-2 ${activeItem === item.name
                         ? "text-primary"
                         : "text-muted-foreground hover:text-foreground"

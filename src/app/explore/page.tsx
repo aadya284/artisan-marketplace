@@ -6,8 +6,9 @@ import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, ShoppingCart, Filter, Search, Grid, List, Heart } from "lucide-react";
+import { Star, ShoppingCart, Filter, Search, Grid, List, Heart, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 // Sample products data
 const products = [

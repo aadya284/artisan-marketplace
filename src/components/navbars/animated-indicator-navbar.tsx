@@ -37,6 +37,7 @@ const NAV_ITEMS = [
 const AnimatedIndicatorNavbar = () => {
   const [activeItem, setActiveItem] = useState(NAV_ITEMS[0].name);
   const { user, isAuthenticated } = useAuth();
+  const { cartCount } = useCart();
 
   const indicatorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);

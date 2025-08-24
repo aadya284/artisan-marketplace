@@ -316,14 +316,26 @@ export default function ExplorePage() {
                       )}
                     </div>
 
-                    {/* Add to Cart Button */}
-                    <Button 
-                      className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold"
-                      style={{ fontFamily: 'Rajdhani, sans-serif' }}
-                    >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Add to Cart
-                    </Button>
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <Button
+                        className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold"
+                        style={{ fontFamily: 'Rajdhani, sans-serif' }}
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-1" />
+                        Add to Cart
+                      </Button>
+                      <Link href={`/artwork/${product.id}`} className="flex-1">
+                        <Button
+                          variant="outline"
+                          className="w-full border-orange-300 text-orange-700 hover:bg-orange-50 font-semibold"
+                          style={{ fontFamily: 'Rajdhani, sans-serif' }}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}

@@ -553,11 +553,20 @@ export default function ExplorePage() {
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                 {filteredProducts.length} Products Found
-                {locationEnabled && detectedState && selectedState === detectedState && (
-                  <Badge className="ml-3 bg-green-100 text-green-800">
-                    <MapPin className="w-3 h-3 mr-1" />
-                    Local Artworks
-                  </Badge>
+                {locationEnabled && detectedState && (
+                  <div className="flex gap-2 ml-3">
+                    {selectedState === detectedState ? (
+                      <Badge className="bg-green-100 text-green-800">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        Showing Local Artworks Only
+                      </Badge>
+                    ) : selectedState === "All States" ? (
+                      <Badge className="bg-blue-100 text-blue-800">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        {localProducts.length} Local + {filteredProducts.length - localProducts.length} Other States
+                      </Badge>
+                    ) : null}
+                  </div>
                 )}
               </h2>
             </div>

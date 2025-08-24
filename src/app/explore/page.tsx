@@ -289,9 +289,11 @@ export default function ExplorePage() {
                       <Badge variant="outline" className="text-xs text-orange-700 border-orange-200 mb-2">
                         {product.state}
                       </Badge>
-                      <h3 className="font-bold text-lg text-gray-800 mb-1" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
-                        {product.name}
-                      </h3>
+                      <Link href={`/artwork/${product.id}`}>
+                        <h3 className="font-bold text-lg text-gray-800 mb-1 hover:text-orange-600 cursor-pointer transition-colors" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                          {product.name}
+                        </h3>
+                      </Link>
                       <p className="text-sm text-gray-600" style={{ fontFamily: 'Poppins, sans-serif' }}>
                         by {product.artist}
                       </p>

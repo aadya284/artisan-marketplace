@@ -108,21 +108,23 @@ const AnimatedIndicatorNavbar = () => {
         <MobileNav activeItem={activeItem} setActiveItem={setActiveItem} user={user} isAuthenticated={isAuthenticated} />
 
         <div className="hidden items-center gap-3 lg:flex">
-          {/* Cart Icon */}
-          <Link href="/cart">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="relative h-10 w-10 p-0 hover:bg-muted"
-              aria-label="Shopping Cart"
-            >
-              <ShoppingCart className="h-5 w-5 text-muted-foreground hover:text-foreground" />
-              {/* Cart counter badge */}
-              <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
-                0
-              </span>
-            </Button>
-          </Link>
+          {/* Cart Icon - Only show for users, not artisans */}
+          {(!isAuthenticated || (user && user.type === "user")) && (
+            <Link href="/cart">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="relative h-10 w-10 p-0 hover:bg-muted"
+                aria-label="Shopping Cart"
+              >
+                <ShoppingCart className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+                {/* Cart counter badge */}
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                  0
+                </span>
+              </Button>
+            </Link>
+          )}
 
           {isAuthenticated && user ? (
             <UserProfileDropdown user={user} />

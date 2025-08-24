@@ -295,7 +295,10 @@ export default function ExplorePage() {
     setLocationEnabled(false);
     setDetectedState("");
     setLocationError("");
-    setSelectedState("All States");
+    // Only reset state filter if it was set to the detected state
+    if (selectedState === detectedState) {
+      setSelectedState("All States");
+    }
   };
 
   const toggleFavorite = (productId: number) => {

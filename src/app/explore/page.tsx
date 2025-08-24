@@ -213,6 +213,12 @@ export default function ExplorePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState(new Set());
 
+  // Location detection states
+  const [locationEnabled, setLocationEnabled] = useState(false);
+  const [detectedState, setDetectedState] = useState("");
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationError, setLocationError] = useState("");
+
   const toggleFavorite = (productId: number) => {
     const newFavorites = new Set(favorites);
     if (newFavorites.has(productId)) {

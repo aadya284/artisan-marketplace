@@ -17,6 +17,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { UserProfileDropdown } from "@/components/ui/user-profile-dropdown";
 
 const NAV_LOGO = {

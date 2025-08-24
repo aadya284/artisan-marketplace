@@ -216,6 +216,24 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
     }
   };
 
+  const handleContactArtisan = () => {
+    if (!contactMessage.trim()) return;
+
+    // Here you would send the message to your backend
+    console.log("Sending message to artisan:", {
+      artworkId: artwork.id,
+      artworkName: artwork.name,
+      artistName: artwork.artist.name,
+      message: contactMessage,
+      timestamp: new Date().toISOString()
+    });
+
+    // Show success message
+    alert("Your message has been sent to the artisan! They will respond soon.");
+    setIsContactDialogOpen(false);
+    setContactMessage("");
+  };
+
   return (
     <>
       <AnimatedIndicatorNavbar />

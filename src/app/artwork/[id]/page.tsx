@@ -188,6 +188,8 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+  const [contactMessage, setContactMessage] = useState("");
 
   const artwork = artworksData[parseInt(params.id) as keyof typeof artworksData];
   const reviews = reviewsData[parseInt(params.id) as keyof typeof reviewsData] || [];

@@ -317,6 +317,11 @@ export default function ExplorePage() {
     return matchesCategory && matchesState && matchesSearch;
   });
 
+  // Get local products from detected state
+  const localProducts = locationEnabled && detectedState
+    ? products.filter(product => product.state === detectedState)
+    : [];
+
   return (
     <>
       <AnimatedIndicatorNavbar />

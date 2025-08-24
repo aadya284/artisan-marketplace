@@ -190,6 +190,7 @@ const MobileNav = ({
   isAuthenticated: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { cartCount } = useCart();
 
   return (
     <div className="block lg:hidden">

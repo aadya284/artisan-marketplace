@@ -319,10 +319,15 @@ export default function ExplorePage() {
     return matchesCategory && matchesState && matchesSearch;
   });
 
-  // Get local products from detected state
+  // Get local products from detected state (for the special local section)
   const localProducts = locationEnabled && detectedState
     ? products.filter(product => product.state === detectedState)
     : [];
+
+  // Helper function to check if a product is local
+  const isLocalProduct = (product: any) => {
+    return locationEnabled && detectedState && product.state === detectedState;
+  };
 
   return (
     <>

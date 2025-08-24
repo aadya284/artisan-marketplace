@@ -140,12 +140,6 @@ export const UserProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) =>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/artisan/orders" className="flex items-center">
-            <Package className="mr-2 h-4 w-4" />
-            <span>Orders</span>
-          </Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
           <Link href="/settings" className="flex items-center">
             <Settings className="mr-2 h-4 w-4" />
             <span>Settings</span>

@@ -267,8 +267,7 @@ export default function ExplorePage() {
         setLocationEnabled(true);
         setIsDetectingLocation(false);
 
-        // Auto-select the detected state
-        setSelectedState(state);
+        // Don't auto-select the detected state - keep showing all products
       },
       (error) => {
         setIsDetectingLocation(false);

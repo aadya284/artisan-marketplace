@@ -81,7 +81,7 @@ const SocialTeamProfiles = () => {
   const currentArtisan = artisans[currentSlide];
 
   return (
-    <section className="py-32 mt-2 bg-background border-t border-amber-200/50">
+    <section className="py-16 mt-2 bg-background border-t border-amber-200/50">
       <div className="container mx-auto">
         <div className="flex flex-col gap-6 py-4 lg:py-8 text-center">
           <Badge

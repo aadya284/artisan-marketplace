@@ -232,17 +232,19 @@ const MobileNav = ({
           <ul className="bg-background text-foreground w-full py-4">
             {NAV_ITEMS.map((navItem, idx) => (
               <li key={idx}>
-                <a
-                  href={navItem.link}
-                  onClick={() => setActiveItem(navItem.name)}
-                  className={`flex items-center gap-3 border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${activeItem === navItem.name
+                <button
+                  onClick={() => {
+                    handleNavClick(navItem);
+                    setIsOpen(false); // Close mobile menu
+                  }}
+                  className={`w-full text-left flex items-center gap-3 border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${activeItem === navItem.name
                       ? "border-primary text-primary"
                       : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                 >
                   {navItem.icon && navItem.icon}
                   {navItem.name}
-                </a>
+                </button>
               </li>
             ))}
 

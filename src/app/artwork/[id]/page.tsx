@@ -393,9 +393,10 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
               {/* Action Buttons */}
               <div className="space-y-3">
                 <div className="flex gap-3">
-                  <Button 
+                  <Button
                     className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3"
                     disabled={!artwork.inStock}
+                    onClick={handleBuyNow}
                   >
                     Buy Now
                   </Button>
@@ -403,9 +404,10 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                     variant="outline"
                     className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50 font-semibold py-3"
                     disabled={!artwork.inStock}
+                    onClick={handleAddToCart}
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    Add to Cart
+                    {isInCart(artwork.id) ? 'Added to Cart' : 'Add to Cart'}
                   </Button>
                 </div>
                 

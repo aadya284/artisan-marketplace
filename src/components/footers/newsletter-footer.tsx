@@ -42,7 +42,7 @@ export const NewsletterFooter = () => {
           <div className="w-full max-w-full sm:max-w-sm">
             <a href="#" className="inline-block">
               <h2 className="mb-6 text-2xl font-bold text-primary">
-                Artisan Marketplace
+                KarigarSetu
               </h2>
             </a>
             <p className="mb-8 text-base text-muted-foreground">
@@ -95,15 +95,15 @@ export const NewsletterFooter = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="flex items-center gap-3">
               <Mail className="h-5 w-5 text-primary" />
-              <span className="text-muted-foreground">info@artisanmarketplace.com</span>
+              <span className="text-muted-foreground">contact@karigarsetu.in</span>
             </div>
             <div className="flex items-center gap-3">
               <Phone className="h-5 w-5 text-primary" />
-              <span className="text-muted-foreground">+1 (555) 123-4567</span>
+              <span className="text-muted-foreground">+91 98765 43210</span>
             </div>
             <div className="flex items-center gap-3">
               <MapPin className="h-5 w-5 text-primary" />
-              <span className="text-muted-foreground">New York, NY</span>
+              <span className="text-muted-foreground">India, IND</span>
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@ export const NewsletterFooter = () => {
 
           {/* Copyright - Below on mobile, left on desktop */}
           <p className="order-2 text-center text-sm text-muted-foreground sm:text-left md:order-1">
-            © {new Date().getFullYear()} Artisan Marketplace. All rights reserved.
+            © {new Date().getFullYear()} KarigarSetu. All rights reserved.
           </p>
         </div>
       </div>

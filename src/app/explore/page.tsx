@@ -219,6 +219,86 @@ export default function ExplorePage() {
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [locationError, setLocationError] = useState("");
 
+  // Calculate distance between two coordinates using Haversine formula
+  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  };
+
+  // Detect state from coordinates
+  const detectStateFromCoordinates = (latitude: number, longitude: number) => {
+    let closestState = "";
+    let minDistance = Infinity;
+
+    Object.entries(stateCoordinates).forEach(([state, coords]) => {
+      const distance = calculateDistance(latitude, longitude, coords.lat, coords.lng);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestState = state;
+      }
+    });
+
+    return closestState;
+  };
+
+  // Enable location detection
+  const enableLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by this browser");
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    setLocationError("");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const state = detectStateFromCoordinates(latitude, longitude);
+
+        setDetectedState(state);
+        setLocationEnabled(true);
+        setIsDetectingLocation(false);
+
+        // Auto-select the detected state
+        setSelectedState(state);
+      },
+      (error) => {
+        setIsDetectingLocation(false);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            setLocationError("Location access denied. Please enable location permissions.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            setLocationError("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            setLocationError("Location request timed out.");
+            break;
+          default:
+            setLocationError("An unknown error occurred.");
+            break;
+        }
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
+  };
+
+  // Disable location detection
+  const disableLocation = () => {
+    setLocationEnabled(false);
+    setDetectedState("");
+    setLocationError("");
+    setSelectedState("All States");
+  };
+
   const toggleFavorite = (productId: number) => {
     const newFavorites = new Set(favorites);
     if (newFavorites.has(productId)) {

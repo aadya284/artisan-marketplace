@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
+import { useCart } from "@/contexts/CartContext";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Button } from "@/components/ui/button";

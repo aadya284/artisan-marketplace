@@ -196,6 +196,9 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [contactMessage, setContactMessage] = useState("");
 
+  const { addToCart, isInCart } = useCart();
+  const router = useRouter();
+
   const artwork = artworksData[parseInt(params.id) as keyof typeof artworksData];
   const reviews = reviewsData[parseInt(params.id) as keyof typeof reviewsData] || [];
 

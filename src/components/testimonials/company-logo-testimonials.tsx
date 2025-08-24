@@ -105,7 +105,7 @@ const testimonials = [
 
 const CompanyLogoTestimonials = () => {
   return (
-    <section className="py-32 bg-background">
+    <section className="pt-16 pb-32 bg-background">
       <div className="border-y border-border">
         <div className="container mx-auto flex flex-col gap-6 border-x border-border py-4 max-lg:border-x lg:py-8">
           <h2 className="font-display text-3xl leading-tight tracking-tight text-marketplace-text-primary md:text-4xl lg:text-6xl">

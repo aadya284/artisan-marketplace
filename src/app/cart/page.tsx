@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
+import { useCart } from "@/contexts/CartContext";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Button } from "@/components/ui/button";
@@ -24,48 +25,8 @@ import {
   Percent
 } from "lucide-react";
 
-// Sample cart items
-const initialCartItems = [
-  {
-    id: 1,
-    name: "Hand-Painted Madhubani Art",
-    artist: "Sita Devi",
-    state: "Bihar",
-    price: 4500,
-    originalPrice: 6000,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    rating: 4.8,
-    inStock: true
-  },
-  {
-    id: 2,
-    name: "Blue Pottery Decorative Bowl",
-    artist: "Kripal Singh",
-    state: "Rajasthan",
-    price: 2200,
-    originalPrice: 2800,
-    quantity: 2,
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    rating: 4.6,
-    inStock: true
-  },
-  {
-    id: 3,
-    name: "Banarasi Silk Saree",
-    artist: "Ravi Shankar",
-    state: "Uttar Pradesh",
-    price: 25000,
-    originalPrice: 30000,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    rating: 4.9,
-    inStock: true
-  }
-];
-
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const { cartItems, updateQuantity, removeFromCart, cartCount } = useCart();
   const [currentStep, setCurrentStep] = useState(1); // 1: Cart, 2: Checkout, 3: Payment
   const [deliveryAddress, setDeliveryAddress] = useState({
     fullName: "",
@@ -80,19 +41,6 @@ export default function CartPage() {
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
 
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      removeItem(id);
-      return;
-    }
-    setCartItems(cartItems.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
-  };
-
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const savings = cartItems.reduce((sum, item) => sum + ((item.originalPrice - item.price) * item.quantity), 0);
@@ -178,7 +126,7 @@ export default function CartPage() {
               {currentStep === 1 && (
                 <div className="bg-white rounded-xl shadow-lg p-6">
                   <h2 className="text-2xl font-bold mb-6 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
-                    Shopping Cart ({cartItems.length} items)
+                    Shopping Cart ({cartCount} items)
                   </h2>
                   
                   <div className="space-y-6">
@@ -205,7 +153,7 @@ export default function CartPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => removeItem(item.id)}
+                              onClick={() => removeFromCart(item.id)}
                               className="text-red-500 hover:text-red-700 hover:bg-red-50"
                             >
                               <Trash2 className="w-4 h-4" />

@@ -1,8 +1,9 @@
 "use client";
 
-import { Menu, X, ShoppingCart, Store, Palette, Home, Info, Phone } from "lucide-react";
+import { Menu, X, ShoppingCart, Store, Palette, Home, Info, Phone, MapPin } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import { UserProfileDropdown } from "@/components/ui/user-profile-dropdown";
 
 const NAV_LOGO = {
@@ -29,13 +31,23 @@ const NAV_ITEMS = [
   { name: "Home", link: "/", icon: <Home className="w-4 h-4" /> },
   { name: "Explore", link: "/explore", icon: <Store className="w-4 h-4" /> },
   { name: "Exhibition", link: "/exhibition", icon: <Palette className="w-4 h-4" /> },
-  { name: "About", link: "/about", icon: <Info className="w-4 h-4" /> },
-  { name: "Contact", link: "/contact", icon: <Phone className="w-4 h-4" /> },
+  { name: "Nearby Stores", link: "/nearby-stores", icon: <MapPin className="w-4 h-4" /> },
+  { name: "About", link: "#about", icon: <Info className="w-4 h-4" /> },
+  { name: "Contact", link: "#contact", icon: <Phone className="w-4 h-4" /> },
 ];
+
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 
 const AnimatedIndicatorNavbar = () => {
   const [activeItem, setActiveItem] = useState(NAV_ITEMS[0].name);
   const { user, isAuthenticated } = useAuth();
+  const { cartCount } = useCart();
+  const pathname = usePathname();
 
   const indicatorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
@@ -60,16 +72,39 @@ const AnimatedIndicatorNavbar = () => {
     return () => window.removeEventListener("resize", updateIndicator);
   }, [activeItem]);
 
+  const handleNavigation = (item: typeof NAV_ITEMS[0]) => {
+    setActiveItem(item.name);
+    
+    // Handle special scroll cases on home page
+    if (pathname === '/') {
+      if (item.name === 'About') {
+        scrollToSection('about-section');
+        return;
+      } else if (item.name === 'Contact') {
+        scrollToSection('contact-section');
+        return;
+      }
+    }
+    
+    // For regular navigation
+    if (item.link.startsWith('#')) {
+      const sectionId = item.link.replace('#', '') + '-section';
+      scrollToSection(sectionId);
+    } else {
+      window.location.href = item.link;
+    }
+  };
+
   return (
     <section className="py-4 bg-background border-b border-border">
       <nav className="container mx-auto flex items-center justify-between">
         {/* Left WordMark */}
-        <a href={NAV_LOGO.url} className="flex items-center gap-4">
+        <Link href={NAV_LOGO.url} className="flex items-center gap-4">
           <img src={NAV_LOGO.src} className="max-h-20 w-20 md:max-h-24 md:w-24" alt={NAV_LOGO.alt} />
           <span className="text-xl font-bold tracking-tighter text-amber-800 font-display">
             {NAV_LOGO.title}
           </span>
-        </a>
+        </Link>
 
         <NavigationMenu className="hidden lg:block">
           <NavigationMenuList
@@ -79,18 +114,17 @@ const AnimatedIndicatorNavbar = () => {
             {NAV_ITEMS.map((item) => (
               <React.Fragment key={item.name}>
                 <NavigationMenuItem>
-                  <NavigationMenuLink
+                  <button
                     data-nav-item={item.name}
-                    href={item.link}
-                    onClick={() => setActiveItem(item.name)}
-                    className={`relative cursor-pointer text-sm font-medium hover:bg-transparent transition-colors flex items-center gap-2 ${activeItem === item.name
+                    onClick={() => handleNavigation(item)}
+                    className={`relative cursor-pointer text-sm font-medium hover:bg-transparent transition-colors flex items-center gap-2 bg-transparent border-none ${activeItem === item.name
                         ? "text-primary"
                         : "text-muted-foreground hover:text-foreground"
                       }`}
                   >
                     {item.icon && item.icon}
                     {item.name}
-                  </NavigationMenuLink>
+                  </button>
                 </NavigationMenuItem>
               </React.Fragment>
             ))}
@@ -105,7 +139,13 @@ const AnimatedIndicatorNavbar = () => {
         </NavigationMenu>
 
         {/* Mobile Menu Popover */}
-        <MobileNav activeItem={activeItem} setActiveItem={setActiveItem} user={user} isAuthenticated={isAuthenticated} />
+        <MobileNav 
+          activeItem={activeItem} 
+          setActiveItem={setActiveItem} 
+          user={user} 
+          isAuthenticated={isAuthenticated}
+          onNavigation={handleNavigation}
+        />
 
         <div className="hidden items-center gap-3 lg:flex">
           {/* Cart Icon - Only show for users, not artisans */}
@@ -119,9 +159,11 @@ const AnimatedIndicatorNavbar = () => {
               >
                 <ShoppingCart className="h-5 w-5 text-muted-foreground hover:text-foreground" />
                 {/* Cart counter badge */}
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
-                  0
-                </span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
               </Button>
             </Link>
           )}
@@ -179,13 +221,16 @@ const MobileNav = ({
   setActiveItem,
   user,
   isAuthenticated,
+  onNavigation,
 }: {
   activeItem: string;
   setActiveItem: (item: string) => void;
   user: any;
   isAuthenticated: boolean;
+  onNavigation: (item: typeof NAV_ITEMS[0]) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { cartCount } = useCart();
 
   return (
     <div className="block lg:hidden">
@@ -201,17 +246,19 @@ const MobileNav = ({
           <ul className="bg-background text-foreground w-full py-4">
             {NAV_ITEMS.map((navItem, idx) => (
               <li key={idx}>
-                <a
-                  href={navItem.link}
-                  onClick={() => setActiveItem(navItem.name)}
-                  className={`flex items-center gap-3 border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${activeItem === navItem.name
+                <button
+                  onClick={() => {
+                    onNavigation(navItem);
+                    setIsOpen(false); // Close mobile menu
+                  }}
+                  className={`w-full text-left flex items-center gap-3 border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 bg-transparent border-none ${activeItem === navItem.name
                       ? "border-primary text-primary"
                       : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}
                 >
                   {navItem.icon && navItem.icon}
                   {navItem.name}
-                </a>
+                </button>
               </li>
             ))}
 
@@ -227,9 +274,11 @@ const MobileNav = ({
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Cart
-                    <span className="absolute right-3 top-2 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
-                      0
-                    </span>
+                    {cartCount > 0 && (
+                      <span className="absolute right-3 top-2 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                        {cartCount > 99 ? '99+' : cartCount}
+                      </span>
+                    )}
                   </Button>
                 </Link>
               </li>

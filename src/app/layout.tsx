@@ -4,6 +4,8 @@ import "./globals.css";
 import VisualEditsMessenger from "../visual-edits/VisualEditsMessenger";
 import ErrorReporter from "@/components/ErrorReporter";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CartProvider } from "@/contexts/CartContext";
+import { Toaster } from "sonner";
 import Script from "next/script";
 
 const rajdhani = Rajdhani({
@@ -38,7 +40,10 @@ export default function RootLayout({
           data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
         />
         <AuthProvider>
-          {children}
+          <CartProvider>
+            {children}
+            <Toaster position="top-right" richColors closeButton />
+          </CartProvider>
         </AuthProvider>
         <VisualEditsMessenger />
       </body>

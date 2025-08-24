@@ -81,7 +81,7 @@ const SocialTeamProfiles = () => {
   const currentArtisan = artisans[currentSlide];
 
   return (
-    <section className="py-32 mt-2 bg-background border-t border-amber-200/50">
+    <section className="py-16 mt-2 bg-background border-t border-amber-200/50">
       <div className="container mx-auto">
         <div className="flex flex-col gap-6 py-4 lg:py-8 text-center">
           <Badge
@@ -182,35 +182,6 @@ const SocialTeamProfiles = () => {
             ))}
           </div>
 
-          {/* Artisan Navigation Thumbnails */}
-          <div className="mt-8 grid grid-cols-5 gap-4 max-w-2xl mx-auto">
-            {artisans.map((artisan, index) => (
-              <button
-                key={artisan.name}
-                className={`relative group rounded-lg overflow-hidden transition-all duration-300 ${
-                  index === currentSlide
-                    ? "ring-2 ring-primary scale-105"
-                    : "hover:scale-105 hover:ring-1 hover:ring-primary/50"
-                }`}
-                onClick={() => goToSlide(index)}
-              >
-                <div className="aspect-square">
-                  <div
-                    className="w-full h-full bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(${artisan.backgroundImage})`,
-                    }}
-                  />
-                  <div className="absolute bg-black/40 group-hover:bg-black/20 transition-colors" style={{ left: '2834px', top: '1491px', bottom: '0px', right: '0px', width: '122px' }} />
-                  <div className="absolute bottom-1 left-1 right-1 text-center">
-                    <p className="text-white text-xs font-medium truncate">
-                      {artisan.name}
-                    </p>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </section>

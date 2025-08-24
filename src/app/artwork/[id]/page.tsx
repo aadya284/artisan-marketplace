@@ -28,7 +28,8 @@ import {
   MessageCircle
 } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
+import { useCart } from "@/contexts/CartContext";
 
 // Sample artwork data - in a real app, this would come from an API
 const artworksData = {
@@ -195,6 +196,9 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [contactMessage, setContactMessage] = useState("");
 
+  const { addToCart, isInCart } = useCart();
+  const router = useRouter();
+
   const artwork = artworksData[parseInt(params.id) as keyof typeof artworksData];
   const reviews = reviewsData[parseInt(params.id) as keyof typeof reviewsData] || [];
 
@@ -232,6 +236,35 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
     alert("Your message has been sent to the artisan! They will respond soon.");
     setIsContactDialogOpen(false);
     setContactMessage("");
+  };
+
+  const handleAddToCart = () => {
+    if (!artwork.inStock) return;
+
+    const cartItem = {
+      id: artwork.id,
+      name: artwork.name,
+      artist: artwork.artist.name,
+      state: artwork.state,
+      price: artwork.price,
+      originalPrice: artwork.originalPrice,
+      image: artwork.images[0],
+      rating: artwork.rating,
+      inStock: artwork.inStock,
+      stockCount: artwork.stockCount,
+    };
+
+    addToCart(cartItem, quantity);
+  };
+
+  const handleBuyNow = () => {
+    if (!artwork.inStock) return;
+
+    // Add to cart first
+    handleAddToCart();
+
+    // Redirect to cart page
+    router.push('/cart');
   };
 
   return (
@@ -360,9 +393,10 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
               {/* Action Buttons */}
               <div className="space-y-3">
                 <div className="flex gap-3">
-                  <Button 
+                  <Button
                     className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3"
                     disabled={!artwork.inStock}
+                    onClick={handleBuyNow}
                   >
                     Buy Now
                   </Button>
@@ -370,9 +404,10 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                     variant="outline"
                     className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50 font-semibold py-3"
                     disabled={!artwork.inStock}
+                    onClick={handleAddToCart}
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    Add to Cart
+                    {isInCart(artwork.id) ? 'Added to Cart' : 'Add to Cart'}
                   </Button>
                 </div>
                 

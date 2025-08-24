@@ -32,39 +32,22 @@ const NAV_ITEMS = [
   { name: "Explore", link: "/explore", icon: <Store className="w-4 h-4" /> },
   { name: "Exhibition", link: "/exhibition", icon: <Palette className="w-4 h-4" /> },
   { name: "Nearby Stores", link: "/nearby-stores", icon: <MapPin className="w-4 h-4" /> },
-  { name: "About", link: "/about", icon: <Info className="w-4 h-4" /> },
-  { name: "Contact", link: "/contact", icon: <Phone className="w-4 h-4" /> },
+  { name: "About", link: "#about", icon: <Info className="w-4 h-4" /> },
+  { name: "Contact", link: "#contact", icon: <Phone className="w-4 h-4" /> },
 ];
+
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 
 const AnimatedIndicatorNavbar = () => {
   const [activeItem, setActiveItem] = useState(NAV_ITEMS[0].name);
   const { user, isAuthenticated } = useAuth();
   const { cartCount } = useCart();
   const pathname = usePathname();
-
-  const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
-    setActiveItem(item.name);
-
-    // Only scroll on home page for About and Contact
-    if (pathname === '/') {
-      if (item.name === 'About') {
-        const aboutSection = document.getElementById('about-section');
-        if (aboutSection) {
-          aboutSection.scrollIntoView({ behavior: 'smooth' });
-          return;
-        }
-      } else if (item.name === 'Contact') {
-        const contactSection = document.getElementById('contact-section');
-        if (contactSection) {
-          contactSection.scrollIntoView({ behavior: 'smooth' });
-          return;
-        }
-      }
-    }
-
-    // For other items or when not on home page, navigate normally
-    window.location.href = item.link;
-  };
 
   const indicatorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
@@ -89,16 +72,39 @@ const AnimatedIndicatorNavbar = () => {
     return () => window.removeEventListener("resize", updateIndicator);
   }, [activeItem]);
 
+  const handleNavigation = (item: typeof NAV_ITEMS[0]) => {
+    setActiveItem(item.name);
+    
+    // Handle special scroll cases on home page
+    if (pathname === '/') {
+      if (item.name === 'About') {
+        scrollToSection('about-section');
+        return;
+      } else if (item.name === 'Contact') {
+        scrollToSection('contact-section');
+        return;
+      }
+    }
+    
+    // For regular navigation
+    if (item.link.startsWith('#')) {
+      const sectionId = item.link.replace('#', '') + '-section';
+      scrollToSection(sectionId);
+    } else {
+      window.location.href = item.link;
+    }
+  };
+
   return (
     <section className="py-4 bg-background border-b border-border">
       <nav className="container mx-auto flex items-center justify-between">
         {/* Left WordMark */}
-        <a href={NAV_LOGO.url} className="flex items-center gap-4">
+        <Link href={NAV_LOGO.url} className="flex items-center gap-4">
           <img src={NAV_LOGO.src} className="max-h-20 w-20 md:max-h-24 md:w-24" alt={NAV_LOGO.alt} />
           <span className="text-xl font-bold tracking-tighter text-amber-800 font-display">
             {NAV_LOGO.title}
           </span>
-        </a>
+        </Link>
 
         <NavigationMenu className="hidden lg:block">
           <NavigationMenuList
@@ -108,17 +114,17 @@ const AnimatedIndicatorNavbar = () => {
             {NAV_ITEMS.map((item) => (
               <React.Fragment key={item.name}>
                 <NavigationMenuItem>
-                  <NavigationMenuLink
+                  <button
                     data-nav-item={item.name}
-                    onClick={() => handleNavClick(item)}
-                    className={`relative cursor-pointer text-sm font-medium hover:bg-transparent transition-colors flex items-center gap-2 ${activeItem === item.name
+                    onClick={() => handleNavigation(item)}
+                    className={`relative cursor-pointer text-sm font-medium hover:bg-transparent transition-colors flex items-center gap-2 bg-transparent border-none ${activeItem === item.name
                         ? "text-primary"
                         : "text-muted-foreground hover:text-foreground"
                       }`}
                   >
                     {item.icon && item.icon}
                     {item.name}
-                  </NavigationMenuLink>
+                  </button>
                 </NavigationMenuItem>
               </React.Fragment>
             ))}
@@ -133,7 +139,13 @@ const AnimatedIndicatorNavbar = () => {
         </NavigationMenu>
 
         {/* Mobile Menu Popover */}
-        <MobileNav activeItem={activeItem} setActiveItem={setActiveItem} user={user} isAuthenticated={isAuthenticated} />
+        <MobileNav 
+          activeItem={activeItem} 
+          setActiveItem={setActiveItem} 
+          user={user} 
+          isAuthenticated={isAuthenticated}
+          onNavigation={handleNavigation}
+        />
 
         <div className="hidden items-center gap-3 lg:flex">
           {/* Cart Icon - Only show for users, not artisans */}
@@ -209,39 +221,16 @@ const MobileNav = ({
   setActiveItem,
   user,
   isAuthenticated,
+  onNavigation,
 }: {
   activeItem: string;
   setActiveItem: (item: string) => void;
   user: any;
   isAuthenticated: boolean;
+  onNavigation: (item: typeof NAV_ITEMS[0]) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { cartCount } = useCart();
-  const pathname = usePathname();
-
-  const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
-    setActiveItem(item.name);
-
-    // Only scroll on home page for About and Contact
-    if (pathname === '/') {
-      if (item.name === 'About') {
-        const aboutSection = document.getElementById('about-section');
-        if (aboutSection) {
-          aboutSection.scrollIntoView({ behavior: 'smooth' });
-          return;
-        }
-      } else if (item.name === 'Contact') {
-        const contactSection = document.getElementById('contact-section');
-        if (contactSection) {
-          contactSection.scrollIntoView({ behavior: 'smooth' });
-          return;
-        }
-      }
-    }
-
-    // For other items or when not on home page, navigate normally
-    window.location.href = item.link;
-  };
 
   return (
     <div className="block lg:hidden">
@@ -259,10 +248,10 @@ const MobileNav = ({
               <li key={idx}>
                 <button
                   onClick={() => {
-                    handleNavClick(navItem);
+                    onNavigation(navItem);
                     setIsOpen(false); // Close mobile menu
                   }}
-                  className={`w-full text-left flex items-center gap-3 border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 ${activeItem === navItem.name
+                  className={`w-full text-left flex items-center gap-3 border-l-[3px] px-6 py-4 text-sm font-medium transition-all duration-75 bg-transparent border-none ${activeItem === navItem.name
                       ? "border-primary text-primary"
                       : "text-muted-foreground hover:text-foreground border-transparent"
                     }`}

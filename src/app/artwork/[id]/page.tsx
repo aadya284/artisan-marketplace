@@ -376,17 +376,84 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                   </Button>
                 </div>
                 
-                <div className="flex gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setIsFavorite(!isFavorite)}
-                    className="flex-1"
                   >
                     <Heart className={`w-4 h-4 mr-2 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
                     {isFavorite ? 'Added to Wishlist' : 'Add to Wishlist'}
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
+
+                  <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                      >
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Connect with Artisan
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[500px]">
+                      <DialogHeader>
+                        <DialogTitle>Connect with {artwork.artist.name}</DialogTitle>
+                        <DialogDescription>
+                          Send a message to the artisan about "{artwork.name}" to get more information or discuss custom orders.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
+                          <Avatar>
+                            <AvatarImage src={artwork.artist.image} alt={artwork.artist.name} />
+                            <AvatarFallback>{artwork.artist.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">{artwork.artist.name}</p>
+                            <p className="text-sm text-gray-600">{artwork.artist.location}</p>
+                            <p className="text-xs text-orange-600">Usually responds within a few hours</p>
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="subject">Subject</Label>
+                          <Input
+                            id="subject"
+                            value={`Question about ${artwork.name}`}
+                            readOnly
+                            className="bg-gray-50"
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="message">Your Message</Label>
+                          <Textarea
+                            id="message"
+                            placeholder="Hi! I'm interested in this artwork. Could you tell me more about..."
+                            value={contactMessage}
+                            onChange={(e) => setContactMessage(e.target.value)}
+                            rows={6}
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsContactDialogOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleContactArtisan}
+                          className="bg-orange-600 hover:bg-orange-700"
+                          disabled={!contactMessage.trim()}
+                        >
+                          Send Message
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Button variant="outline" size="sm">
                     <Share2 className="w-4 h-4 mr-2" />
                     Share
                   </Button>

@@ -25,48 +25,8 @@ import {
   Percent
 } from "lucide-react";
 
-// Sample cart items
-const initialCartItems = [
-  {
-    id: 1,
-    name: "Hand-Painted Madhubani Art",
-    artist: "Sita Devi",
-    state: "Bihar",
-    price: 4500,
-    originalPrice: 6000,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    rating: 4.8,
-    inStock: true
-  },
-  {
-    id: 2,
-    name: "Blue Pottery Decorative Bowl",
-    artist: "Kripal Singh",
-    state: "Rajasthan",
-    price: 2200,
-    originalPrice: 2800,
-    quantity: 2,
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    rating: 4.6,
-    inStock: true
-  },
-  {
-    id: 3,
-    name: "Banarasi Silk Saree",
-    artist: "Ravi Shankar",
-    state: "Uttar Pradesh",
-    price: 25000,
-    originalPrice: 30000,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-    rating: 4.9,
-    inStock: true
-  }
-];
-
 export default function CartPage() {
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const { cartItems, updateQuantity, removeFromCart, cartCount } = useCart();
   const [currentStep, setCurrentStep] = useState(1); // 1: Cart, 2: Checkout, 3: Payment
   const [deliveryAddress, setDeliveryAddress] = useState({
     fullName: "",

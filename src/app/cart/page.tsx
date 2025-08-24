@@ -126,7 +126,7 @@ export default function CartPage() {
               {currentStep === 1 && (
                 <div className="bg-white rounded-xl shadow-lg p-6">
                   <h2 className="text-2xl font-bold mb-6 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
-                    Shopping Cart ({cartItems.length} items)
+                    Shopping Cart ({cartCount} items)
                   </h2>
                   
                   <div className="space-y-6">

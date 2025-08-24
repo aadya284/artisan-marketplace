@@ -93,45 +93,45 @@ export default function ArtisanDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">₹0</div>
-                <p className="text-xs text-muted-foreground">No sales yet</p>
+                <div className="text-2xl font-bold">₹{artisanEarnings.totalEarnings.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">All time earnings</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Orders</CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Available Balance</CardTitle>
+                <Wallet className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">Orders received</p>
+                <div className="text-2xl font-bold text-green-600">₹{artisanEarnings.availableBalance.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">Ready for withdrawal</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Products</CardTitle>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Pending Clearance</CardTitle>
+                <Package className="h-4 w-4 text-orange-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">Listed products</p>
+                <div className="text-2xl font-bold text-orange-600">₹{artisanEarnings.pendingClearance.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">Processing payments</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Growth</CardTitle>
+                <CardTitle className="text-sm font-medium">Monthly Growth</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">0%</div>
-                <p className="text-xs text-muted-foreground">Monthly growth</p>
+                <div className="text-2xl font-bold text-green-600">+{artisanEarnings.monthlyGrowth}%</div>
+                <p className="text-xs text-muted-foreground">vs last month</p>
               </CardContent>
             </Card>
           </div>

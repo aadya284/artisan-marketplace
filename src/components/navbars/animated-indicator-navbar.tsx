@@ -217,6 +217,31 @@ const MobileNav = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { cartCount } = useCart();
+  const pathname = usePathname();
+
+  const handleNavClick = (item: typeof NAV_ITEMS[0]) => {
+    setActiveItem(item.name);
+
+    // Only scroll on home page for About and Contact
+    if (pathname === '/') {
+      if (item.name === 'About') {
+        const aboutSection = document.getElementById('about-section');
+        if (aboutSection) {
+          aboutSection.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      } else if (item.name === 'Contact') {
+        const contactSection = document.getElementById('contact-section');
+        if (contactSection) {
+          contactSection.scrollIntoView({ behavior: 'smooth' });
+          return;
+        }
+      }
+    }
+
+    // For other items or when not on home page, navigate normally
+    window.location.href = item.link;
+  };
 
   return (
     <div className="block lg:hidden">

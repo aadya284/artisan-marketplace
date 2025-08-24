@@ -121,9 +121,11 @@ const AnimatedIndicatorNavbar = () => {
               >
                 <ShoppingCart className="h-5 w-5 text-muted-foreground hover:text-foreground" />
                 {/* Cart counter badge */}
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
-                  0
-                </span>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
               </Button>
             </Link>
           )}
@@ -229,9 +231,11 @@ const MobileNav = ({
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Cart
-                    <span className="absolute right-3 top-2 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
-                      0
-                    </span>
+                    {cartCount > 0 && (
+                      <span className="absolute right-3 top-2 h-5 w-5 rounded-full bg-primary text-xs font-bold text-primary-foreground flex items-center justify-center">
+                        {cartCount > 99 ? '99+' : cartCount}
+                      </span>
+                    )}
                   </Button>
                 </Link>
               </li>

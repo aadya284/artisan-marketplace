@@ -224,14 +224,14 @@ export default function ExplorePage() {
               </h2>
             </div>
 
-            <div className={`grid gap-6 ${viewMode === "grid" 
-              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" 
+            <div className={`grid gap-6 ${viewMode === "grid"
+              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               : "grid-cols-1"
             }`}>
               {filteredProducts.map((product) => (
-                <div 
-                  key={product.id} 
-                  className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
+                <div
+                  key={product.id}
+                  className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group ${
                     viewMode === "list" ? "flex" : ""
                   }`}
                 >

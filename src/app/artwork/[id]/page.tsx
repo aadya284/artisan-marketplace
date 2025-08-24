@@ -28,7 +28,8 @@ import {
   MessageCircle
 } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
+import { useCart } from "@/contexts/CartContext";
 
 // Sample artwork data - in a real app, this would come from an API
 const artworksData = {

@@ -238,6 +238,35 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
     setContactMessage("");
   };
 
+  const handleAddToCart = () => {
+    if (!artwork.inStock) return;
+
+    const cartItem = {
+      id: artwork.id,
+      name: artwork.name,
+      artist: artwork.artist.name,
+      state: artwork.state,
+      price: artwork.price,
+      originalPrice: artwork.originalPrice,
+      image: artwork.images[0],
+      rating: artwork.rating,
+      inStock: artwork.inStock,
+      stockCount: artwork.stockCount,
+    };
+
+    addToCart(cartItem, quantity);
+  };
+
+  const handleBuyNow = () => {
+    if (!artwork.inStock) return;
+
+    // Add to cart first
+    handleAddToCart();
+
+    // Redirect to cart page
+    router.push('/cart');
+  };
+
   return (
     <>
       <AnimatedIndicatorNavbar />

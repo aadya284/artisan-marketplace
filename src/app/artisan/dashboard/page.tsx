@@ -15,6 +15,33 @@ import { Separator } from "@/components/ui/separator";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
+// Types for bank details form
+interface BankDetailsForm {
+  accountHolderName: string;
+  accountNumber: string;
+  confirmAccountNumber: string;
+  ifscCode: string;
+  bankName: string;
+  branchName: string;
+  accountType: "savings" | "current";
+}
+
+// Sample artisan earnings data
+const artisanEarnings = {
+  totalEarnings: 45750,
+  availableBalance: 23400,
+  pendingClearance: 8500,
+  totalWithdrawn: 13850,
+  recentSales: [
+    { id: 1, artwork: "Madhubani Painting", amount: 4500, date: "2024-01-15", status: "cleared" },
+    { id: 2, artwork: "Blue Pottery Bowl", amount: 2200, date: "2024-01-12", status: "cleared" },
+    { id: 3, artwork: "Warli Art Canvas", amount: 3200, date: "2024-01-10", status: "pending" },
+    { id: 4, artwork: "Kalamkari Fabric", amount: 5600, date: "2024-01-08", status: "cleared" },
+    { id: 5, artwork: "Pattachitra Scroll", amount: 3800, date: "2024-01-05", status: "cleared" }
+  ],
+  monthlyGrowth: 15.2
+};
+
 export default function ArtisanDashboardPage() {
   const { user } = useAuth();
 

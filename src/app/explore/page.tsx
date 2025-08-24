@@ -352,6 +352,129 @@ export default function ExplorePage() {
           </div>
         </section>
 
+        {/* Location-based Discovery */}
+        <section className="py-8 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-100">
+          <div className="container mx-auto">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                  <MapPin className="inline-block w-6 h-6 mr-2 text-green-600" />
+                  Discover Local Artworks
+                </h2>
+                <p className="text-gray-600" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                  {locationEnabled && detectedState
+                    ? `Showing artworks from ${detectedState} - your local region`
+                    : "Enable location to discover beautiful artworks from artisans in your state"
+                  }
+                </p>
+                {locationError && (
+                  <p className="text-red-600 text-sm mt-2">{locationError}</p>
+                )}
+              </div>
+
+              <div className="flex items-center gap-4">
+                {locationEnabled && detectedState && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-green-100 rounded-lg">
+                    <Navigation className="w-4 h-4 text-green-700" />
+                    <span className="text-sm font-medium text-green-700">{detectedState}</span>
+                  </div>
+                )}
+
+                {!locationEnabled ? (
+                  <Button
+                    onClick={enableLocation}
+                    disabled={isDetectingLocation}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    {isDetectingLocation ? (
+                      <>
+                        <Loader className="w-4 h-4 mr-2 animate-spin" />
+                        Detecting...
+                      </>
+                    ) : (
+                      <>
+                        <Navigation className="w-4 h-4 mr-2" />
+                        Enable Location
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={disableLocation}
+                    variant="outline"
+                    className="border-green-300 text-green-700 hover:bg-green-50"
+                  >
+                    Disable Location
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Local Artworks Preview */}
+            {locationEnabled && detectedState && localProducts.length > 0 && (
+              <div className="mt-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Artworks from {detectedState} ({localProducts.length})
+                  </h3>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedState(detectedState)}
+                    className="border-green-300 text-green-700 hover:bg-green-50"
+                  >
+                    View All Local Artworks
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {localProducts.slice(0, 4).map((product) => (
+                    <Link key={product.id} href={`/artwork/${product.id}`}>
+                      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group">
+                        <div className="relative">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute top-2 left-2">
+                            <Badge className="bg-green-600 text-white text-xs">
+                              Local
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className="p-3">
+                          <h4 className="font-medium text-sm text-gray-800 mb-1 line-clamp-1">
+                            {product.name}
+                          </h4>
+                          <p className="text-xs text-gray-600 mb-2">by {product.artist}</p>
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-sm">₹{product.price.toLocaleString()}</span>
+                            <div className="flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                              <span className="text-xs">{product.rating}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {locationEnabled && detectedState && localProducts.length === 0 && (
+              <div className="mt-8 text-center py-8 bg-white rounded-lg">
+                <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-700 mb-2">No local artworks found</h3>
+                <p className="text-gray-500">
+                  We don't have artworks from {detectedState} yet, but check back soon!
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* Filters and Controls */}
         <section className="py-8 bg-white border-b border-gray-100">
           <div className="container mx-auto">

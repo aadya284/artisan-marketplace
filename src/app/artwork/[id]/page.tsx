@@ -10,17 +10,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Star, 
-  ShoppingCart, 
-  Heart, 
-  Share2, 
-  Truck, 
-  Shield, 
+import {
+  Star,
+  ShoppingCart,
+  Heart,
+  Share2,
+  Truck,
+  Shield,
   RotateCcw,
   ChevronLeft,
   Plus,
-  Minus
+  Minus,
+  MessageCircle
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";

@@ -179,10 +179,10 @@ export default function NearbyStoresPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
               Be the First to Know
             </h2>
-            <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
               Get notified when the Nearby Stores feature launches. Join our community of craft enthusiasts today!
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md mx-auto">
               <input
                 type="email"
@@ -193,8 +193,8 @@ export default function NearbyStoresPage() {
                 Notify Me
               </Button>
             </div>
-            
-            <p className="text-sm text-orange-200 mt-4">
+
+            <p className="text-sm text-white opacity-90 mt-4">
               We'll only send you updates about this feature. No spam, ever.
             </p>
           </div>

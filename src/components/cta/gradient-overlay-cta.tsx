@@ -24,9 +24,9 @@ const GradientOverlayCta = () => {
                 size="lg"
                 variant="secondary"
                 onClick={() => {
-                  const workshopsSection = document.getElementById('workshops-section');
-                  if (workshopsSection) {
-                    workshopsSection.scrollIntoView({ behavior: 'smooth' });
+                  const aboutSection = document.getElementById('about-section');
+                  if (aboutSection) {
+                    aboutSection.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
               >

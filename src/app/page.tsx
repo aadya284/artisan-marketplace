@@ -2,7 +2,6 @@ import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator
 import { TwoColumnHeroWithImage } from "@/components/heros/two-column-hero-with-image";
 import { TaglineSection } from "@/components/tagline/tagline-section";
 import { VideoShowcase } from "@/components/video/video-showcase";
-import { LiveArtisanWorkshops } from "@/components/workshops/live-artisan-workshops";
 import { SocialTeamProfiles } from "@/components/teams/social-team-profiles";
 import { CompanyLogoTestimonials } from "@/components/testimonials/company-logo-testimonials";
 import { GradientOverlayCta } from "@/components/cta/gradient-overlay-cta";
@@ -15,7 +14,6 @@ export default function HomePage() {
       <AnimatedIndicatorNavbar />
       <TwoColumnHeroWithImage />
       <TaglineSection />
-      <LiveArtisanWorkshops />
       <VideoShowcase />
       <SocialTeamProfiles />
       <CompanyLogoTestimonials />

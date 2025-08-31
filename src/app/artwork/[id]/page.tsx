@@ -195,6 +195,14 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [contactMessage, setContactMessage] = useState("");
+  const [isCustomizeDialogOpen, setIsCustomizeDialogOpen] = useState(false);
+  const [engravingText, setEngravingText] = useState("");
+  const [designDetails, setDesignDetails] = useState("");
+  const [preferredColours, setPreferredColours] = useState("");
+  const [referenceImageUrl, setReferenceImageUrl] = useState("");
+  const [preferredSize, setPreferredSize] = useState("");
+  const [preferredDeadline, setPreferredDeadline] = useState("");
+  const [budget, setBudget] = useState("");
 
   const { addToCart, isInCart } = useCart();
   const router = useRouter();
@@ -223,7 +231,6 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   const handleContactArtisan = () => {
     if (!contactMessage.trim()) return;
 
-    // Here you would send the message to your backend
     console.log("Sending message to artisan:", {
       artworkId: artwork.id,
       artworkName: artwork.name,
@@ -232,10 +239,40 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
       timestamp: new Date().toISOString()
     });
 
-    // Show success message
     alert("Your message has been sent to the artisan! They will respond soon.");
     setIsContactDialogOpen(false);
     setContactMessage("");
+  };
+
+  const handleSubmitCustomization = () => {
+    if (!designDetails.trim()) return;
+
+    const customizationRequest = {
+      artworkId: artwork.id,
+      artworkName: artwork.name,
+      artistName: artwork.artist.name,
+      engravingText: engravingText.trim() || null,
+      designDetails: designDetails.trim(),
+      preferredColours: preferredColours.trim() || null,
+      preferredSize: preferredSize.trim() || null,
+      referenceImageUrl: referenceImageUrl.trim() || null,
+      preferredDeadline: preferredDeadline || null,
+      budget: budget.trim() || null,
+      timestamp: new Date().toISOString()
+    };
+
+    console.log("Customization request submitted:", customizationRequest);
+
+    alert("Your customization request has been sent to the artisan! They will reach out to you to confirm details.");
+
+    setIsCustomizeDialogOpen(false);
+    setEngravingText("");
+    setDesignDetails("");
+    setPreferredColours("");
+    setReferenceImageUrl("");
+    setPreferredSize("");
+    setPreferredDeadline("");
+    setBudget("");
   };
 
   const handleAddToCart = () => {
@@ -411,7 +448,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                   </Button>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <Button
                     variant="outline"
                     size="sm"
@@ -483,6 +520,114 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                           disabled={!contactMessage.trim()}
                         >
                           Send Message
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={isCustomizeDialogOpen} onOpenChange={setIsCustomizeDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                      >
+                        Request Customization
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[650px]">
+                      <DialogHeader>
+                        <DialogTitle>Request a Custom Design</DialogTitle>
+                        <DialogDescription>
+                          Share your customization preferences for "{artwork.name}". The artisan will review and get back to you with options and timelines.
+                        </DialogDescription>
+                      </DialogHeader>
+
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="engraving">Name Engraving (optional)</Label>
+                            <Input
+                              id="engraving"
+                              placeholder="Add a name or initials"
+                              value={engravingText}
+                              onChange={(e) => setEngravingText(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="colours">Preferred Colours (comma-separated)</Label>
+                            <Input
+                              id="colours"
+                              placeholder="e.g., red, gold, indigo"
+                              value={preferredColours}
+                              onChange={(e) => setPreferredColours(e.target.value)}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="size">Preferred Size/Dimensions</Label>
+                            <Input
+                              id="size"
+                              placeholder="e.g., 16 x 12 inches"
+                              value={preferredSize}
+                              onChange={(e) => setPreferredSize(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="deadline">Preferred Deadline</Label>
+                            <Input
+                              id="deadline"
+                              type="date"
+                              value={preferredDeadline}
+                              onChange={(e) => setPreferredDeadline(e.target.value)}
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="reference">Reference Image URL (optional)</Label>
+                          <Input
+                            id="reference"
+                            placeholder="Paste a link to a reference image"
+                            value={referenceImageUrl}
+                            onChange={(e) => setReferenceImageUrl(e.target.value)}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="details">Customization Details</Label>
+                          <Textarea
+                            id="details"
+                            placeholder="Describe your specific design idea, patterns, motifs, or any other requirements"
+                            value={designDetails}
+                            onChange={(e) => setDesignDetails(e.target.value)}
+                            rows={6}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="budget">Estimated Budget (optional)</Label>
+                          <Input
+                            id="budget"
+                            placeholder="e.g., up to ₹5,000"
+                            value={budget}
+                            onChange={(e) => setBudget(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsCustomizeDialogOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleSubmitCustomization}
+                          className="bg-orange-600 hover:bg-orange-700"
+                          disabled={!designDetails.trim()}
+                        >
+                          Send Request
                         </Button>
                       </DialogFooter>
                     </DialogContent>

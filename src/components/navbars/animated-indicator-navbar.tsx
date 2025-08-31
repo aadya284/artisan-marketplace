@@ -1,5 +1,7 @@
 "use client";
 
+'use client'
+
 import { Menu, X, ShoppingCart, Store, Palette, Home, Phone, MapPin, Video } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";

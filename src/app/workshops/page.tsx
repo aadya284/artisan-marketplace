@@ -106,11 +106,11 @@ export default function WorkshopsPage() {
         <section className="py-16 bg-gradient-to-r from-orange-100 to-amber-100">
           <div className="container mx-auto text-center">
             <h1 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
-              Live Artisan
+              KarigarSetu
               <span className="block text-orange-600">Workshops</span>
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              Monetization beyond sales: learn authentic crafts directly from artisans through interactive video workshops (₹50–₹500).
+              Crafting Together, Growing Together.
             </p>
 
             {/* Search */}

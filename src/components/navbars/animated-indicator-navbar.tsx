@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, ShoppingCart, Store, Palette, Home, MapPin } from "lucide-react";
+import { Menu, X, ShoppingCart, Store, Palette, Home, MapPin, Video } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -31,6 +31,7 @@ const NAV_ITEMS = [
   { name: "Home", link: "/", icon: <Home className="w-4 h-4" /> },
   { name: "Explore", link: "/explore", icon: <Store className="w-4 h-4" /> },
   { name: "Exhibition", link: "/exhibition", icon: <Palette className="w-4 h-4" /> },
+  { name: "Workshops", link: "#workshops", icon: <Video className="w-4 h-4" /> },
   { name: "Nearby Stores", link: "/nearby-stores", icon: <MapPin className="w-4 h-4" /> },
 ];
 

@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";

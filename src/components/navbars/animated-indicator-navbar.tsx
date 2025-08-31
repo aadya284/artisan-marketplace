@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X, ShoppingCart, Store, Palette, Home, Info, Phone, MapPin } from "lucide-react";
+import { Menu, X, ShoppingCart, Store, Palette, Home, MapPin } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -32,8 +32,6 @@ const NAV_ITEMS = [
   { name: "Explore", link: "/explore", icon: <Store className="w-4 h-4" /> },
   { name: "Exhibition", link: "/exhibition", icon: <Palette className="w-4 h-4" /> },
   { name: "Nearby Stores", link: "/nearby-stores", icon: <MapPin className="w-4 h-4" /> },
-  { name: "About", link: "#about", icon: <Info className="w-4 h-4" /> },
-  { name: "Contact", link: "#contact", icon: <Phone className="w-4 h-4" /> },
 ];
 
 const scrollToSection = (sectionId: string) => {
@@ -74,17 +72,6 @@ const AnimatedIndicatorNavbar = () => {
 
   const handleNavigation = (item: typeof NAV_ITEMS[0]) => {
     setActiveItem(item.name);
-    
-    // Handle special scroll cases on home page
-    if (pathname === '/') {
-      if (item.name === 'About') {
-        scrollToSection('about-section');
-        return;
-      } else if (item.name === 'Contact') {
-        scrollToSection('contact-section');
-        return;
-      }
-    }
     
     // For regular navigation
     if (item.link.startsWith('#')) {

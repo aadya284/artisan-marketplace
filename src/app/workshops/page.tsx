@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { Search, Video, Clock, Users } from "lucide-react";
+import { Search, Video, Users } from "lucide-react";
 
 const WORKSHOPS = [
   {
@@ -174,7 +174,7 @@ export default function WorkshopsPage() {
               {filtered.map((w) => (
                 <div key={w.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                   <div className="relative">
-                    <video className="w-full h-48 object-cover" autoPlay loop muted playsInline preload="metadata" poster={w.poster}>
+                    <video className="w-full h-48 object-cover" autoPlay loop muted playsInline preload="none" poster={w.poster}>
                       <source src={w.video} type="video/mp4" />
                     </video>
 

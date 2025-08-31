@@ -1,6 +1,14 @@
+import { useState } from "react";
 import Link from "next/link";
+import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
+import { NewsletterFooter } from "@/components/footers/newsletter-footer";
+import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Search, Video, Clock, Users } from "lucide-react";
 
 const WORKSHOPS = [
   {
@@ -72,57 +80,152 @@ const WORKSHOPS = [
 ];
 
 export default function WorkshopsPage() {
-  return (
-    <section className="py-16 lg:py-24 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Workshops</h1>
-          <p className="mt-3 text-muted-foreground">Live artisan-led video workshops. Prices range from ₹50–₹500.</p>
-        </div>
+  const [searchQuery, setSearchQuery] = useState("");
+  const [level, setLevel] = useState("All");
+  const [priceRange, setPriceRange] = useState<[number, number]>([50, 500]);
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {WORKSHOPS.map((w) => (
-            <Card key={w.id} className="overflow-hidden">
-              <div className="relative">
-                <div className="absolute left-3 top-3 z-10 flex items-center gap-2">
-                  <span className="rounded-full bg-red-500/90 text-white text-xs px-2 py-0.5">Live</span>
-                  <span className="rounded-full bg-black/70 text-white text-xs px-2 py-0.5">{w.level}</span>
-                </div>
-                <video
-                  className="w-full h-48 object-cover"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  preload="metadata"
-                  poster={w.poster}
-                >
-                  <source src={w.video} type="video/mp4" />
-                </video>
+  const levels = ["All", "Beginner", "Intermediate", "Advanced", "All Levels"];
+
+  const filtered = WORKSHOPS.filter((w) => {
+    const matchesSearch =
+      w.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      w.artisan.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesLevel = level === "All" || w.level === level || (level === "All Levels" && w.level === "All Levels");
+    const matchesPrice = w.price >= priceRange[0] && w.price <= priceRange[1];
+    return matchesSearch && matchesLevel && matchesPrice;
+  });
+
+  return (
+    <>
+      <AnimatedIndicatorNavbar />
+
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+        {/* Hero */}
+        <section className="py-16 bg-gradient-to-r from-orange-100 to-amber-100">
+          <div className="container mx-auto text-center">
+            <h1 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+              Live Artisan
+              <span className="block text-orange-600">Workshops</span>
+            </h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Monetization beyond sales: learn authentic crafts directly from artisans through interactive video workshops (₹50–₹500).
+            </p>
+
+            {/* Search */}
+            <div className="max-w-md mx-auto relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Input
+                type="text"
+                placeholder="Search workshops or artisans..."
+                className="pl-10 pr-4 py-3 w-full rounded-full border-orange-200 focus:border-orange-400"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Filters */}
+        <section className="py-6 bg-gray-50">
+          <div className="container mx-auto">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              {/* Level Filter */}
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm font-medium text-gray-700 mr-3">Level:</span>
+                {levels.map((lv) => (
+                  <Button
+                    key={lv}
+                    variant={level === lv ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setLevel(lv)}
+                    className={level === lv ? "bg-orange-600 hover:bg-orange-700" : "border-orange-200 text-orange-700 hover:bg-orange-50"}
+                  >
+                    {lv}
+                  </Button>
+                ))}
               </div>
 
-              <CardHeader className="pb-0">
-                <CardTitle className="text-lg">{w.title}</CardTitle>
-                <CardDescription>
-                  By {w.artisan} • {w.duration}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-2">
-                <p className="text-sm text-muted-foreground">{w.blurb}</p>
-              </CardContent>
-              <CardFooter className="justify-between border-t pt-4">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-semibold">₹{w.price}</span>
-                  <span className="text-xs text-muted-foreground">per seat</span>
+              {/* Price Filter */}
+              <div className="flex items-center gap-4 w-full lg:w-auto">
+                <span className="text-sm font-medium text-gray-700">Price:</span>
+                <div className="min-w-[220px] w-full lg:w-64">
+                  <Slider min={50} max={500} value={priceRange} onValueChange={(v: any) => setPriceRange(v)} />
                 </div>
-                <Button asChild size="sm">
-                  <Link href={`/workshops/${w.id}`}>View Details</Link>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                <Badge variant="outline" className="text-orange-700 border-orange-200">
+                  ₹{priceRange[0]}–₹{priceRange[1]}
+                </Badge>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Grid */}
+        <section className="py-12">
+          <div className="container mx-auto">
+            <div className="mb-8 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                {filtered.length} Workshops Available
+              </h2>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((w) => (
+                <div key={w.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                  <div className="relative">
+                    <video className="w-full h-48 object-cover" autoPlay loop muted playsInline preload="metadata" poster={w.poster}>
+                      <source src={w.video} type="video/mp4" />
+                    </video>
+
+                    <Badge className="absolute top-3 left-3 bg-red-600 text-white">Live</Badge>
+                    <Badge variant="outline" className="absolute top-3 right-3 text-xs text-orange-700 border-orange-200">
+                      {w.level}
+                    </Badge>
+
+                    <div className="absolute bottom-3 right-3 bg-black/70 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                      <Users className="w-3 h-3" /> 50+ joined
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <div className="mb-3">
+                      <Badge variant="outline" className="text-xs text-orange-700 border-orange-200 mb-2">{w.duration}</Badge>
+                      <h3 className="font-bold text-xl text-gray-800 mb-2 leading-tight" style={{ fontFamily: 'Rajdhani, sans-serif' }}>{w.title}</h3>
+                      <p className="text-sm text-gray-600 mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>by {w.artisan}</p>
+                    </div>
+
+                    <p className="text-sm text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Poppins, sans-serif' }}>{w.blurb}</p>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xl font-semibold">₹{w.price}</span>
+                        <span className="text-xs text-gray-500">per seat</span>
+                      </div>
+                      <Button asChild className="bg-orange-600 hover:bg-orange-700">
+                        <Link href={`/workshops/${w.id}`}>
+                          <Video className="w-4 h-4 mr-2" /> Join Workshop
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {filtered.length === 0 && (
+              <div className="text-center py-12">
+                <div className="text-gray-400 mb-4">
+                  <Video className="w-16 h-16 mx-auto" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-700 mb-2">No workshops found</h3>
+                <p className="text-gray-500">Try adjusting your search or filters.</p>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
-    </section>
+
+      <NewsletterFooter />
+      <AiChatbotWidget />
+    </>
   );
 }

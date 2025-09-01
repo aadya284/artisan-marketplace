@@ -333,13 +333,13 @@ export default function ExplorePage() {
     <>
       <AnimatedIndicatorNavbar />
       
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50">
         {/* Hero Section */}
-        <section className="py-16 bg-gradient-to-r from-orange-100 to-amber-100">
+        <section className="py-16 bg-gradient-to-r from-amber-100 to-amber-200">
           <div className="container mx-auto text-center">
             <h1 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
               Explore Authentic
-              <span className="block text-orange-600">Indian Crafts</span>
+              <span className="block text-amber-600">Indian Crafts</span>
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Discover handcrafted treasures from talented artisans across India. Each piece tells a story of tradition and craftsmanship.
@@ -351,7 +351,7 @@ export default function ExplorePage() {
               <Input
                 type="text"
                 placeholder="Search crafts, artists, or states..."
-                className="pl-10 pr-4 py-3 w-full rounded-full border-orange-200 focus:border-orange-400"
+                className="pl-10 pr-4 py-3 w-full rounded-full border-amber-200 focus:border-amber-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -496,8 +496,8 @@ export default function ExplorePage() {
                     size="sm"
                     onClick={() => setSelectedCategory(category)}
                     className={selectedCategory === category 
-                      ? "bg-orange-600 hover:bg-orange-700" 
-                      : "border-orange-200 text-orange-700 hover:bg-orange-50"
+                      ? "bg-amber-600 hover:bg-amber-700"
+                      : "border-amber-200 text-amber-700 hover:bg-amber-50"
                     }
                   >
                     {category}
@@ -515,8 +515,8 @@ export default function ExplorePage() {
                     size="sm"
                     onClick={() => setSelectedState(state)}
                     className={selectedState === state 
-                      ? "bg-indigo-600 hover:bg-indigo-700" 
-                      : "border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                      ? "bg-amber-600 hover:bg-amber-700"
+                      : "border-amber-200 text-amber-700 hover:bg-amber-50"
                     }
                   >
                     {state}
@@ -619,7 +619,7 @@ export default function ExplorePage() {
                     {/* Featured and Local Badges */}
                     <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
                       {product.featured && (
-                        <Badge className="bg-orange-600 text-white text-xs">
+                        <Badge className="bg-amber-600 text-white text-xs">
                           Featured
                         </Badge>
                       )}
@@ -641,11 +641,11 @@ export default function ExplorePage() {
 
                   <div className={`p-6 ${viewMode === "list" ? "flex-1" : ""}`}>
                     <div className="mb-3">
-                      <Badge variant="outline" className="text-xs text-orange-700 border-orange-200 mb-2">
+                      <Badge variant="outline" className="text-xs text-amber-700 border-amber-200 mb-2">
                         {product.state}
                       </Badge>
                       <Link href={`/artwork/${product.id}`}>
-                        <h3 className="font-bold text-lg text-gray-800 mb-1 hover:text-orange-600 cursor-pointer transition-colors" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                        <h3 className="font-bold text-lg text-gray-800 mb-1 hover:text-amber-600 cursor-pointer transition-colors" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                           {product.name}
                         </h3>
                       </Link>
@@ -674,7 +674,7 @@ export default function ExplorePage() {
                     {/* Action Buttons */}
                     <div className="flex gap-2">
                       <Button
-                        className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold"
+                        className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold"
                         style={{ fontFamily: 'Rajdhani, sans-serif' }}
                       >
                         <ShoppingCart className="w-4 h-4 mr-1" />
@@ -683,7 +683,7 @@ export default function ExplorePage() {
                       <Link href={`/artwork/${product.id}`} className="flex-1">
                         <Button
                           variant="outline"
-                          className="w-full border-orange-300 text-orange-700 hover:bg-orange-50 font-semibold"
+                          className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 font-semibold"
                           style={{ fontFamily: 'Rajdhani, sans-serif' }}
                         >
                           <Eye className="w-4 h-4 mr-1" />

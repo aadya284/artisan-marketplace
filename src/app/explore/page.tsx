@@ -360,7 +360,7 @@ export default function ExplorePage() {
         </section>
 
         {/* Location-based Discovery */}
-        <section className="py-8 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-100">
+        <section className="hidden">
           <div className="container mx-auto">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="flex-1">

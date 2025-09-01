@@ -181,7 +181,7 @@ const InteractiveIndiaMap = () => {
           </Badge>
           <h2 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
             Discover India's Rich
-            <span className="block text-orange-600">Cultural Heritage</span>
+            <span className="block text-primary">Cultural Heritage</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Click on any state to explore traditional crafts, meet local artisans, and support cultural preservation
@@ -599,7 +599,7 @@ const InteractiveIndiaMap = () => {
                       Secure Payment
                     </span>
                     <span className="flex items-center gap-1">
-                      <span className="text-orange-500">📦</span>
+                      <span className="text-primary">📦</span>
                       Fast Shipping
                     </span>
                   </div>

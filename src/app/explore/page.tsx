@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, ShoppingCart, Filter, Search, Grid, List, Heart, Eye, MapPin, Navigation, Loader } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 
 // Sample products data
@@ -524,24 +525,43 @@ export default function ExplorePage() {
                 ))}
               </div>
 
-              {/* View Toggle */}
-              <div className="flex items-center gap-2">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="p-2"
-                >
-                  <Grid className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="p-2"
-                >
-                  <List className="w-4 h-4" />
-                </Button>
+              {/* Location Toggle + View Toggle */}
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-700">Enable Location</span>
+                  <Switch
+                    checked={locationEnabled}
+                    onCheckedChange={(checked) => {
+                      if (checked) enableLocation(); else disableLocation();
+                    }}
+                    disabled={isDetectingLocation}
+                    className="data-[state=checked]:bg-amber-600"
+                  />
+                  {locationEnabled && detectedState && (
+                    <span className="text-xs text-amber-700">({detectedState})</span>
+                  )}
+                  {locationError && (
+                    <span className="text-xs text-red-600">{locationError}</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className="p-2"
+                  >
+                    <Grid className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className="p-2"
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

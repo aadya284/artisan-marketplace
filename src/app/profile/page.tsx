@@ -36,14 +36,14 @@ export default function ProfilePage() {
                 <CardTitle className="flex items-center gap-4">
                   <Avatar className="h-16 w-16">
                     <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className={`text-lg ${user.type === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'}`}>
+                    <AvatarFallback className={`text-lg ${user.type === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-primary'}`}>
                       {user.name.slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <h2 className="text-xl font-semibold">{user.name}</h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <Badge className={`${user.type === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800'} border-0`}>
+                      <Badge className={`${user.type === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-primary'} border-0`}>
                         {user.type === 'user' ? 'Customer' : 'Artisan'}
                       </Badge>
                     </div>

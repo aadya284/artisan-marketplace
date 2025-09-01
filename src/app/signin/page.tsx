@@ -107,7 +107,7 @@ export default function SignInPage() {
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
                   <div className="p-3 bg-orange-100 rounded-full">
-                    <Palette className="h-6 w-6 text-orange-600" />
+                    <Palette className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg">Sign in as Artisan</h3>
@@ -147,7 +147,7 @@ export default function SignInPage() {
               {userType === "user" ? (
                 <User className="h-5 w-5 text-blue-600" />
               ) : (
-                <Palette className="h-5 w-5 text-orange-600" />
+                <Palette className="h-5 w-5 text-primary" />
               )}
               <span className="font-medium">
                 {userType === "user" ? "User" : "Artisan"} Sign In

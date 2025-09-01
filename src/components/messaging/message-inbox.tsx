@@ -327,7 +327,7 @@ export default function MessageInbox({ className }: MessageInboxProps) {
                         <div>
                           <h3 className="font-semibold">{selectedMessage.customerName}</h3>
                           <p className="text-sm text-gray-600">{selectedMessage.customerEmail}</p>
-                          <p className="text-xs text-primary">Re: {selectedMessage.artworkName}</p>
+                          <p className="text-xs text-orange-600">Re: {selectedMessage.artworkName}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -385,7 +385,7 @@ export default function MessageInbox({ className }: MessageInboxProps) {
                           >
                             <p className="text-sm">{threadMessage.message}</p>
                             <p className={`text-xs mt-2 ${
-                              threadMessage.sender === "artisan" ? "text-primary" : "text-gray-500"
+                              threadMessage.sender === "artisan" ? "text-orange-100" : "text-gray-500"
                             }`}>
                               {formatTimestamp(threadMessage.timestamp)}
                             </p>

@@ -26,7 +26,7 @@ export default function NearbyStoresPage() {
         {/* Hero Section */}
         <section className="py-20 md:py-32">
           <div className="container mx-auto text-center">
-            <Badge variant="outline" className="mb-6 bg-orange-100 text-primary border-orange-200">
+            <Badge variant="outline" className="mb-6 bg-orange-100 text-orange-700 border-orange-200">
               <Clock className="w-4 h-4 mr-2" />
               Coming Soon
             </Badge>
@@ -41,7 +41,7 @@ export default function NearbyStoresPage() {
 
             <div className="flex justify-center">
               <div className="relative">
-                <MapPin className="w-16 h-16 text-primary animate-bounce" />
+                <MapPin className="w-16 h-16 text-orange-600 animate-bounce" />
                 <div className="absolute -top-2 -right-2 w-6 h-6 bg-orange-600 rounded-full animate-ping"></div>
               </div>
             </div>
@@ -61,7 +61,7 @@ export default function NearbyStoresPage() {
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-orange-100 rounded-lg">
-                      <Navigation className="w-6 h-6 text-primary" />
+                      <Navigation className="w-6 h-6 text-orange-600" />
                     </div>
                     <CardTitle className="text-xl" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                       Interactive Map
@@ -80,7 +80,7 @@ export default function NearbyStoresPage() {
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-orange-100 rounded-lg">
-                      <Search className="w-6 h-6 text-primary" />
+                      <Search className="w-6 h-6 text-orange-600" />
                     </div>
                     <CardTitle className="text-xl" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                       Smart Search
@@ -99,7 +99,7 @@ export default function NearbyStoresPage() {
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-orange-100 rounded-lg">
-                      <Store className="w-6 h-6 text-primary" />
+                      <Store className="w-6 h-6 text-orange-600" />
                     </div>
                     <CardTitle className="text-xl" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                       Store Information
@@ -118,7 +118,7 @@ export default function NearbyStoresPage() {
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-orange-100 rounded-lg">
-                      <Heart className="w-6 h-6 text-primary" />
+                      <Heart className="w-6 h-6 text-orange-600" />
                     </div>
                     <CardTitle className="text-xl" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                       Wishlist Sync
@@ -137,7 +137,7 @@ export default function NearbyStoresPage() {
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-orange-100 rounded-lg">
-                      <Star className="w-6 h-6 text-primary" />
+                      <Star className="w-6 h-6 text-orange-600" />
                     </div>
                     <CardTitle className="text-xl" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                       Reviews & Ratings
@@ -156,7 +156,7 @@ export default function NearbyStoresPage() {
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <div className="p-3 bg-orange-100 rounded-lg">
-                      <Calendar className="w-6 h-6 text-primary" />
+                      <Calendar className="w-6 h-6 text-orange-600" />
                     </div>
                     <CardTitle className="text-xl" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                       Events & Workshops
@@ -189,7 +189,7 @@ export default function NearbyStoresPage() {
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-3 rounded-lg border border-white/30 bg-white/20 text-white placeholder-white/80 focus:ring-2 focus:ring-white/50 focus:outline-none focus:bg-white/30"
               />
-              <Button size="lg" className="bg-white text-primary hover:bg-orange-50 font-semibold px-8">
+              <Button size="lg" className="bg-white text-orange-600 hover:bg-orange-50 font-semibold px-8">
                 Notify Me
               </Button>
             </div>

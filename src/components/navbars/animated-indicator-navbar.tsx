@@ -89,7 +89,7 @@ const AnimatedIndicatorNavbar = () => {
         {/* Left WordMark */}
         <Link href={NAV_LOGO.url} className="flex items-center gap-4">
           <img src={NAV_LOGO.src} className="max-h-20 w-20 md:max-h-24 md:w-24" alt={NAV_LOGO.alt} />
-          <span className="text-xl font-bold tracking-tighter text-primary font-display">
+          <span className="text-xl font-bold tracking-tighter text-amber-800 font-display">
             {NAV_LOGO.title}
           </span>
         </Link>

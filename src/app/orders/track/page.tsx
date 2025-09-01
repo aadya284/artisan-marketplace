@@ -89,7 +89,7 @@ export default function TrackPackagePage() {
 
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-orange-100 rounded-full">
-                  <Clock className="h-4 w-4 text-primary" />
+                  <Clock className="h-4 w-4 text-orange-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm">Processing Time</h3>

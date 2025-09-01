@@ -116,10 +116,10 @@ export default function ArtisanDashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pending Clearance</CardTitle>
-                <Package className="h-4 w-4 text-primary" />
+                <Package className="h-4 w-4 text-orange-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-primary">₹{artisanEarnings.pendingClearance.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-orange-600">₹{artisanEarnings.pendingClearance.toLocaleString()}</div>
                 <p className="text-xs text-muted-foreground">Processing payments</p>
               </CardContent>
             </Card>
@@ -161,7 +161,7 @@ export default function ArtisanDashboardPage() {
                           <p className="font-bold">₹{sale.amount.toLocaleString()}</p>
                           <Badge
                             variant={sale.status === "cleared" ? "default" : "secondary"}
-                            className={sale.status === "cleared" ? "bg-green-100 text-green-800" : "bg-orange-100 text-primary"}
+                            className={sale.status === "cleared" ? "bg-green-100 text-green-800" : "bg-orange-100 text-orange-800"}
                           >
                             {sale.status === "cleared" ? "Cleared" : "Pending"}
                           </Badge>

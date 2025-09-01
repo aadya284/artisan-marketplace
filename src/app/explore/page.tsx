@@ -339,7 +339,7 @@ export default function ExplorePage() {
           <div className="container mx-auto text-center">
             <h1 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
               Explore Authentic
-              <span className="block text-primary">Indian Crafts</span>
+              <span className="block text-orange-600">Indian Crafts</span>
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Discover handcrafted treasures from talented artisans across India. Each piece tells a story of tradition and craftsmanship.
@@ -497,7 +497,7 @@ export default function ExplorePage() {
                     onClick={() => setSelectedCategory(category)}
                     className={selectedCategory === category 
                       ? "bg-orange-600 hover:bg-orange-700" 
-                      : "border-orange-200 text-primary hover:bg-orange-50"
+                      : "border-orange-200 text-orange-700 hover:bg-orange-50"
                     }
                   >
                     {category}
@@ -641,11 +641,11 @@ export default function ExplorePage() {
 
                   <div className={`p-6 ${viewMode === "list" ? "flex-1" : ""}`}>
                     <div className="mb-3">
-                      <Badge variant="outline" className="text-xs text-primary border-orange-200 mb-2">
+                      <Badge variant="outline" className="text-xs text-orange-700 border-orange-200 mb-2">
                         {product.state}
                       </Badge>
                       <Link href={`/artwork/${product.id}`}>
-                        <h3 className="font-bold text-lg text-gray-800 mb-1 hover:text-primary cursor-pointer transition-colors" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                        <h3 className="font-bold text-lg text-gray-800 mb-1 hover:text-orange-600 cursor-pointer transition-colors" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                           {product.name}
                         </h3>
                       </Link>
@@ -683,7 +683,7 @@ export default function ExplorePage() {
                       <Link href={`/artwork/${product.id}`} className="flex-1">
                         <Button
                           variant="outline"
-                          className="w-full border-orange-300 text-primary hover:bg-orange-50 font-semibold"
+                          className="w-full border-orange-300 text-orange-700 hover:bg-orange-50 font-semibold"
                           style={{ fontFamily: 'Rajdhani, sans-serif' }}
                         >
                           <Eye className="w-4 h-4 mr-1" />

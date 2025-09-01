@@ -104,13 +104,13 @@ export default function CartPage() {
                     <Icon className="w-5 h-5" />
                   </div>
                   <span className={`ml-2 font-medium ${
-                    currentStep >= step ? "text-primary" : "text-gray-400"
+                    currentStep >= step ? "text-orange-600" : "text-gray-400"
                   }`} style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                     {title}
                   </span>
                   {step < 3 && (
                     <ArrowRight className={`w-5 h-5 mx-4 ${
-                      currentStep > step ? "text-primary" : "text-gray-300"
+                      currentStep > step ? "text-orange-600" : "text-gray-300"
                     }`} />
                   )}
                 </div>
@@ -256,10 +256,10 @@ export default function CartPage() {
                     </h3>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-orange-300 cursor-pointer">
-                        <input type="radio" name="delivery" defaultChecked className="text-primary" />
+                        <input type="radio" name="delivery" defaultChecked className="text-orange-600" />
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <Truck className="w-5 h-5 text-primary" />
+                            <Truck className="w-5 h-5 text-orange-600" />
                             <span className="font-medium">Standard Delivery</span>
                             <Badge variant="outline" className="text-green-600 border-green-600">FREE</Badge>
                           </div>
@@ -268,7 +268,7 @@ export default function CartPage() {
                       </div>
                       
                       <div className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-orange-300 cursor-pointer">
-                        <input type="radio" name="delivery" className="text-primary" />
+                        <input type="radio" name="delivery" className="text-orange-600" />
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <Clock className="w-5 h-5 text-blue-600" />
@@ -394,7 +394,7 @@ export default function CartPage() {
                     <span>₹{tax.toLocaleString()}</span>
                   </div>
                   {discount > 0 && (
-                    <div className="flex justify-between text-primary">
+                    <div className="flex justify-between text-orange-600">
                       <span>Promo Discount</span>
                       <span>-₹{discount.toLocaleString()}</span>
                     </div>
@@ -426,7 +426,7 @@ export default function CartPage() {
                       </Button>
                       <Button 
                         variant="outline" 
-                        className="w-full border-orange-600 text-primary hover:bg-orange-50"
+                        className="w-full border-orange-600 text-orange-600 hover:bg-orange-50"
                         style={{ fontFamily: 'Rajdhani, sans-serif' }}
                       >
                         Buy Now (Express Checkout)

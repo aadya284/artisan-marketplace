@@ -76,8 +76,8 @@ export default function SignInPage() {
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-primary mb-2">Welcome Back</h1>
-            <p className="text-primary">Choose how you'd like to sign in</p>
+            <h1 className="text-3xl font-bold text-amber-800 mb-2">Welcome Back</h1>
+            <p className="text-amber-600">Choose how you'd like to sign in</p>
           </div>
 
           <div className="space-y-4">
@@ -107,7 +107,7 @@ export default function SignInPage() {
               <CardContent className="p-6">
                 <div className="flex items-center space-x-4">
                   <div className="p-3 bg-orange-100 rounded-full">
-                    <Palette className="h-6 w-6 text-primary" />
+                    <Palette className="h-6 w-6 text-orange-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg">Sign in as Artisan</h3>
@@ -121,7 +121,7 @@ export default function SignInPage() {
           </div>
 
           <div className="text-center mt-6">
-            <Link href="/" className="text-primary hover:text-primary text-sm">
+            <Link href="/" className="text-amber-600 hover:text-amber-800 text-sm">
               ← Back to Home
             </Link>
           </div>
@@ -147,7 +147,7 @@ export default function SignInPage() {
               {userType === "user" ? (
                 <User className="h-5 w-5 text-blue-600" />
               ) : (
-                <Palette className="h-5 w-5 text-primary" />
+                <Palette className="h-5 w-5 text-orange-600" />
               )}
               <span className="font-medium">
                 {userType === "user" ? "User" : "Artisan"} Sign In

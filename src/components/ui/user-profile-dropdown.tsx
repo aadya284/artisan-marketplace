@@ -45,7 +45,7 @@ export const UserProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) =>
           <Button variant="ghost" className="relative h-8 w-8 rounded-full">
             <Avatar className="h-8 w-8">
               <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback className="bg-amber-100 text-amber-800">
+              <AvatarFallback className="bg-amber-100 text-primary">
                 {user.name.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -106,7 +106,7 @@ export const UserProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) =>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
             <AvatarImage src={user.avatar} alt={user.name} />
-            <AvatarFallback className="bg-orange-100 text-orange-800">
+            <AvatarFallback className="bg-orange-100 text-primary">
               {user.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -117,7 +117,7 @@ export const UserProfileDropdown: React.FC<ProfileDropdownProps> = ({ user }) =>
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-            <p className="text-xs leading-none text-orange-600">Artisan</p>
+            <p className="text-xs leading-none text-primary">Artisan</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

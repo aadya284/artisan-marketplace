@@ -201,7 +201,7 @@ export default function ExhibitionPage() {
                 <p className="text-gray-600">Featured Artists</p>
               </div>
               <div>
-                <h3 className="text-3xl font-bold text-orange-600" style={{ fontFamily: 'Rajdhani, sans-serif' }}>5K+</h3>
+                <h3 className="text-3xl font-bold text-primary" style={{ fontFamily: 'Rajdhani, sans-serif' }}>5K+</h3>
                 <p className="text-gray-600">Visitors Monthly</p>
               </div>
               <div>

@@ -107,7 +107,7 @@ export default function WorkshopsPage() {
           <div className="container mx-auto text-center">
             <h1 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
               KarigarSetu
-              <span className="block text-orange-600">Workshops</span>
+              <span className="block text-primary">Workshops</span>
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Crafting Together, Growing Together.
@@ -140,7 +140,7 @@ export default function WorkshopsPage() {
                     variant={level === lv ? "default" : "outline"}
                     size="sm"
                     onClick={() => setLevel(lv)}
-                    className={level === lv ? "bg-orange-600 hover:bg-orange-700" : "border-orange-200 text-orange-700 hover:bg-orange-50"}
+                    className={level === lv ? "bg-orange-600 hover:bg-orange-700" : "border-orange-200 text-primary hover:bg-orange-50"}
                   >
                     {lv}
                   </Button>
@@ -153,7 +153,7 @@ export default function WorkshopsPage() {
                 <div className="min-w-[220px] w-full lg:w-64">
                   <Slider min={50} max={500} value={priceRange} onValueChange={(v: any) => setPriceRange(v)} />
                 </div>
-                <Badge variant="outline" className="text-orange-700 border-orange-200">
+                <Badge variant="outline" className="text-primary border-orange-200">
                   ₹{priceRange[0]}–₹{priceRange[1]}
                 </Badge>
               </div>
@@ -179,7 +179,7 @@ export default function WorkshopsPage() {
                     </video>
 
                     <Badge className="absolute top-3 left-3 bg-red-600 text-white">Live</Badge>
-                    <Badge variant="outline" className="absolute top-3 right-3 text-xs text-orange-700 border-orange-200">
+                    <Badge variant="outline" className="absolute top-3 right-3 text-xs text-primary border-orange-200">
                       {w.level}
                     </Badge>
 
@@ -190,7 +190,7 @@ export default function WorkshopsPage() {
 
                   <div className="p-6">
                     <div className="mb-3">
-                      <Badge variant="outline" className="text-xs text-orange-700 border-orange-200 mb-2">{w.duration}</Badge>
+                      <Badge variant="outline" className="text-xs text-primary border-orange-200 mb-2">{w.duration}</Badge>
                       <h3 className="font-bold text-xl text-gray-800 mb-2 leading-tight" style={{ fontFamily: 'Rajdhani, sans-serif' }}>{w.title}</h3>
                       <p className="text-sm text-gray-600 mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>by {w.artisan}</p>
                     </div>

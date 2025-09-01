@@ -121,7 +121,7 @@ export default function RegisterPage() {
               {userType === "user" ? (
                 <User className="h-5 w-5 text-blue-600" />
               ) : (
-                <Palette className="h-5 w-5 text-orange-600" />
+                <Palette className="h-5 w-5 text-primary" />
               )}
               <span className="font-medium">
                 {userType === "user" ? "User" : "Artisan"} Registration

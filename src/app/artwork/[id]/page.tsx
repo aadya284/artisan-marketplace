@@ -312,7 +312,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
         {/* Breadcrumb */}
         <div className="container mx-auto py-4">
           <nav className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/explore" className="hover:text-orange-600 flex items-center gap-1">
+            <Link href="/explore" className="hover:text-primary flex items-center gap-1">
               <ChevronLeft className="w-4 h-4" />
               Back to Explore
             </Link>
@@ -357,7 +357,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
             {/* Product Info */}
             <div className="space-y-6">
               <div>
-                <Badge variant="outline" className="text-orange-700 border-orange-200 mb-3">
+                <Badge variant="outline" className="text-primary border-orange-200 mb-3">
                   {artwork.state} • {artwork.category}
                 </Badge>
                 <h1 className="text-3xl font-bold text-gray-800 mb-2" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
@@ -439,7 +439,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex-1 border-orange-300 text-orange-700 hover:bg-orange-50 font-semibold py-3"
+                    className="flex-1 border-orange-300 text-primary hover:bg-orange-50 font-semibold py-3"
                     disabled={!artwork.inStock}
                     onClick={handleAddToCart}
                   >
@@ -463,7 +463,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                        className="border-orange-300 text-primary hover:bg-orange-50"
                       >
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Connect with Artisan
@@ -485,7 +485,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                           <div>
                             <p className="font-medium">{artwork.artist.name}</p>
                             <p className="text-sm text-gray-600">{artwork.artist.location}</p>
-                            <p className="text-xs text-orange-600">Usually responds within a few hours</p>
+                            <p className="text-xs text-primary">Usually responds within a few hours</p>
                           </div>
                         </div>
 
@@ -530,7 +530,7 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                        className="border-orange-300 text-primary hover:bg-orange-50"
                       >
                         Request Customization
                       </Button>
@@ -740,22 +740,22 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
                         
                         <div className="flex items-center gap-6">
                           <div className="text-center">
-                            <div className="text-2xl font-bold text-orange-600">{artwork.artist.rating}</div>
+                            <div className="text-2xl font-bold text-primary">{artwork.artist.rating}</div>
                             <div className="text-sm text-gray-600">Rating</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-2xl font-bold text-orange-600">{artwork.artist.totalReviews}</div>
+                            <div className="text-2xl font-bold text-primary">{artwork.artist.totalReviews}</div>
                             <div className="text-sm text-gray-600">Reviews</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-2xl font-bold text-orange-600">{artwork.artist.worksCreated}</div>
+                            <div className="text-2xl font-bold text-primary">{artwork.artist.worksCreated}</div>
                             <div className="text-sm text-gray-600">Works</div>
                           </div>
                         </div>
                         
                         <p className="text-gray-700 leading-relaxed">{artwork.artist.bio}</p>
                         
-                        <Button variant="outline" className="border-orange-300 text-orange-700 hover:bg-orange-50">
+                        <Button variant="outline" className="border-orange-300 text-primary hover:bg-orange-50">
                           View More Works by {artwork.artist.name}
                         </Button>
                       </div>

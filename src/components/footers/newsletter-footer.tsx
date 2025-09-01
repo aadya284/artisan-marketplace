@@ -41,11 +41,11 @@ export const NewsletterFooter = () => {
         <div className="mb-10 flex flex-col items-start justify-between gap-10 border-b pb-10 sm:mb-16 sm:pb-12 md:flex-row">
           <div className="w-full max-w-full sm:max-w-sm">
             <a href="#" className="inline-block">
-              <h2 className="mb-6 text-2xl font-bold text-amber-100">
+              <h2 className="mb-6 text-2xl font-bold text-primary">
                 KarigarSetu
               </h2>
             </a>
-            <p className="mb-8 text-base text-amber-200">
+            <p className="mb-8 text-base text-primary">
               Stay updated on new artisan products and stories from our vibrant 
               community of traditional craftspeople.
             </p>
@@ -68,7 +68,7 @@ export const NewsletterFooter = () => {
             <nav className="grid w-full grid-cols-1 gap-x-12 gap-y-8 sm:grid-cols-2 md:w-auto md:grid-cols-3">
               {navigation.map((section) => (
                 <div key={section.title} className="min-w-[140px]">
-                  <h2 className="mb-4 text-lg font-semibold text-amber-100">
+                  <h2 className="mb-4 text-lg font-semibold text-primary">
                     {section.title}
                   </h2>
                   <ul className="space-y-3.5">
@@ -76,7 +76,7 @@ export const NewsletterFooter = () => {
                       <li key={link.name}>
                         <a
                           href={link.href}
-                          className="inline-block py-1 text-amber-200 transition-colors duration-200 hover:text-amber-100 active:text-amber-300"
+                          className="inline-block py-1 text-primary transition-colors duration-200 hover:text-primary active:text-primary"
                         >
                           {link.name}
                         </a>
@@ -91,19 +91,19 @@ export const NewsletterFooter = () => {
 
         {/* Contact Information */}
         <div className="mb-10 border-b pb-10">
-          <h3 className="mb-6 text-lg font-semibold text-amber-100">Get in Touch</h3>
+          <h3 className="mb-6 text-lg font-semibold text-primary">Get in Touch</h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="flex items-center gap-3">
-              <Mail className="h-5 w-5 text-amber-300" />
-              <span className="text-amber-200">contact@karigarsetu.in</span>
+              <Mail className="h-5 w-5 text-primary" />
+              <span className="text-primary">contact@karigarsetu.in</span>
             </div>
             <div className="flex items-center gap-3">
-              <Phone className="h-5 w-5 text-amber-300" />
-              <span className="text-amber-200">+91 98765 43210</span>
+              <Phone className="h-5 w-5 text-primary" />
+              <span className="text-primary">+91 98765 43210</span>
             </div>
             <div className="flex items-center gap-3">
-              <MapPin className="h-5 w-5 text-amber-300" />
-              <span className="text-amber-200">India, IND</span>
+              <MapPin className="h-5 w-5 text-primary" />
+              <span className="text-primary">India, IND</span>
             </div>
           </div>
         </div>
@@ -116,7 +116,7 @@ export const NewsletterFooter = () => {
                 key={link.href}
                 href={link.href}
                 aria-label={`Visit our ${link.name} page`}
-                className="rounded-full p-3 text-amber-200 transition-all duration-200 hover:bg-amber-700 hover:text-amber-100 active:bg-amber-800"
+                className="rounded-full p-3 text-primary transition-all duration-200 hover:bg-amber-700 hover:text-primary active:bg-amber-800"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -126,7 +126,7 @@ export const NewsletterFooter = () => {
           </div>
 
           {/* Copyright - Below on mobile, left on desktop */}
-          <p className="order-2 text-center text-sm text-amber-200 sm:text-left md:order-1">
+          <p className="order-2 text-center text-sm text-primary sm:text-left md:order-1">
             © {new Date().getFullYear()} KarigarSetu. All rights reserved.
           </p>
         </div>

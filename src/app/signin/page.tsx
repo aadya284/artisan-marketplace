@@ -76,7 +76,7 @@ export default function SignInPage() {
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-amber-800 mb-2">Welcome Back</h1>
+            <h1 className="text-3xl font-bold text-primary mb-2">Welcome Back</h1>
             <p className="text-amber-600">Choose how you'd like to sign in</p>
           </div>
 
@@ -121,7 +121,7 @@ export default function SignInPage() {
           </div>
 
           <div className="text-center mt-6">
-            <Link href="/" className="text-amber-600 hover:text-amber-800 text-sm">
+            <Link href="/" className="text-amber-600 hover:text-primary text-sm">
               ← Back to Home
             </Link>
           </div>

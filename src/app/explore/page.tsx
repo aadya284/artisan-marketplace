@@ -604,11 +604,9 @@ export default function ExplorePage() {
                 >
                   <div className={`relative ${viewMode === "list" ? "w-64 flex-shrink-0" : ""}`}>
                     <Link href={`/artwork/${product.id}`} className="block">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className={`object-cover transition-transform duration-300 group-hover:scale-105 ${viewMode === "list" ? "w-full h-48" : "w-full h-64"}`}
-                      />
+                      <div className={`${viewMode === "list" ? "w-full h-48" : "w-full h-64"} bg-black flex items-center justify-center`}>
+                        <span className="text-white/80 font-medium">Artwork Preview</span>
+                      </div>
 
                       {/* View Details Overlay */}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">

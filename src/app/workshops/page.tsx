@@ -153,7 +153,7 @@ export default function WorkshopsPage() {
                 <div className="min-w-[220px] w-full lg:w-64">
                   <Slider min={50} max={500} value={priceRange} onValueChange={(v: any) => setPriceRange(v)} />
                 </div>
-                <Badge variant="outline" className="text-orange-700 border-orange-200">
+                <Badge variant="outline" className="text-primary border-orange-200">
                   ₹{priceRange[0]}–₹{priceRange[1]}
                 </Badge>
               </div>

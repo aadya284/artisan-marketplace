@@ -141,13 +141,13 @@ export default function ExhibitionPage() {
     <>
       <AnimatedIndicatorNavbar />
       
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50">
         {/* Hero Section */}
-        <section className="py-16 bg-gradient-to-r from-purple-100 to-indigo-100">
+        <section className="py-16 bg-gradient-to-r from-amber-100 to-amber-200">
           <div className="container mx-auto text-center">
             <h1 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
               Art Exhibitions &
-              <span className="block text-purple-600">Cultural Showcases</span>
+              <span className="block text-amber-600">Cultural Showcases</span>
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Join exclusive exhibitions, meet talented artisans, and immerse yourself in India's rich cultural heritage.
@@ -180,7 +180,7 @@ export default function ExhibitionPage() {
               <Input
                 type="text"
                 placeholder="Search exhibitions or artists..."
-                className="pl-10 pr-4 py-3 w-full rounded-full border-purple-200 focus:border-purple-400"
+                className="pl-10 pr-4 py-3 w-full rounded-full border-amber-200 focus:border-amber-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -193,15 +193,15 @@ export default function ExhibitionPage() {
           <div className="container mx-auto">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
               <div>
-                <h3 className="text-3xl font-bold text-purple-600" style={{ fontFamily: 'Rajdhani, sans-serif' }}>24+</h3>
+                <h3 className="text-3xl font-bold text-amber-600" style={{ fontFamily: 'Rajdhani, sans-serif' }}>24+</h3>
                 <p className="text-gray-600">Active Exhibitions</p>
               </div>
               <div>
-                <h3 className="text-3xl font-bold text-indigo-600" style={{ fontFamily: 'Rajdhani, sans-serif' }}>150+</h3>
+                <h3 className="text-3xl font-bold text-amber-600" style={{ fontFamily: 'Rajdhani, sans-serif' }}>150+</h3>
                 <p className="text-gray-600">Featured Artists</p>
               </div>
               <div>
-                <h3 className="text-3xl font-bold text-orange-600" style={{ fontFamily: 'Rajdhani, sans-serif' }}>5K+</h3>
+                <h3 className="text-3xl font-bold text-amber-600" style={{ fontFamily: 'Rajdhani, sans-serif' }}>5K+</h3>
                 <p className="text-gray-600">Visitors Monthly</p>
               </div>
               <div>
@@ -226,8 +226,8 @@ export default function ExhibitionPage() {
                     size="sm"
                     onClick={() => setSelectedCategory(category)}
                     className={selectedCategory === category 
-                      ? "bg-purple-600 hover:bg-purple-700" 
-                      : "border-purple-200 text-purple-700 hover:bg-purple-50"
+                      ? "bg-amber-600 hover:bg-amber-700"
+                      : "border-amber-200 text-amber-700 hover:bg-amber-50"
                     }
                   >
                     {category}
@@ -245,8 +245,8 @@ export default function ExhibitionPage() {
                     size="sm"
                     onClick={() => setSelectedStatus(status)}
                     className={selectedStatus === status 
-                      ? "bg-indigo-600 hover:bg-indigo-700" 
-                      : "border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                      ? "bg-amber-600 hover:bg-amber-700"
+                      : "border-amber-200 text-amber-700 hover:bg-amber-50"
                     }
                   >
                     {status === "All" ? status : getStatusText(status)}
@@ -300,7 +300,7 @@ export default function ExhibitionPage() {
 
                   <div className="p-6">
                     <div className="mb-3">
-                      <Badge variant="outline" className="text-xs text-purple-700 border-purple-200 mb-2">
+                      <Badge variant="outline" className="text-xs text-amber-700 border-amber-200 mb-2">
                         {exhibition.category}
                       </Badge>
                       <h3 className="font-bold text-xl text-gray-800 mb-2 leading-tight" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
@@ -318,11 +318,11 @@ export default function ExhibitionPage() {
                     {/* Location and Date */}
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <MapPin className="w-4 h-4 text-purple-600" />
+                        <MapPin className="w-4 h-4 text-amber-600" />
                         {exhibition.location}
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="w-4 h-4 text-indigo-600" />
+                        <Calendar className="w-4 h-4 text-amber-600" />
                         {new Date(exhibition.startDate).toLocaleDateString()} - {new Date(exhibition.endDate).toLocaleDateString()}
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export default function ExhibitionPage() {
                     {/* Action Buttons */}
                     <div className="space-y-2">
                       <Button 
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold"
+                        className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold"
                         style={{ fontFamily: 'Rajdhani, sans-serif' }}
                       >
                         <Eye className="w-4 h-4 mr-2" />
@@ -352,7 +352,7 @@ export default function ExhibitionPage() {
                       
                       <Button 
                         variant="outline" 
-                        className="w-full border-purple-200 text-purple-700 hover:bg-purple-50"
+                        className="w-full border-amber-200 text-amber-700 hover:bg-amber-50"
                         style={{ fontFamily: 'Rajdhani, sans-serif' }}
                       >
                         {/* eslint-disable-next-line jsx-a11y/alt-text */}
@@ -378,7 +378,7 @@ export default function ExhibitionPage() {
         </section>
 
         {/* Artist Call-to-Action */}
-        <section className="py-16 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+        <section className="py-16 bg-gradient-to-r from-amber-700 to-amber-800 text-white">
           <div className="container mx-auto text-center">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
               Are You an Artist?
@@ -389,7 +389,7 @@ export default function ExhibitionPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 size="lg"
-                className="bg-white text-purple-700 hover:bg-gray-100 font-bold px-8 py-3 shadow-lg transition-all duration-200 hover:shadow-xl"
+                className="bg-white text-amber-700 hover:bg-gray-100 font-bold px-8 py-3 shadow-lg transition-all duration-200 hover:shadow-xl"
                 style={{ fontFamily: 'Rajdhani, sans-serif' }}
               >
                 <Plus className="w-5 h-5 mr-2" />
@@ -397,7 +397,7 @@ export default function ExhibitionPage() {
               </Button>
               <Button
                 size="lg"
-                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-700 font-bold px-8 py-3 shadow-lg transition-all duration-200 hover:shadow-xl"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-amber-700 font-bold px-8 py-3 shadow-lg transition-all duration-200 hover:shadow-xl"
                 style={{ fontFamily: 'Rajdhani, sans-serif' }}
               >
                 Learn More

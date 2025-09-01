@@ -147,9 +147,9 @@ export default function ExhibitionPage() {
           <div className="container mx-auto text-center">
             <h1 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
               Art Exhibitions &
-              <span className="block text-amber-600">Cultural Showcases</span>
+              <span className="block text-amber-700">Cultural Showcases</span>
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <p className="text-lg text-gray-800 max-w-2xl mx-auto mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Join exclusive exhibitions, meet talented artisans, and immerse yourself in India's rich cultural heritage.
             </p>
             
@@ -157,16 +157,15 @@ export default function ExhibitionPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Button 
                 size="lg" 
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3"
+                className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-8 py-3"
                 style={{ fontFamily: 'Rajdhani, sans-serif' }}
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Organize Exhibition
               </Button>
               <Button 
-                variant="outline" 
-                size="lg" 
-                className="border-purple-200 text-purple-700 hover:bg-purple-50 font-bold px-8 py-3"
+                size="lg"
+                className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-8 py-3"
                 style={{ fontFamily: 'Rajdhani, sans-serif' }}
               >
                 <Palette className="w-5 h-5 mr-2" />

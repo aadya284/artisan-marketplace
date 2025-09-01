@@ -272,11 +272,9 @@ export default function ExhibitionPage() {
                   className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 >
                   <div className="relative">
-                    <img 
-                      src={exhibition.image} 
-                      alt={exhibition.title}
-                      className="w-full h-48 object-cover"
-                    />
+                    <div className="w-full h-48 bg-black flex items-center justify-center">
+                      <span className="text-white/80 font-medium">Artwork Preview</span>
+                    </div>
                     
                     {/* Status Badge */}
                     <Badge className={`absolute top-3 left-3 ${getStatusColor(exhibition.status)} text-white`}>

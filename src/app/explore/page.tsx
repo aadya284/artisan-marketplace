@@ -339,7 +339,7 @@ export default function ExplorePage() {
           <div className="container mx-auto text-center">
             <h1 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
               Explore Authentic
-              <span className="block text-orange-600">Indian Crafts</span>
+              <span className="block text-primary">Indian Crafts</span>
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Discover handcrafted treasures from talented artisans across India. Each piece tells a story of tradition and craftsmanship.
@@ -645,7 +645,7 @@ export default function ExplorePage() {
                         {product.state}
                       </Badge>
                       <Link href={`/artwork/${product.id}`}>
-                        <h3 className="font-bold text-lg text-gray-800 mb-1 hover:text-orange-600 cursor-pointer transition-colors" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
+                        <h3 className="font-bold text-lg text-gray-800 mb-1 hover:text-primary cursor-pointer transition-colors" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
                           {product.name}
                         </h3>
                       </Link>

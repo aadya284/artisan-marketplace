@@ -3,8 +3,7 @@ import { TwoColumnHeroWithImage } from "@/components/heros/two-column-hero-with-
 import { TaglineSection } from "@/components/tagline/tagline-section";
 import { VideoShowcase } from "@/components/video/video-showcase";
 import { SocialTeamProfiles } from "@/components/teams/social-team-profiles";
-import { CompanyLogoTestimonials } from "@/components/testimonials/company-logo-testimonials";
-import { GradientOverlayCta } from "@/components/cta/gradient-overlay-cta";
+import AiMarketplaceDashboard from "@/components/marketplace/ai-marketplace-dashboard";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 
@@ -16,8 +15,7 @@ export default function HomePage() {
       <TaglineSection />
       <VideoShowcase />
       <SocialTeamProfiles />
-      <CompanyLogoTestimonials />
-      <GradientOverlayCta />
+      <AiMarketplaceDashboard />
       <NewsletterFooter />
       <AiChatbotWidget />
     </>

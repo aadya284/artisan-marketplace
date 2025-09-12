@@ -1,5 +1,4 @@
-import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
-import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
+import { AnimatedIndicatorNavbar as Navbar } from "@/components/navbars/animated-indicator-navbar";
 import { TwoColumnHeroWithImage } from "@/components/heros/two-column-hero-with-image";
 import { TaglineSection } from "@/components/tagline/tagline-section";
 import { VideoShowcase } from "@/components/video/video-showcase";
@@ -11,7 +10,7 @@ import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 export default function HomePage() {
   return (
     <>
-      <AnimatedIndicatorNavbar />
+      <Navbar />
       <TwoColumnHeroWithImage />
       <TaglineSection />
       <VideoShowcase />

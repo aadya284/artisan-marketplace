@@ -201,8 +201,12 @@ export default function ArtworkDetailPage() {
   const { addToCart, isInCart } = useCart();
   const router = useRouter();
 
-  const artwork = artworksData[parseInt(params.id) as keyof typeof artworksData];
-  const reviews = reviewsData[parseInt(params.id) as keyof typeof reviewsData] || [];
+  const routeParams = useParams<{ id: string }>();
+  const idParam = Array.isArray(routeParams?.id) ? routeParams.id[0] : routeParams?.id;
+  const parsedId = idParam ? parseInt(idParam, 10) : NaN;
+
+  const artwork = artworksData[parsedId as keyof typeof artworksData];
+  const reviews = reviewsData[parsedId as keyof typeof reviewsData] || [];
 
   if (!artwork) {
     notFound();

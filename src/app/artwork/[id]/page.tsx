@@ -183,13 +183,7 @@ const reviewsData = {
   ]
 };
 
-interface ArtworkDetailPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
+export default function ArtworkDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);

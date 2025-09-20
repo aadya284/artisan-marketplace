@@ -125,10 +125,6 @@ export function AiMarketplaceDashboard() {
       <div className="container mx-auto">
         {/* Header */}
         <div className="mb-10 text-center">
-          <Badge variant="outline" className="mb-4 bg-marketplace-surface">
-            <Sparkles className="w-4 h-4 mr-2 text-indigo-600" />
-            AI-Powered Marketplace
-          </Badge>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-marketplace-text-primary">
             Discover Crafts • Track Growth • Shop Smart
           </h2>

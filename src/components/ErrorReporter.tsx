@@ -25,8 +25,9 @@ export default function ErrorReporter({ error, reset }: ReporterProps) {
       const filename = e.filename || "";
       const fromFullStory = /fullstory|edge\.fullstory\.com/i.test(stack) || /fullstory|edge\.fullstory\.com/i.test(filename);
       const isFailedToFetch = /Failed to fetch/i.test(msg);
-      const fromDevOverlay = /react-dev-overlay/i.test(stack);
-      if (isFailedToFetch && (fromFullStory || fromDevOverlay)) {
+      const fromDevOverlay = /react-dev-overlay|get-error-by-type/i.test(stack);
+      const fromRouteMessenger = /route-messenger\.js|messageHandler/i.test(stack) || /route-messenger\.js/i.test(filename);
+      if (isFailedToFetch && (fromFullStory || fromDevOverlay || fromRouteMessenger)) {
         e.preventDefault();
         return; // ignore noisy third-party fetch errors
       }
@@ -50,8 +51,9 @@ export default function ErrorReporter({ error, reset }: ReporterProps) {
       const stack = (reason?.stack || "").toString();
       const isFailedToFetch = /Failed to fetch/i.test(msg);
       const fromFullStory = /fullstory|edge\.fullstory\.com/i.test(stack);
-      const fromDevOverlay = /react-dev-overlay/i.test(stack);
-      if (isFailedToFetch && (fromFullStory || fromDevOverlay)) {
+      const fromDevOverlay = /react-dev-overlay|get-error-by-type/i.test(stack);
+      const fromRouteMessenger = /route-messenger\.js|messageHandler/i.test(stack);
+      if (isFailedToFetch && (fromFullStory || fromDevOverlay || fromRouteMessenger)) {
         e.preventDefault();
         return; // ignore noisy third-party fetch errors
       }

@@ -1,9 +1,8 @@
 "use client";
 
-import { ArrowRight, ArrowUpRight, Palette } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 const artVideos = [
@@ -57,14 +56,6 @@ const TwoColumnHeroWithImage = () => {
 
       <div className="container mx-auto relative z-30">
         <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto">
-          <Badge
-            variant="outline"
-            className="bg-primary text-primary-foreground border-0 hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            <Palette className="mr-2 size-3.5 text-primary-foreground" />
-            Handcrafted Heritage
-            <ArrowUpRight className="ml-2 size-4" />
-          </Badge>
 
           <h1 className="text-pretty text-4xl font-bold lg:text-6xl xl:text-7xl leading-tight font-display text-white">
             Where Every Craft Tells a Story and{" "}

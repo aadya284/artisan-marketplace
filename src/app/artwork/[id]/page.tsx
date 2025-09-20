@@ -28,7 +28,7 @@ import {
   MessageCircle
 } from "lucide-react";
 import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
+import { notFound, useRouter, useParams } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
 
 // Sample artwork data - in a real app, this would come from an API
@@ -183,13 +183,7 @@ const reviewsData = {
   ]
 };
 
-interface ArtworkDetailPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
+export default function ArtworkDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -207,8 +201,12 @@ export default function ArtworkDetailPage({ params }: ArtworkDetailPageProps) {
   const { addToCart, isInCart } = useCart();
   const router = useRouter();
 
-  const artwork = artworksData[parseInt(params.id) as keyof typeof artworksData];
-  const reviews = reviewsData[parseInt(params.id) as keyof typeof reviewsData] || [];
+  const routeParams = useParams<{ id: string }>();
+  const idParam = Array.isArray(routeParams?.id) ? routeParams.id[0] : routeParams?.id;
+  const parsedId = idParam ? parseInt(idParam, 10) : NaN;
+
+  const artwork = artworksData[parsedId as keyof typeof artworksData];
+  const reviews = reviewsData[parsedId as keyof typeof reviewsData] || [];
 
   if (!artwork) {
     notFound();

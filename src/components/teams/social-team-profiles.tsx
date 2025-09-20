@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Palette, ChevronLeft, ChevronRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Featured Indian artisans with their craft specialties and background images
@@ -84,13 +83,6 @@ const SocialTeamProfiles = () => {
     <section className="py-16 mt-2 bg-background border-t border-amber-200/50">
       <div className="container mx-auto">
         <div className="flex flex-col gap-6 py-4 lg:py-8 text-center">
-          <Badge
-            variant="outline"
-            className="w-fit mx-auto gap-1 bg-card px-3 text-sm font-normal tracking-tight shadow-sm"
-          >
-            <Palette className="size-4" />
-            <span>Meet Our Artisans</span>
-          </Badge>
           <h2 className="text-3xl leading-tight tracking-tight md:text-4xl lg:text-6xl font-display">
             Masters of Traditional Crafts
           </h2>

@@ -19,7 +19,17 @@ export default function ErrorReporter({ error, reset }: ReporterProps) {
 
     const send = (payload: unknown) => window.parent.postMessage(payload, "*");
 
-    const onError = (e: ErrorEvent) =>
+    const onError = (e: ErrorEvent) => {
+      const msg = e.message || "";
+      const stack = (e.error?.stack || "") as string;
+      const filename = e.filename || "";
+      const fromFullStory = /fullstory|edge\.fullstory\.com/i.test(stack) || /fullstory|edge\.fullstory\.com/i.test(filename);
+      const isFailedToFetch = /Failed to fetch/i.test(msg);
+      const fromDevOverlay = /react-dev-overlay/i.test(stack);
+      if (isFailedToFetch && (fromFullStory || fromDevOverlay)) {
+        e.preventDefault();
+        return; // ignore noisy third-party fetch errors
+      }
       send({
         type: "ERROR_CAPTURED",
         error: {
@@ -32,17 +42,29 @@ export default function ErrorReporter({ error, reset }: ReporterProps) {
         },
         timestamp: Date.now(),
       });
+    };
 
-    const onReject = (e: PromiseRejectionEvent) =>
+    const onReject = (e: PromiseRejectionEvent) => {
+      const reason: any = e.reason;
+      const msg = (reason?.message || String(reason || "")).toString();
+      const stack = (reason?.stack || "").toString();
+      const isFailedToFetch = /Failed to fetch/i.test(msg);
+      const fromFullStory = /fullstory|edge\.fullstory\.com/i.test(stack);
+      const fromDevOverlay = /react-dev-overlay/i.test(stack);
+      if (isFailedToFetch && (fromFullStory || fromDevOverlay)) {
+        e.preventDefault();
+        return; // ignore noisy third-party fetch errors
+      }
       send({
         type: "ERROR_CAPTURED",
         error: {
-          message: e.reason?.message ?? String(e.reason),
-          stack: e.reason?.stack,
+          message: reason?.message ?? String(reason),
+          stack: reason?.stack,
           source: "unhandledrejection",
         },
         timestamp: Date.now(),
       });
+    };
 
     const pollOverlay = () => {
       const overlay = document.querySelector("[data-nextjs-dialog-overlay]");

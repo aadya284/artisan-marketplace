@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { MessageCircle, X, Send, Package, ShoppingBag, Phone, Clock } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface QuickAction {
   label: string
@@ -147,19 +148,22 @@ export default function AiChatbotWidget() {
             {/* Quick Actions */}
             {messages.length === 1 && (
               <div className="px-4 pb-2 shrink-0 border-t border-border bg-background">
-                <p className="text-xs text-muted-foreground mb-2">Quick actions:</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {quickActions.map((action, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleQuickAction(action)}
-                      className="flex items-center gap-2 p-2 text-xs bg-muted hover:bg-accent rounded-md transition-colors text-left"
-                    >
-                      {action.icon}
-                      {action.label}
-                    </button>
-                  ))}
-                </div>
+                <p className="text-xs text-muted-foreground mb-2">Quick action:</p>
+                <Select onValueChange={(v) => { const a = quickActions.find(q => q.label === v); if (a) handleQuickAction(a); }}>
+                  <SelectTrigger className="w-full" aria-label="Quick action">
+                    <SelectValue placeholder="Choose an action" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {quickActions.map((action) => (
+                      <SelectItem key={action.label} value={action.label}>
+                        <span className="flex items-center gap-2">
+                          {action.icon}
+                          {action.label}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
 

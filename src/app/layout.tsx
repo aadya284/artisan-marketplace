@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Rajdhani } from "next/font/google";
 import "./globals.css";
 import VisualEditsMessenger from "../visual-edits/VisualEditsMessenger";
@@ -34,7 +35,11 @@ export default function RootLayout({
           <CartProvider>
             {children}
             <Toaster position="top-right" richColors closeButton />
+<<<<<<< HEAD
             <AiChatbotWidget />
+=======
+            {/* <AiChatbotWidget /> */}
+>>>>>>> e515397 (fix: remove react-rough-notation for Vercel build compatibility)
           </CartProvider>
         </AuthProvider>
         <VisualEditsMessenger />

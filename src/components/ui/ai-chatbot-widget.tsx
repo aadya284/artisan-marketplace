@@ -107,7 +107,7 @@ export default function AiChatbotWidget() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="mb-4 w-80 h-96 bg-card border border-border rounded-lg shadow-xl overflow-hidden"
+            className="mb-4 w-80 h-96 bg-card border border-border rounded-lg shadow-xl overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
@@ -165,19 +165,19 @@ export default function AiChatbotWidget() {
 
             {/* Input */}
             <div className="p-4 border-t border-border bg-background">
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Type your message..."
-                  className="flex-1 px-3 py-2 text-sm bg-muted border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="flex-1 px-3 text-sm h-10 bg-muted border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputValue.trim()}
-                  className="p-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="h-10 w-10 flex items-center justify-center bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Send className="w-4 h-4" />
                 </button>

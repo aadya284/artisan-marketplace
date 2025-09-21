@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { MessageCircle, X, Send, Package, ShoppingBag, Phone, Clock } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface QuickAction {
   label: string
@@ -107,10 +108,10 @@ export default function AiChatbotWidget() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="mb-4 w-80 h-96 bg-card border border-border rounded-lg shadow-xl overflow-hidden"
+            className="mb-4 w-80 h-96 bg-card border border-border rounded-lg shadow-xl overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
+            <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between shrink-0">
               <div>
                 <h3 className="font-display font-semibold text-sm">kalabandhu</h3>
                 <p className="text-xs opacity-90">How can I help you today?</p>
@@ -125,7 +126,7 @@ export default function AiChatbotWidget() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-4 space-y-4 h-60 overflow-y-auto bg-background">
+            <div className="flex-1 min-h-0 p-4 space-y-4 overflow-y-auto bg-background">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -146,38 +147,41 @@ export default function AiChatbotWidget() {
 
             {/* Quick Actions */}
             {messages.length === 1 && (
-              <div className="px-4 pb-2">
-                <p className="text-xs text-muted-foreground mb-2">Quick actions:</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {quickActions.map((action, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleQuickAction(action)}
-                      className="flex items-center gap-2 p-2 text-xs bg-muted hover:bg-accent rounded-md transition-colors text-left"
-                    >
-                      {action.icon}
-                      {action.label}
-                    </button>
-                  ))}
-                </div>
+              <div className="px-4 pb-2 shrink-0 border-t border-border bg-background">
+                <p className="text-xs text-muted-foreground mb-2">Quick action:</p>
+                <Select onValueChange={(v) => { const a = quickActions.find(q => q.label === v); if (a) handleQuickAction(a); }}>
+                  <SelectTrigger className="w-full" aria-label="Quick action">
+                    <SelectValue placeholder="Choose an action" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {quickActions.map((action) => (
+                      <SelectItem key={action.label} value={action.label}>
+                        <span className="flex items-center gap-2">
+                          {action.icon}
+                          {action.label}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
 
             {/* Input */}
-            <div className="p-4 border-t border-border bg-background">
-              <div className="flex gap-2">
+            <div className="p-4 border-t border-border bg-background shrink-0">
+              <div className="flex items-center gap-2">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Type your message..."
-                  className="flex-1 px-3 py-2 text-sm bg-muted border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="flex-1 px-3 text-sm h-10 bg-muted border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={!inputValue.trim()}
-                  className="p-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="h-10 w-10 flex items-center justify-center bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <Send className="w-4 h-4" />
                 </button>

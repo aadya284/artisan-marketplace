@@ -110,7 +110,7 @@ export default function AiChatbotWidget() {
             className="mb-4 w-80 h-96 bg-card border border-border rounded-lg shadow-xl overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
+            <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between shrink-0">
               <div>
                 <h3 className="font-display font-semibold text-sm">kalabandhu</h3>
                 <p className="text-xs opacity-90">How can I help you today?</p>
@@ -125,7 +125,7 @@ export default function AiChatbotWidget() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-4 space-y-4 h-60 overflow-y-auto bg-background">
+            <div className="flex-1 min-h-0 p-4 space-y-4 overflow-y-auto bg-background">
               {messages.map((message) => (
                 <div
                   key={message.id}
@@ -146,7 +146,7 @@ export default function AiChatbotWidget() {
 
             {/* Quick Actions */}
             {messages.length === 1 && (
-              <div className="px-4 pb-2">
+              <div className="px-4 pb-2 shrink-0 border-t border-border bg-background">
                 <p className="text-xs text-muted-foreground mb-2">Quick actions:</p>
                 <div className="grid grid-cols-2 gap-2">
                   {quickActions.map((action, index) => (
@@ -164,7 +164,7 @@ export default function AiChatbotWidget() {
             )}
 
             {/* Input */}
-            <div className="p-4 border-t border-border bg-background">
+            <div className="p-4 border-t border-border bg-background shrink-0">
               <div className="flex items-center gap-2">
                 <input
                   type="text"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +49,8 @@ const ARTWORK_TYPES = [
   "Metal Work", "Embroidery", "Handicrafts", "Traditional Art", "Modern Art", "Other"
 ];
 
-export default function RegisterPage() {
+
+function RegisterPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [userType, setUserType] = useState<UserType>("user");
@@ -137,6 +138,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {userType === "user" ? (
               <>
+                {/* ...existing user form code... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
@@ -169,7 +171,7 @@ export default function RegisterPage() {
                     </div>
                   </div>
                 </div>
-
+                {/* ...existing code... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
@@ -204,7 +206,7 @@ export default function RegisterPage() {
                     </div>
                   </div>
                 </div>
-
+                {/* ...existing code... */}
                 <div className="space-y-2">
                   <Label htmlFor="location">Location</Label>
                   <div className="relative">
@@ -220,7 +222,7 @@ export default function RegisterPage() {
                     />
                   </div>
                 </div>
-
+                {/* ...existing code... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
@@ -256,6 +258,7 @@ export default function RegisterPage() {
               </>
             ) : (
               <>
+                {/* ...existing artisan form code... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
@@ -288,7 +291,7 @@ export default function RegisterPage() {
                     </div>
                   </div>
                 </div>
-
+                {/* ...existing code... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
@@ -321,7 +324,7 @@ export default function RegisterPage() {
                     </div>
                   </div>
                 </div>
-
+                {/* ...existing code... */}
                 <div className="space-y-2">
                   <Label htmlFor="artworkType">Type of Artwork</Label>
                   <Select value={artisanFormData.artworkType} onValueChange={(value) => handleArtisanFormChange("artworkType", value)}>
@@ -337,7 +340,7 @@ export default function RegisterPage() {
                     </SelectContent>
                   </Select>
                 </div>
-
+                {/* ...existing code... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="state">State</Label>
@@ -370,7 +373,7 @@ export default function RegisterPage() {
                     </div>
                   </div>
                 </div>
-
+                {/* ...existing code... */}
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio (Optional)</Label>
                   <Textarea
@@ -381,7 +384,7 @@ export default function RegisterPage() {
                     rows={3}
                   />
                 </div>
-
+                {/* ...existing code... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
@@ -431,5 +434,13 @@ export default function RegisterPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterPageContent />
+    </Suspense>
   );
 }

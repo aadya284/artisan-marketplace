@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { Toaster } from "sonner";
 import Script from "next/script";
+import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 
 const rajdhani = Rajdhani({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
           <CartProvider>
             {children}
             <Toaster position="top-right" richColors closeButton />
+            <AiChatbotWidget />
           </CartProvider>
         </AuthProvider>
         <VisualEditsMessenger />

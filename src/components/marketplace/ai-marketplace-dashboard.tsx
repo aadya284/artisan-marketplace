@@ -232,8 +232,8 @@ export function AiMarketplaceDashboard() {
                 <CardDescription>Month-over-month performance</CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
-                <ChartContainer config={chartConfig} className="h-56">
-                  <LineChart data={growthData} margin={{ left: 8, right: 8 }}>
+                <ChartContainer config={chartConfig} className="h-56 w-full">
+                  <LineChart data={growthData} margin={{ left: 12, right: 12, top: 10, bottom: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" tickLine={false} axisLine={false} />
                     <YAxis tickLine={false} axisLine={false} />

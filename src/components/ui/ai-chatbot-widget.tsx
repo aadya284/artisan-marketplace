@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { MessageCircle, X, Send, Package, ShoppingBag, Phone, Clock } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 
@@ -51,6 +51,15 @@ export default function AiChatbotWidget() {
     }
   ])
   const [inputValue, setInputValue] = useState("")
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
 
   const handleQuickAction = (action: QuickAction) => {
     const userMessage: Message = {
@@ -164,6 +173,7 @@ export default function AiChatbotWidget() {
                   </div>
                 </div>
               ))}
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Input */}

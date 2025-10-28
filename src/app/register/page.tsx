@@ -2,6 +2,8 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "@/config/firebaseConfig";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -37,23 +39,22 @@ interface ArtisanFormData {
 }
 
 const INDIAN_STATES = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
-  "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
-  "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
-  "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
-  "Uttarakhand", "West Bengal", "Delhi", "Jammu and Kashmir", "Ladakh"
+  "Andhra Pradesh", "Assam", "Bihar", "Goa", "Gujarat", "Haryana",
+  "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Odisha",
+  "Punjab", "Rajasthan", "Tamil Nadu", "Telangana", "Uttar Pradesh", "West Bengal"
 ];
 
 const ARTWORK_TYPES = [
-  "Painting", "Sculpture", "Pottery", "Textiles", "Jewelry", "Wood Carving",
-  "Metal Work", "Embroidery", "Handicrafts", "Traditional Art", "Modern Art", "Other"
+  "Painting", "Sculpture", "Pottery", "Textiles", "Jewelry",
+  "Wood Carving", "Metal Work", "Embroidery", "Handicrafts", "Other"
 ];
-
 
 function RegisterPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [userType, setUserType] = useState<UserType>("user");
+  const [loading, setLoading] = useState(false);
+
   const [userFormData, setUserFormData] = useState<UserFormData>({
     name: "",
     email: "",
@@ -63,6 +64,7 @@ function RegisterPageContent() {
     password: "",
     confirmPassword: ""
   });
+
   const [artisanFormData, setArtisanFormData] = useState<ArtisanFormData>({
     name: "",
     brandName: "",
@@ -78,36 +80,76 @@ function RegisterPageContent() {
 
   useEffect(() => {
     const type = searchParams.get("type");
-    if (type === "artisan" || type === "user") {
-      setUserType(type);
-    }
+    if (type === "artisan" || type === "user") setUserType(type);
   }, [searchParams]);
 
-  const handleUserFormChange = (field: keyof UserFormData, value: string) => {
-    setUserFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const handleUserFormChange = (field: keyof UserFormData, value: string) =>
+    setUserFormData((prev) => ({ ...prev, [field]: value }));
 
-  const handleArtisanFormChange = (field: keyof ArtisanFormData, value: string) => {
-    setArtisanFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const handleArtisanFormChange = (field: keyof ArtisanFormData, value: string) =>
+    setArtisanFormData((prev) => ({ ...prev, [field]: value }));
 
+  // -------------------- Normal Email/Password Sign-Up --------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setLoading(true);
+
     const formData = userType === "user" ? userFormData : artisanFormData;
-    
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords don't match!");
+      setLoading(false);
       return;
     }
 
-    // TODO: Implement actual registration logic
-    console.log("Registration attempted", { userType, formData });
-    
-    // Redirect to sign in page after successful registration
-    router.push("/signin");
+    try {
+      // 1️⃣ Create user in Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
+      const idToken = await user.getIdToken();
+
+      // 2️⃣ Verify token in backend
+      await fetch("http://localhost:5000/verify-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+
+      alert("Registration successful!");
+      router.push("/signin");
+    } catch (error: any) {
+      alert(error.message);
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // -------------------- Google Sign-Up --------------------
+  const handleGoogleSignUp = async () => {
+    try {
+      setLoading(true);
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const idToken = await user.getIdToken();
+
+      await fetch("http://localhost:5000/verify-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+
+      alert("Registered with Google successfully!");
+      router.push("/signin");
+    } catch (error: any) {
+      alert(error.message);
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // -------------------- UI --------------------
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl">
@@ -134,303 +176,233 @@ function RegisterPageContent() {
             Fill in your details to create your {userType} account
           </CardDescription>
         </CardHeader>
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {userType === "user" ? (
+            {/* USER FORM */}
+            {userType === "user" && (
               <>
-                {/* ...existing user form code... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Enter your full name"
-                        value={userFormData.name}
-                        onChange={(e) => handleUserFormChange("name", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={userFormData.email}
-                        onChange={(e) => handleUserFormChange("email", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-                {/* ...existing code... */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="Enter your phone number"
-                        value={userFormData.phone}
-                        onChange={(e) => handleUserFormChange("phone", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="age">Age</Label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="age"
-                        type="number"
-                        placeholder="Enter your age"
-                        value={userFormData.age}
-                        onChange={(e) => handleUserFormChange("age", e.target.value)}
-                        className="pl-10"
-                        min="18"
-                        max="100"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-                {/* ...existing code... */}
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Label>Full Name</Label>
                     <Input
-                      id="location"
-                      type="text"
-                      placeholder="Enter your city, state"
-                      value={userFormData.location}
-                      onChange={(e) => handleUserFormChange("location", e.target.value)}
-                      className="pl-10"
+                      value={userFormData.name}
+                      onChange={(e) => handleUserFormChange("name", e.target.value)}
+                      placeholder="Enter your full name"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      value={userFormData.email}
+                      onChange={(e) => handleUserFormChange("email", e.target.value)}
+                      placeholder="Enter your email"
                       required
                     />
                   </div>
                 </div>
-                {/* ...existing code... */}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Create a password"
-                        value={userFormData.password}
-                        onChange={(e) => handleUserFormChange("password", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label>Phone</Label>
+                    <Input
+                      type="tel"
+                      value={userFormData.phone}
+                      onChange={(e) => handleUserFormChange("phone", e.target.value)}
+                      placeholder="Enter phone number"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        placeholder="Confirm your password"
-                        value={userFormData.confirmPassword}
-                        onChange={(e) => handleUserFormChange("confirmPassword", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label>Age</Label>
+                    <Input
+                      type="number"
+                      value={userFormData.age}
+                      onChange={(e) => handleUserFormChange("age", e.target.value)}
+                      placeholder="Age"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Location</Label>
+                  <Input
+                    value={userFormData.location}
+                    onChange={(e) => handleUserFormChange("location", e.target.value)}
+                    placeholder="Enter your city, state"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Password</Label>
+                    <Input
+                      type="password"
+                      value={userFormData.password}
+                      onChange={(e) => handleUserFormChange("password", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Confirm Password</Label>
+                    <Input
+                      type="password"
+                      value={userFormData.confirmPassword}
+                      onChange={(e) => handleUserFormChange("confirmPassword", e.target.value)}
+                      required
+                    />
                   </div>
                 </div>
               </>
-            ) : (
+            )}
+
+            {/* ARTISAN FORM */}
+            {userType === "artisan" && (
               <>
-                {/* ...existing artisan form code... */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Enter your full name"
-                        value={artisanFormData.name}
-                        onChange={(e) => handleArtisanFormChange("name", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label>Full Name</Label>
+                    <Input
+                      value={artisanFormData.name}
+                      onChange={(e) => handleArtisanFormChange("name", e.target.value)}
+                      placeholder="Enter your name"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="brandName">Brand Name</Label>
-                    <div className="relative">
-                      <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="brandName"
-                        type="text"
-                        placeholder="Enter your brand name"
-                        value={artisanFormData.brandName}
-                        onChange={(e) => handleArtisanFormChange("brandName", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label>Brand Name</Label>
+                    <Input
+                      value={artisanFormData.brandName}
+                      onChange={(e) => handleArtisanFormChange("brandName", e.target.value)}
+                      placeholder="Enter brand name"
+                      required
+                    />
                   </div>
                 </div>
-                {/* ...existing code... */}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={artisanFormData.email}
-                        onChange={(e) => handleArtisanFormChange("email", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      value={artisanFormData.email}
+                      onChange={(e) => handleArtisanFormChange("email", e.target.value)}
+                      placeholder="Enter email"
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="Enter your phone number"
-                        value={artisanFormData.phone}
-                        onChange={(e) => handleArtisanFormChange("phone", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label>Phone</Label>
+                    <Input
+                      type="tel"
+                      value={artisanFormData.phone}
+                      onChange={(e) => handleArtisanFormChange("phone", e.target.value)}
+                      placeholder="Enter phone number"
+                      required
+                    />
                   </div>
                 </div>
-                {/* ...existing code... */}
+
                 <div className="space-y-2">
-                  <Label htmlFor="artworkType">Type of Artwork</Label>
-                  <Select value={artisanFormData.artworkType} onValueChange={(value) => handleArtisanFormChange("artworkType", value)}>
+                  <Label>Type of Artwork</Label>
+                  <Select
+                    value={artisanFormData.artworkType}
+                    onValueChange={(v) => handleArtisanFormChange("artworkType", v)}
+                  >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select your artwork type" />
+                      <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {ARTWORK_TYPES.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
+                      {ARTWORK_TYPES.map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                {/* ...existing code... */}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="state">State</Label>
-                    <Select value={artisanFormData.state} onValueChange={(value) => handleArtisanFormChange("state", value)}>
+                    <Label>State</Label>
+                    <Select
+                      value={artisanFormData.state}
+                      onValueChange={(v) => handleArtisanFormChange("state", v)}
+                    >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select your state" />
+                        <SelectValue placeholder="Select state" />
                       </SelectTrigger>
                       <SelectContent>
-                        {INDIAN_STATES.map((state) => (
-                          <SelectItem key={state} value={state}>
-                            {state}
+                        {INDIAN_STATES.map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="city"
-                        type="text"
-                        placeholder="Enter your city"
-                        value={artisanFormData.city}
-                        onChange={(e) => handleArtisanFormChange("city", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label>City</Label>
+                    <Input
+                      value={artisanFormData.city}
+                      onChange={(e) => handleArtisanFormChange("city", e.target.value)}
+                      placeholder="Enter city"
+                      required
+                    />
                   </div>
                 </div>
-                {/* ...existing code... */}
+
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio (Optional)</Label>
+                  <Label>Bio (optional)</Label>
                   <Textarea
-                    id="bio"
-                    placeholder="Tell us about yourself and your artwork..."
                     value={artisanFormData.bio}
                     onChange={(e) => handleArtisanFormChange("bio", e.target.value)}
-                    rows={3}
+                    placeholder="Tell us about yourself"
                   />
                 </div>
-                {/* ...existing code... */}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Create a password"
-                        value={artisanFormData.password}
-                        onChange={(e) => handleArtisanFormChange("password", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label>Password</Label>
+                    <Input
+                      type="password"
+                      value={artisanFormData.password}
+                      onChange={(e) => handleArtisanFormChange("password", e.target.value)}
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="confirmPassword"
-                        type="password"
-                        placeholder="Confirm your password"
-                        value={artisanFormData.confirmPassword}
-                        onChange={(e) => handleArtisanFormChange("confirmPassword", e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
+                    <Label>Confirm Password</Label>
+                    <Input
+                      type="password"
+                      value={artisanFormData.confirmPassword}
+                      onChange={(e) => handleArtisanFormChange("confirmPassword", e.target.value)}
+                      required
+                    />
                   </div>
                 </div>
               </>
             )}
 
-            <Button type="submit" className="w-full">
-              Create Account
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
-          </form>
 
-          <div className="text-center text-sm mt-4">
-            <span className="text-muted-foreground">Already have an account? </span>
-            <Link href="/signin" className="text-primary hover:underline">
-              Sign in
-            </Link>
-          </div>
+            <Button variant="outline" onClick={handleGoogleSignUp} className="w-full">
+              Continue with Google
+            </Button>
+
+            <div className="text-center text-sm mt-4">
+              <span className="text-muted-foreground">Already have an account? </span>
+              <Link href="/signin" className="text-primary hover:underline">
+                Sign in
+              </Link>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>

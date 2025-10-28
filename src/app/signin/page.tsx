@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "@/config/firebaseConfig";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { User, Palette, Mail, Lock, ArrowLeft } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 type UserType = "user" | "artisan" | null;
 
@@ -20,57 +22,87 @@ export default function SignInPage() {
   const { signIn } = useAuth();
   const router = useRouter();
 
-  const handleRoleSelection = (type: UserType) => {
-    setUserType(type);
-  };
+  // Select user or artisan role
+  const handleRoleSelection = (type: UserType) => setUserType(type);
 
+  // ---------- Normal Email/Password Sign-In ----------
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      // 1️⃣ Sign in via Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    // TODO: Replace with actual authentication API call
-    // For now, create a mock user object
-    const mockUser = {
-      id: "mock-user-id",
-      name: email.split('@')[0],
-      email: email,
-      type: userType!,
-      avatar: undefined
-    };
+      // 2️⃣ Get Firebase ID Token
+      const idToken = await user.getIdToken();
 
-    signIn(mockUser);
-    router.push("/");
+      // 3️⃣ Send token to backend for verification
+      const res = await fetch("http://localhost:5000/verify-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // 4️⃣ Save in frontend context
+        signIn({
+          id: user.uid,
+          name: user.displayName || user.email!.split("@")[0],
+          email: user.email!,
+          type: userType!,
+        });
+        router.push("/");
+      } else {
+        alert(data.error || "Invalid credentials");
+      }
+    } catch (err: any) {
+      alert(err.message);
+      console.error(err);
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    // TODO: Implement Google OAuth
-    // For now, create a mock user
-    const mockUser = {
-      id: "google-user-id",
-      name: "Google User",
-      email: "user@gmail.com",
-      type: userType!,
-      avatar: undefined
-    };
+  // ---------- Google Sign-In ----------
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const idToken = await user.getIdToken();
 
-    signIn(mockUser);
-    router.push("/");
+      // Send token to backend for verification
+      const res = await fetch("http://localhost:5000/verify-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        signIn({
+          id: user.uid,
+          name: user.displayName || user.email!.split("@")[0],
+          email: user.email!,
+          type: userType!,
+        });
+        router.push("/");
+      } else {
+        alert(data.error || "Verification failed");
+      }
+    } catch (error: any) {
+      console.error("Google Sign-in Error:", error);
+      alert(error.message);
+    }
   };
 
+  // ---------- Mock Apple Sign-In (optional) ----------
   const handleAppleSignIn = () => {
-    // TODO: Implement Apple OAuth
-    // For now, create a mock user
-    const mockUser = {
-      id: "apple-user-id",
-      name: "Apple User",
-      email: "user@icloud.com",
-      type: userType!,
-      avatar: undefined
-    };
-
-    signIn(mockUser);
-    router.push("/");
+    alert("Apple Sign-In coming soon!");
   };
 
+  // ---------- Role Selection Screen ----------
   if (!userType) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center p-4">
@@ -81,40 +113,32 @@ export default function SignInPage() {
           </div>
 
           <div className="space-y-4">
-            <Card 
+            <Card
               className="cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-amber-300"
               onClick={() => handleRoleSelection("user")}
             >
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <User className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">Sign in as User</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Browse and purchase beautiful handcrafted items
-                    </p>
-                  </div>
+              <CardContent className="p-6 flex items-center gap-4">
+                <User className="h-6 w-6 text-blue-600" />
+                <div>
+                  <h3 className="font-semibold text-lg">Sign in as User</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Browse and purchase beautiful handcrafted items
+                  </p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card 
+            <Card
               className="cursor-pointer hover:shadow-lg transition-shadow border-2 hover:border-amber-300"
               onClick={() => handleRoleSelection("artisan")}
             >
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-orange-100 rounded-full">
-                    <Palette className="h-6 w-6 text-orange-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">Sign in as Artisan</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Sell your artwork and manage your business
-                    </p>
-                  </div>
+              <CardContent className="p-6 flex items-center gap-4">
+                <Palette className="h-6 w-6 text-orange-600" />
+                <div>
+                  <h3 className="font-semibold text-lg">Sign in as Artisan</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Sell your artwork and manage your business
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -130,17 +154,13 @@ export default function SignInPage() {
     );
   }
 
+  // ---------- Actual Sign-In Form ----------
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
+      <Card className="w-full max-w-md shadow-md">
+        <CardHeader>
           <div className="flex items-center gap-2 mb-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setUserType(null)}
-              className="p-1"
-            >
+            <Button variant="ghost" size="sm" onClick={() => setUserType(null)} className="p-1">
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-2">
@@ -155,10 +175,9 @@ export default function SignInPage() {
             </div>
           </div>
           <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your {userType} account
-          </CardDescription>
+          <CardDescription>Enter your credentials to access your {userType} account</CardDescription>
         </CardHeader>
+
         <CardContent className="space-y-4">
           <form onSubmit={handleSignIn} className="space-y-4">
             <div className="space-y-2">
@@ -176,6 +195,7 @@ export default function SignInPage() {
                 />
               </div>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -191,6 +211,7 @@ export default function SignInPage() {
                 />
               </div>
             </div>
+
             <Button type="submit" className="w-full">
               Sign In
             </Button>
@@ -201,9 +222,7 @@ export default function SignInPage() {
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
+              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
 
@@ -229,20 +248,15 @@ export default function SignInPage() {
               </svg>
               Google
             </Button>
+
             <Button variant="outline" onClick={handleAppleSignIn}>
-              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701" />
-              </svg>
-              Apple
+              <span>Apple</span>
             </Button>
           </div>
 
           <div className="text-center text-sm">
             <span className="text-muted-foreground">Don't have an account? </span>
-            <Link
-              href={`/register?type=${userType}`}
-              className="text-primary hover:underline"
-            >
+            <Link href={`/register?type=${userType}`} className="text-primary hover:underline">
               Create account
             </Link>
           </div>

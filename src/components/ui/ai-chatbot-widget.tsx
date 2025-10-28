@@ -46,25 +46,66 @@ export default function AiChatbotWidget() {
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const getServerUrl = () => {
+    // Use environment variable if available, otherwise fallback to localhost
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+  };
+
   const sendToGemini = async (userMessage: string) => {
     try {
-      const res = await fetch("http://localhost:5000/chat", {
+      const serverUrl = getServerUrl();
+      console.log('Connecting to server:', serverUrl);
+      
+      // First, check if server is reachable
+      try {
+        await fetch(`${serverUrl}`);
+      } catch (e) {
+        throw new Error("Cannot connect to chat server. Please check if the server is running.");
+      }
+      
+      const res = await fetch(`${serverUrl}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({ message: userMessage })
       });
       
+      let responseData;
+      const contentType = res.headers.get("content-type");
+      
+      // Handle different response types
+      if (contentType && contentType.includes("application/json")) {
+        try {
+          responseData = await res.json();
+        } catch (e) {
+          console.error("Failed to parse JSON response:", e);
+          throw new Error("Invalid response from server");
+        }
+      } else {
+        // If not JSON, try to get text content for better error message
+        const textContent = await res.text();
+        console.error("Non-JSON response:", textContent);
+        throw new Error("Server returned invalid response format");
+      }
+
       if (!res.ok) {
-        const errorData = await res.json();
-        console.error("Chatbot API Error:", errorData);
-        throw new Error(errorData.error || "Failed to get response");
+        throw new Error(responseData.error || `Server error: ${res.status}`);
       }
       
-      const data = await res.json();
-      return data.reply;
+      if (!responseData.reply) {
+        console.error("Invalid response structure:", responseData);
+        throw new Error("Invalid response format from server");
+      }
+      
+      return responseData.reply;
     } catch (error: any) {
       console.error("Chatbot Error:", error);
-      return "⚠️ " + (error.message || "Network error connecting to Kalabandhu backend.");
+      if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+        return "⚠️ Cannot connect to the chat server. Please check your internet connection and try again.";
+      }
+      return "⚠️ " + (error.message || "Something went wrong. Please try again later.");
     }
   };
 
@@ -105,15 +146,23 @@ export default function AiChatbotWidget() {
   };
 
   const handleClearChat = async () => {
-    await fetch("http://localhost:5000/clear-cache", { method: "POST" });
-    setMessages([
-      {
-        id: "welcome",
-        content: "Chat cleared. How can I assist you now?",
-        isUser: false,
-        timestamp: new Date()
-      }
-    ]);
+    try {
+      const serverUrl = getServerUrl();
+      await fetch(`${serverUrl}/clear-cache`, { 
+        method: "POST",
+        credentials: 'include'
+      });
+      setMessages([
+        {
+          id: "welcome",
+          content: "Chat cleared. How can I assist you now?",
+          isUser: false,
+          timestamp: new Date()
+        }
+      ]);
+    } catch (error) {
+      console.error("Failed to clear chat cache:", error);
+    }
   };
 
   return (

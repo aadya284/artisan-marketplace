@@ -39,13 +39,22 @@ export default function SignInPage() {
       // 3️⃣ Send token to backend for verification
       const res = await fetch("http://localhost:5000/verify-token", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({ idToken }),
       });
 
+      // Handle non-JSON responses
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server returned non-JSON response");
+      }
+
       const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && data.success) {
         // 4️⃣ Save in frontend context
         signIn({
           id: user.uid,
@@ -58,8 +67,12 @@ export default function SignInPage() {
         alert(data.error || "Invalid credentials");
       }
     } catch (err: any) {
-      alert(err.message);
-      console.error(err);
+      console.error("Sign-in error:", err);
+      if (err.message === "Server returned non-JSON response") {
+        alert("Unable to connect to the authentication server. Please try again later.");
+      } else {
+        alert(err.message || "Sign-in failed. Please try again.");
+      }
     }
   };
 
@@ -74,13 +87,22 @@ export default function SignInPage() {
       // Send token to backend for verification
       const res = await fetch("http://localhost:5000/verify-token", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({ idToken }),
       });
 
+      // Handle non-JSON responses
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server returned non-JSON response");
+      }
+
       const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && data.success) {
         signIn({
           id: user.uid,
           name: user.displayName || user.email!.split("@")[0],
@@ -93,7 +115,11 @@ export default function SignInPage() {
       }
     } catch (error: any) {
       console.error("Google Sign-in Error:", error);
-      alert(error.message);
+      if (error.message === "Server returned non-JSON response") {
+        alert("Unable to connect to the authentication server. Please try again later.");
+      } else {
+        alert(error.message || "Google sign-in failed. Please try again.");
+      }
     }
   };
 

@@ -12,8 +12,19 @@ const { LRUCache } = require("lru-cache"); // ✅ Correct import for Node.js v20
 // 1️⃣ Express setup
 // -------------------------
 const app = express();
+// Enable CORS for all routes
 app.use(cors());
+
+// Parse JSON bodies and handle parsing errors
 app.use(express.json());
+
+// Global error handler for JSON parsing
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+  next();
+});
 
 // Verify environment variables
 console.log("Environment Check:");
@@ -209,35 +220,81 @@ app.post("/chat", async (req, res) => {
     // ✅ Step 4: Cache the response
     cache.set(message, reply);
 
-    res.json({ reply });
+    // Ensure we're sending a proper JSON response
+    return res.status(200).json({ 
+      success: true,
+      reply: reply 
+    });
   } catch (error) {
     console.error("❌ Detailed error:", error);
+    
+    // Log detailed error information
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
       console.error("❌ Error Data:", error.response.data);
       console.error("❌ Error Status:", error.response.status);
       console.error("❌ Error Headers:", error.response.headers);
     } else if (error.request) {
-      // The request was made but no response was received
       console.error("❌ No response received:", error.request);
     } else {
-      // Something happened in setting up the request that triggered an Error
       console.error("❌ Error setting up request:", error.message);
     }
     
-    res.status(500).json({
-      error: "Failed to connect to Gemini API. Details: " + (error.response?.data?.error?.message || error.message)
+    // Ensure we're sending a proper error response
+    return res.status(500).json({
+      success: false,
+      error: "Failed to process request",
+      details: error.response?.data?.error?.message || error.message
     });
   }
 });
 
 // -------------------------
-// 6️⃣ Clear Cache Endpoint
+// 6️⃣ Verify ID Token route
+// -------------------------
+app.post("/verify-token", async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    
+    if (!idToken) {
+      return res.status(400).json({ 
+        success: false,
+        error: "No ID token provided" 
+      });
+    }
+
+    try {
+      const decoded = await admin.auth().verifyIdToken(idToken);
+      console.log("✅ Verified user:", decoded.email);
+      return res.status(200).json({
+        success: true,
+        message: "User verified successfully",
+        user: decoded
+      });
+    } catch (error) {
+      console.error("❌ Token verification failed:", error.message);
+      return res.status(401).json({ 
+        success: false,
+        error: "Invalid or expired token"
+      });
+    }
+  } catch (error) {
+    console.error("❌ Verification error:", error);
+    return res.status(500).json({ 
+      success: false,
+      error: "Internal server error during verification" 
+    });
+  }
+});
+
+// -------------------------
+// 7️⃣ Clear Cache Endpoint
 // -------------------------
 app.post("/clear-cache", (req, res) => {
   cache.clear();
-  res.json({ message: "✅ Chat cache cleared successfully." });
+  res.json({ 
+    success: true,
+    message: "✅ Chat cache cleared successfully." 
+  });
 });
 
 // -------------------------

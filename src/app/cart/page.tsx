@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
 import { useCart } from "@/contexts/CartContext";
+import RazorpayGPayButton from "@/components/ui/razorpay-gpay-button";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ import {
 } from "lucide-react";
 
 export default function CartPage() {
-  const { cartItems, updateQuantity, removeFromCart, cartCount } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, cartCount, clearCart } = useCart();
   const [currentStep, setCurrentStep] = useState(1); // 1: Cart, 2: Checkout, 3: Payment
   const [deliveryAddress, setDeliveryAddress] = useState({
     fullName: "",
@@ -348,6 +349,23 @@ export default function CartPage() {
                         <Badge variant="outline" className="text-blue-600 border-blue-600">₹50 Extra</Badge>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Google Pay via Razorpay */}
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold mb-2" style={{ fontFamily: 'Rajdhani, sans-serif' }}>Pay with Google Pay</h3>
+                    <RazorpayGPayButton 
+                      amount={total} 
+                      onSuccess={(response) => {
+                        alert("Payment successful! Order ID: " + response.razorpay_order_id);
+                        clearCart();
+                        window.location.href = '/orders';
+                      }}
+                      onError={(error) => {
+                        console.error('Payment failed:', error);
+                        alert('Payment failed: ' + error.message);
+                      }}
+                    />
                   </div>
                 </div>
               )}

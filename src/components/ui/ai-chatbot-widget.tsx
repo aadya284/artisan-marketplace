@@ -1,15 +1,15 @@
 "use client";
+"use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   MessageCircle,
   X,
   Send,
-  Package,
-  ShoppingBag,
-  Phone,
-  Clock,
-  Trash2
+  Trash2,
+  Mic,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -45,142 +45,139 @@ export default function AiChatbotWidget() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
+  const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
+  const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
 
-  const getServerUrl = () => {
-    // Use environment variable if available, otherwise fallback to localhost
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-  };
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Setup speech synthesis
+    if ('speechSynthesis' in window) {
+      setSpeechSynthesis(window.speechSynthesis);
+    }
+
+    // Setup speech recognition if available
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SR) {
+      const recognition = new SR();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-IN';
+      setSpeechRecognition(recognition);
+    }
+  }, []);
+
+  const getServerUrl = () => process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
   const sendToGemini = async (userMessage: string) => {
     try {
       const serverUrl = getServerUrl();
-      console.log('Connecting to server:', serverUrl);
-      
-      // First, check if server is reachable
-      try {
-        await fetch(`${serverUrl}`);
-      } catch (e) {
-        throw new Error("Cannot connect to chat server. Please check if the server is running.");
-      }
-      
+      // quick reachability check
+      await fetch(serverUrl).catch(() => {});
+
       const res = await fetch(`${serverUrl}/chat`, {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userMessage })
       });
-      
-      let responseData;
-      const contentType = res.headers.get("content-type");
-      
-      // Handle different response types
-      if (contentType && contentType.includes("application/json")) {
-        try {
-          responseData = await res.json();
-        } catch (e) {
-          console.error("Failed to parse JSON response:", e);
-          throw new Error("Invalid response from server");
-        }
-      } else {
-        // If not JSON, try to get text content for better error message
-        const textContent = await res.text();
-        console.error("Non-JSON response:", textContent);
-        throw new Error("Server returned invalid response format");
+
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `Server ${res.status}`);
+        if (!data.reply) throw new Error('Invalid response from server');
+        return data.reply as string;
       }
 
-      if (!res.ok) {
-        throw new Error(responseData.error || `Server error: ${res.status}`);
-      }
-      
-      if (!responseData.reply) {
-        console.error("Invalid response structure:", responseData);
-        throw new Error("Invalid response format from server");
-      }
-      
-      return responseData.reply;
-    } catch (error: any) {
-      console.error("Chatbot Error:", error);
-      if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
-        return "⚠️ Cannot connect to the chat server. Please check your internet connection and try again.";
-      }
-      return "⚠️ " + (error.message || "Something went wrong. Please try again later.");
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || `Server ${res.status}`);
+      return text;
+    } catch (err: any) {
+      console.error('Chatbot error', err);
+      return '⚠️ ' + (err.message || 'Something went wrong');
     }
+  };
+
+  const speakMessage = useCallback((text: string) => {
+    if (!speechSynthesis || !isSpeechEnabled) return;
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-IN';
+      u.onstart = () => setIsSpeaking(true);
+      u.onend = () => setIsSpeaking(false);
+      u.onerror = () => setIsSpeaking(false);
+      speechSynthesis.speak(u);
+    } catch (e) {
+      console.error('speak error', e);
+    }
+  }, [speechSynthesis, isSpeechEnabled]);
+
+  const startListening = () => {
+    if (!speechRecognition) {
+      alert('Speech recognition not supported in this browser');
+      return;
+    }
+
+    speechRecognition.onresult = (ev: any) => {
+      const transcript = ev.results && ev.results[0] && ev.results[0][0] && ev.results[0][0].transcript;
+      if (transcript) {
+        setInputValue(transcript);
+        handleSendMessage(transcript);
+      }
+      setIsListening(false);
+    };
+
+    speechRecognition.onerror = (e: any) => {
+      console.error('recognition error', e);
+      setIsListening(false);
+    };
+
+    speechRecognition.onend = () => setIsListening(false);
+    setIsListening(true);
+    speechRecognition.start();
+  };
+
+  const handleSendMessage = async (text?: string) => {
+    const messageText = text ?? inputValue;
+    if (!messageText.trim()) return;
+
+    const userMsg: Message = { id: Date.now().toString(), content: messageText, isUser: true, timestamp: new Date() };
+    setMessages(prev => [...prev, userMsg]);
+    setInputValue('');
+    setLoading(true);
+    const reply = await sendToGemini(messageText);
+    setLoading(false);
+    const botMsg: Message = { id: (Date.now()+1).toString(), content: reply, isUser: false, timestamp: new Date() };
+    setMessages(prev => [...prev, botMsg]);
+    if (isSpeechEnabled) speakMessage(reply);
   };
 
   const handleQuickAction = async (action: QuickAction) => {
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      content: action.message,
-      isUser: true,
-      timestamp: new Date()
-    };
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages(prev => [...prev, { id: Date.now().toString(), content: action.message, isUser: true, timestamp: new Date() }]);
     setLoading(true);
-    const botReply = await sendToGemini(action.message);
+    const reply = await sendToGemini(action.message);
     setLoading(false);
-    setMessages((prev) => [
-      ...prev,
-      { id: (Date.now() + 1).toString(), content: botReply, isUser: false, timestamp: new Date() }
-    ]);
-  };
-
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
-    const userMsg: Message = {
-      id: Date.now().toString(),
-      content: inputValue,
-      isUser: true,
-      timestamp: new Date()
-    };
-    setMessages((prev) => [...prev, userMsg]);
-    setInputValue("");
-    setLoading(true);
-    const botReply = await sendToGemini(userMsg.content);
-    setLoading(false);
-    setMessages((prev) => [
-      ...prev,
-      { id: (Date.now() + 1).toString(), content: botReply, isUser: false, timestamp: new Date() }
-    ]);
+    setMessages(prev => [...prev, { id: (Date.now()+1).toString(), content: reply, isUser: false, timestamp: new Date() }]);
+    if (isSpeechEnabled) speakMessage(reply);
   };
 
   const handleClearChat = async () => {
+    const serverUrl = getServerUrl();
     try {
-      const serverUrl = getServerUrl();
-      console.log("Clearing chat cache at", `${serverUrl}/clear-cache`);
-      const res = await fetch(`${serverUrl}/clear-cache`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" }
-      });
-
-      if (!res.ok) {
-        let errText = await res.text().catch(() => "");
-        console.error("Failed to clear cache, server returned:", res.status, errText);
-        // show friendly message to the user
-        setMessages((prev) => [
-          ...prev,
-          { id: Date.now().toString(), content: "⚠️ Failed to clear chat cache.", isUser: false, timestamp: new Date() }
-        ]);
-        return;
-      }
-
-      // success - reset messages to welcome
-      setMessages([
-        {
-          id: "welcome",
-          content: "Chat cleared. How can I assist you now?",
-          isUser: false,
-          timestamp: new Date()
-        }
-      ]);
-    } catch (error) {
-      console.error("Failed to clear chat cache:", error);
-      setMessages((prev) => [
-        ...prev,
-        { id: Date.now().toString(), content: "⚠️ Error clearing chat. Please try again.", isUser: false, timestamp: new Date() }
-      ]);
+      await fetch(`${serverUrl}/clear-cache`, { method: 'POST' });
+    } catch (e) {
+      // ignore
     }
+    setMessages([{
+      id: 'welcome',
+      content: 'Chat cleared. How can I assist you now?',
+      isUser: false,
+      timestamp: new Date()
+    }]);
   };
 
   return (
@@ -194,7 +191,6 @@ export default function AiChatbotWidget() {
             transition={{ duration: 0.2 }}
             className="w-80 h-96 bg-white border rounded-xl shadow-xl flex flex-col overflow-hidden"
           >
-            {/* Header */}
             <div className="bg-orange-600 text-white p-4 flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-sm">Kalabandhu</h3>
@@ -210,9 +206,8 @@ export default function AiChatbotWidget() {
               </div>
             </div>
 
-            {/* Quick Actions */}
-            {messages.length === 1 && (
-              <div className="px-4 py-2 border-b bg-gray-50">
+            <div className="px-4 py-2 border-b bg-gray-50">
+              {messages.length === 1 && (
                 <select
                   className="w-full text-xs p-2 border rounded"
                   defaultValue=""
@@ -221,56 +216,41 @@ export default function AiChatbotWidget() {
                     if (act) handleQuickAction(act);
                   }}
                 >
-                  <option value="" disabled>
-                    Choose a quick action...
-                  </option>
+                  <option value="" disabled>Choose a quick action...</option>
                   {quickActions.map((action) => (
-                    <option key={action.label} value={action.label}>
-                      {action.label}
-                    </option>
+                    <option key={action.label} value={action.label}>{action.label}</option>
                   ))}
                 </select>
-              </div>
-            )}
-
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50">
-              {messages.map((msg) => (
-                <div key={msg.id} className={`flex ${msg.isUser ? "justify-end" : "justify-start"}`}>
-                  <div
-                    className={`max-w-[80%] px-3 py-2 text-sm rounded-lg ${
-                      msg.isUser ? "bg-orange-600 text-white" : "bg-white border"
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                </div>
-              ))}
-              {loading && (
-                <div className="text-xs text-gray-400 text-center">Thinking...</div>
               )}
             </div>
 
-            {/* Input Area */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSendMessage();
-              }}
-              className="p-3 border-t flex items-center gap-2 bg-white"
-            >
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
-              />
-              <button
-                type="submit"
-                disabled={!inputValue.trim() || loading}
-                className="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 disabled:opacity-50"
-              >
+            <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50">
+              {messages.map(msg => (
+                <div key={msg.id} className={`flex ${msg.isUser ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`group relative max-w-[80%] px-3 py-2 text-sm rounded-lg ${msg.isUser ? 'bg-orange-600 text-white' : 'bg-white border'}`}>
+                    {msg.content}
+                    <button
+                      onClick={() => speakMessage(msg.content)}
+                      className="absolute -right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full text-gray-500 hover:bg-gray-100"
+                      title="Click to hear this message"
+                    >
+                      <Volume2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {loading && <div className="text-xs text-gray-400 text-center">Thinking...</div>}
+            </div>
+
+            <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="p-3 border-t flex items-center gap-2 bg-white">
+              <button type="button" onClick={startListening} disabled={isListening || loading} className="p-2 text-gray-500 hover:text-orange-600 transition-colors" title={isListening ? 'Listening...' : 'Click to speak'}>
+                <Mic className={`w-4 h-4 ${isListening ? 'text-orange-600 animate-pulse' : ''}`} />
+              </button>
+              <input type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} placeholder="Type your message..." className="flex-1 text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400" />
+              <button type="button" onClick={() => { if (isSpeaking && speechSynthesis) speechSynthesis.cancel(); setIsSpeaking(false); }} className="p-2 text-gray-500 hover:text-orange-600 transition-colors" title={isSpeaking ? 'Stop speaking' : 'Speech disabled'}>
+                {isSpeaking ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              </button>
+              <button type="submit" disabled={!inputValue.trim() || loading} className="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 disabled:opacity-50">
                 <Send className="w-4 h-4" />
               </button>
             </form>
@@ -278,12 +258,7 @@ export default function AiChatbotWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Button */}
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-14 h-14 bg-orange-600 text-white rounded-full shadow-lg flex items-center justify-center"
-        whileTap={{ scale: 0.9 }}
-      >
+      <motion.button onClick={() => setIsOpen(!isOpen)} className="w-14 h-14 bg-orange-600 text-white rounded-full shadow-lg flex items-center justify-center" whileTap={{ scale: 0.9 }}>
         {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </motion.button>
     </div>

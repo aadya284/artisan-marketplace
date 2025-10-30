@@ -148,10 +148,24 @@ export default function AiChatbotWidget() {
   const handleClearChat = async () => {
     try {
       const serverUrl = getServerUrl();
-      await fetch(`${serverUrl}/clear-cache`, { 
+      console.log("Clearing chat cache at", `${serverUrl}/clear-cache`);
+      const res = await fetch(`${serverUrl}/clear-cache`, {
         method: "POST",
-        credentials: 'include'
+        headers: { "Content-Type": "application/json" }
       });
+
+      if (!res.ok) {
+        let errText = await res.text().catch(() => "");
+        console.error("Failed to clear cache, server returned:", res.status, errText);
+        // show friendly message to the user
+        setMessages((prev) => [
+          ...prev,
+          { id: Date.now().toString(), content: "⚠️ Failed to clear chat cache.", isUser: false, timestamp: new Date() }
+        ]);
+        return;
+      }
+
+      // success - reset messages to welcome
       setMessages([
         {
           id: "welcome",
@@ -162,6 +176,10 @@ export default function AiChatbotWidget() {
       ]);
     } catch (error) {
       console.error("Failed to clear chat cache:", error);
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now().toString(), content: "⚠️ Error clearing chat. Please try again.", isUser: false, timestamp: new Date() }
+      ]);
     }
   };
 
@@ -183,7 +201,7 @@ export default function AiChatbotWidget() {
                 <p className="text-xs opacity-80">Your artisan companion</p>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={handleClearChat} title="Clear chat">
+                <button type="button" onClick={handleClearChat} title="Clear chat" aria-label="Clear chat">
                   <Trash2 className="w-4 h-4" />
                 </button>
                 <button onClick={() => setIsOpen(false)} title="Close">

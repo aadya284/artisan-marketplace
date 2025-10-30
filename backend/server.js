@@ -1,6 +1,8 @@
 // server.js
 
-require("dotenv").config();
+const path = require("path");
+// Load .env.local placed next to this file (robust regardless of cwd)
+require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
@@ -36,8 +38,28 @@ console.log("- GEMINI_API_KEY length:", process.env.GEMINI_API_KEY?.length);
 // 2️⃣ Firebase Admin setup
 // -------------------------
 const saPath = process.env.FIREBASE_ADMIN_SA_PATH || "./config/serviceAccountKey.json";
+// Resolve service account path relative to this file when not absolute
+const saPathResolved = path.isAbsolute(saPath) ? saPath : path.resolve(__dirname, saPath);
 try {
-  const serviceAccount = JSON.parse(fs.readFileSync(saPath, "utf8"));
+  let serviceAccount;
+  if (fs.existsSync(saPathResolved)) {
+    serviceAccount = JSON.parse(fs.readFileSync(saPathResolved, "utf8"));
+    console.log("ℹ️ Using service account file:", saPathResolved);
+  } else if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    // Allow storing the entire JSON in an env var (escaped newlines or plain JSON)
+    try {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+      console.log("ℹ️ Using FIREBASE_SERVICE_ACCOUNT_KEY from environment");
+    } catch (innerErr) {
+      // try replacing literal \n sequences with newlines then parse
+      const normalized = process.env.FIREBASE_SERVICE_ACCOUNT_KEY.replace(/\\n/g, "\n");
+      serviceAccount = JSON.parse(normalized);
+      console.log("ℹ️ Parsed FIREBASE_SERVICE_ACCOUNT_KEY after normalizing newlines");
+    }
+  } else {
+    throw new Error(`Service account not found at ${saPathResolved} and FIREBASE_SERVICE_ACCOUNT_KEY not set`);
+  }
+
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });

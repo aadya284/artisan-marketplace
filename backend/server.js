@@ -9,6 +9,8 @@ const fs = require("fs");
 const admin = require("firebase-admin");
 const axios = require("axios");
 const { LRUCache } = require("lru-cache"); // ✅ Correct import for Node.js v20+ (CommonJS)
+// Google Cloud Translation client (v3)
+const { TranslationServiceClient } = require('@google-cloud/translate').v3;
 
 // -------------------------
 // 1️⃣ Express setup
@@ -340,6 +342,78 @@ app.get("/list-models", async (req, res) => {
 // -------------------------
 // 7️⃣ Health route (for testing)
 // -------------------------
+// -------------------------
+// 9️⃣ Google Translate endpoint
+// -------------------------
+app.post('/translate', async (req, res) => {
+  try {
+    const { text, target } = req.body;
+    if (!text) return res.status(400).json({ success: false, error: 'text is required' });
+
+    // Mode A: API key via TRANSLATE_API_KEY (simpler, less permissions work for quick tests)
+    const apiKey = process.env.TRANSLATE_API_KEY;
+    if (apiKey) {
+      try {
+        console.log('ℹ️ Using TRANSLATE_API_KEY for translation (REST v2)');
+        const contents = Array.isArray(text) ? text : [String(text)];
+        const url = `https://translation.googleapis.com/language/translate/v2?key=${encodeURIComponent(apiKey)}`;
+        const body = {
+          q: contents,
+          target: target || 'en',
+          format: 'text'
+        };
+
+        const response = await axios.post(url, body, { headers: { 'Content-Type': 'application/json' } });
+        const translations = (response.data?.data?.translations || []).map(t => t.translatedText || '');
+        return res.status(200).json({ success: true, translations });
+      } catch (err) {
+        console.error('❌ Translate (API key) error:', err.response?.data || err.message || err);
+        return res.status(500).json({ success: false, error: err.response?.data?.error?.message || err.message || String(err) });
+      }
+    }
+
+    // Mode B: fallback to using service account JSON via TranslationServiceClient (v3)
+    const saPath = process.env.FIREBASE_ADMIN_SA_PATH || './config/serviceAccountKey.json';
+    const saPathResolved = path.isAbsolute(saPath) ? saPath : path.resolve(__dirname, saPath);
+    let creds = null;
+    if (fs.existsSync(saPathResolved)) {
+      creds = JSON.parse(fs.readFileSync(saPathResolved, 'utf8'));
+      console.log('ℹ️ Using service account for translation:', saPathResolved);
+    } else if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+      try {
+        creds = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+        console.log('ℹ️ Using FIREBASE_SERVICE_ACCOUNT_KEY env for translation');
+      } catch (e) {
+        const normalized = process.env.FIREBASE_SERVICE_ACCOUNT_KEY.replace(/\\n/g, '\n');
+        creds = JSON.parse(normalized);
+        console.log('ℹ️ Parsed FIREBASE_SERVICE_ACCOUNT_KEY after normalizing newlines for translation');
+      }
+    } else {
+      return res.status(500).json({ success: false, error: 'Service account not found for translation' });
+    }
+
+    const projectId = creds.project_id;
+    if (!projectId) return res.status(500).json({ success: false, error: 'project_id not found in service account' });
+
+    const client = new TranslationServiceClient({ credentials: creds, projectId });
+    const parent = `projects/${projectId}/locations/global`;
+
+    const contents = Array.isArray(text) ? text : [String(text)];
+
+    const [response] = await client.translateText({
+      parent,
+      contents,
+      mimeType: 'text/plain',
+      targetLanguageCode: target || 'en'
+    });
+
+    const translations = (response.translations || []).map(t => t.translatedText || '');
+    return res.status(200).json({ success: true, translations });
+  } catch (error) {
+    console.error('❌ Translate error:', error?.message || error);
+    return res.status(500).json({ success: false, error: error?.message || String(error) });
+  }
+});
 app.get("/", (req, res) => {
   res.send("🚀 KarigarSetu backend running successfully!");
 });

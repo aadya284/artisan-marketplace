@@ -10,7 +10,7 @@ import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 export default function HomePage() {
   return (
     <>
-      <Navbar />
+    <Navbar />
       <TwoColumnHeroWithImage />
       <TaglineSection />
       <VideoShowcase />

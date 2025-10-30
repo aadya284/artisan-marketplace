@@ -44,6 +44,7 @@ const scrollToSection = (sectionId: string) => {
 
 const AnimatedIndicatorNavbar = () => {
   const [activeItem, setActiveItem] = useState(NAV_ITEMS[0].name);
+  const [lang, setLang] = useState("hi");
   const { user, isAuthenticated } = useAuth();
   const { cartCount } = useCart();
   const pathname = usePathname();
@@ -83,9 +84,95 @@ const AnimatedIndicatorNavbar = () => {
     }
   };
 
+  const LANGS = [
+    { code: "hi", label: "हिंदी" },
+    { code: "ta", label: "தமிழ்" },
+    { code: "bn", label: "বাংলা" },
+    { code: "mr", label: "मराठी" },
+    { code: "en", label: "English" },
+  ];
+
+  const BACKEND_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+
+  async function translatePage(target: string) {
+    try {
+      let els = Array.from(document.querySelectorAll<HTMLElement>("[data-translate]"));
+
+      // If no explicit marks, auto-select common visible text elements (fallback)
+      if (!els.length) {
+        const candidates = Array.from(document.querySelectorAll<HTMLElement>("h1,h2,h3,p,button,a,label,span"));
+        // Filter visible, non-empty, non-icon elements
+        const visible = candidates.filter((el) => {
+          const txt = (el.innerText || el.textContent || "").trim();
+          if (!txt) return false;
+          // skip elements inside nav/menus or with role img/svg or small text
+          const tag = el.tagName.toLowerCase();
+          if (el.closest('nav') || el.closest('[role="menu"]')) return false;
+          if (el.querySelector('svg')) return false;
+          // skip elements that contain other element children (to avoid removing styling/markup)
+          if (el.querySelector('*')) return false;
+          // visibility check
+          const style = window.getComputedStyle(el);
+          if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity || '1') === 0) return false;
+          return true;
+        });
+
+        // Limit to 50 items to avoid huge requests
+        els = visible.slice(0, 50);
+      }
+
+      if (!els.length) return;
+
+      // Save original text if not already saved (allow reverting)
+      els.forEach((el) => {
+        if (!el.dataset.originalText) {
+          el.dataset.originalText = (el.innerText || el.textContent || "").trim();
+        }
+      });
+
+      const texts = els.map((el) => (el.dataset.originalText || (el.innerText || el.textContent || "")).trim());
+      const res = await fetch(`${BACKEND_BASE}/translate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: texts, target }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        console.error("Translate failed:", json.error);
+        return;
+      }
+      const translations: string[] = json.translations || [];
+      for (let i = 0; i < els.length; i++) {
+        els[i].innerText = translations[i] ?? "";
+      }
+    } catch (e) {
+      console.error("Translate error:", e);
+    }
+  }
+
   return (
-    <section className="py-4 bg-background border-b border-border">
+    <section className="relative py-4 bg-background border-b border-border">
       <nav className="container mx-auto flex items-center justify-between">
+        {/* Compact language selector (top-left) */}
+        <div className="absolute left-4 top-3 z-50">
+          <label htmlFor="site-lang" className="sr-only">Select language</label>
+          <select
+            id="site-lang"
+            value={lang}
+            onChange={async (e) => {
+              const v = e.target.value;
+              setLang(v);
+              // translate visible marked strings
+              await translatePage(v);
+            }}
+            className="rounded-md border px-2 py-1 text-sm bg-white"
+            aria-label="Select language"
+          >
+            {LANGS.map((l) => (
+              <option key={l.code} value={l.code}>{l.label}</option>
+            ))}
+          </select>
+        </div>
         {/* Left WordMark */}
         <Link href={NAV_LOGO.url} className="flex items-center gap-4">
           <img src={NAV_LOGO.src} className="max-h-20 w-20 md:max-h-24 md:w-24" alt={NAV_LOGO.alt} />

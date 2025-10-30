@@ -96,41 +96,105 @@ const AnimatedIndicatorNavbar = () => {
 
   async function translatePage(target: string) {
     try {
-      let els = Array.from(document.querySelectorAll<HTMLElement>("[data-translate]"));
+      // Collect text nodes and some common attribute strings so we translate everything visible
+      const textNodes: Text[] = [];
+      const attrItems: { el: HTMLElement; attr: string; original: string }[] = [];
 
-      // If no explicit marks, auto-select common visible text elements (fallback)
-      if (!els.length) {
-        const candidates = Array.from(document.querySelectorAll<HTMLElement>("h1,h2,h3,p,button,a,label,span"));
-        // Filter visible, non-empty, non-icon elements
+      const markedEls = Array.from(document.querySelectorAll<HTMLElement>("[data-translate]"));
+
+      const pushTextNodesUnder = (root: Node) => {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+          acceptNode(node: Node) {
+            const v = node.nodeValue;
+            if (!v) return NodeFilter.FILTER_REJECT;
+            if (!v.trim()) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          },
+        } as any);
+        let cur: Node | null = walker.nextNode();
+        while (cur) {
+          textNodes.push(cur as Text);
+          cur = walker.nextNode();
+        }
+      };
+
+      const pushAttributesFor = (el: HTMLElement) => {
+        try {
+          // common attributes to translate
+          const attrs = ["placeholder", "title", "alt", "aria-label"];
+          attrs.forEach((attr) => {
+            const v = el.getAttribute(attr);
+            if (v && v.trim()) {
+              attrItems.push({ el, attr, original: v });
+            }
+          });
+
+          // input/textarea value
+          if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && (el as HTMLInputElement).value) {
+            const input = el as HTMLInputElement | HTMLTextAreaElement;
+            if (input.type !== "hidden" && input.value.trim()) {
+              attrItems.push({ el, attr: "value", original: input.value });
+            }
+          }
+        } catch (e) {
+          // ignore attribute read errors
+        }
+      };
+
+      if (markedEls.length) {
+        markedEls.forEach((el) => {
+          pushTextNodesUnder(el);
+          pushAttributesFor(el);
+        });
+      } else {
+        // Fallback: gather visible common text-bearing elements and collect their text nodes
+        const candidates = Array.from(document.querySelectorAll<HTMLElement>("h1,h2,h3,p,button,a,label,span,li,input,textarea"));
         const visible = candidates.filter((el) => {
           const txt = (el.innerText || el.textContent || "").trim();
-          if (!txt) return false;
-          // skip elements inside nav/menus or with role img/svg or small text
-          const tag = el.tagName.toLowerCase();
-          if (el.closest('nav') || el.closest('[role="menu"]')) return false;
-          if (el.querySelector('svg')) return false;
-          // skip elements that contain other element children (to avoid removing styling/markup)
-          if (el.querySelector('*')) return false;
-          // visibility check
+          // also consider attribute-only elements
+          const hasAttrText = !!(el.getAttribute && (el.getAttribute('placeholder') || el.getAttribute('title') || el.getAttribute('aria-label') || (el instanceof HTMLInputElement && (el as HTMLInputElement).value)));
+          if (!txt && !hasAttrText) return false;
+          // skip interactive menus
+          if (el.closest('[role="menu"]')) return false;
+          if (el.querySelector && el.querySelector('svg')) return false;
           const style = window.getComputedStyle(el);
           if (style.display === 'none' || style.visibility === 'hidden' || parseFloat(style.opacity || '1') === 0) return false;
           return true;
         });
-
-        // Limit to 50 items to avoid huge requests
-        els = visible.slice(0, 50);
+        // Limit elements to avoid huge requests
+        visible.slice(0, 80).forEach((el) => {
+          pushTextNodesUnder(el);
+          pushAttributesFor(el);
+        });
+        // Also include SVG <text> nodes (select their text content separately)
+        try {
+          const svgTextEls = Array.from(document.querySelectorAll<SVGTextElement>('svg text'));
+          svgTextEls.forEach((st) => pushTextNodesUnder(st as unknown as Node));
+        } catch (e) {}
       }
 
-      if (!els.length) return;
+      if (!textNodes.length && !attrItems.length) return;
 
-      // Save original text if not already saved (allow reverting)
-      els.forEach((el) => {
-        if (!el.dataset.originalText) {
-          el.dataset.originalText = (el.innerText || el.textContent || "").trim();
-        }
+      // Save original text on each text node (non-standard property but safe in client)
+      textNodes.forEach((tn) => {
+        if (!(tn as any).__originalText) (tn as any).__originalText = tn.nodeValue;
       });
 
-      const texts = els.map((el) => (el.dataset.originalText || (el.innerText || el.textContent || "")).trim());
+      // Save original attributes on elements (use dataset to persist)
+      attrItems.forEach(({ el, attr, original }) => {
+        try {
+          (el as any).dataset = (el as any).dataset || {};
+          const key = `originalAttr_${attr}`;
+          if (!(el as any).dataset[key]) (el as any).dataset[key] = original;
+        } catch (e) {}
+      });
+
+      // Build combined texts array (first text nodes, then attributes) to send in one batch
+      const texts: string[] = [
+        ...textNodes.map((tn) => ((tn as any).__originalText || tn.nodeValue || "").trim()),
+        ...attrItems.map((it) => it.original.trim()),
+      ];
+
       const res = await fetch(`${BACKEND_BASE}/translate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -142,8 +206,36 @@ const AnimatedIndicatorNavbar = () => {
         return;
       }
       const translations: string[] = json.translations || [];
-      for (let i = 0; i < els.length; i++) {
-        els[i].innerText = translations[i] ?? "";
+
+      // Diagnostic log: how many items we sent vs received
+      try { console.debug('[translatePage] textsSent=', textNodes.length + attrItems.length, 'translationsReceived=', translations.length); } catch (e) {}
+
+      // Apply translations back to text nodes (skip undefined translations to avoid clearing text)
+      for (let i = 0; i < textNodes.length; i++) {
+        if (translations[i] === undefined) continue;
+        const t = translations[i];
+        try {
+          textNodes[i].nodeValue = t;
+        } catch (e) {
+          // ignore failures on read-only nodes
+        }
+      }
+
+      // Apply translations back to attributes (skip undefined)
+      for (let j = 0; j < attrItems.length; j++) {
+        const idx = textNodes.length + j;
+        if (translations[idx] === undefined) continue;
+        const trans = translations[idx];
+        const { el, attr } = attrItems[j];
+        try {
+          if (attr === 'value') {
+            if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+              (el as HTMLInputElement | HTMLTextAreaElement).value = trans;
+            }
+          } else {
+            el.setAttribute(attr, trans);
+          }
+        } catch (e) {}
       }
     } catch (e) {
       console.error("Translate error:", e);

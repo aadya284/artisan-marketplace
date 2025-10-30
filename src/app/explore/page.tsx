@@ -33,20 +33,41 @@ export default function ExplorePage() {
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [locationError, setLocationError] = useState("");
 
-  // ✅ Fetch products from Firestore
+  // ✅ Fetch artworks from Firestore
   useEffect(() => {
     const fetchProducts = async () => {
+      console.log("🔄 Fetching artworks data...");
       try {
-        const querySnapshot = await getDocs(collection(db, "products"));
-        const fetchedProducts = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        if (!db) {
+          throw new Error("Firestore DB instance not initialized");
+        }
+        
+        const artworksRef = collection(db, "artworks");
+        console.log("📑 Querying 'artworks' collection...");
+        
+        const querySnapshot = await getDocs(artworksRef);
+        console.log(`✅ Retrieved ${querySnapshot.size} artworks`);
+        
+        const fetchedProducts = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          console.log(`📄 Artwork document ${doc.id}:`, data);
+          return {
+            id: doc.id,
+            ...data,
+          };
+        });
+        
         setProducts(fetchedProducts);
+        console.log("✨ Successfully updated products state with", fetchedProducts.length, "items");
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("❌ Error fetching artworks:", error);
+        if (error instanceof Error) {
+          console.error("Error details:", error.message);
+          console.error("Stack trace:", error.stack);
+        }
       } finally {
         setLoading(false);
+        console.log("🏁 Finished loading artworks data");
       }
     };
 

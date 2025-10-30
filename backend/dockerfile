@@ -1,0 +1,20 @@
+# 🏗️ Use official Node.js runtime as base image
+FROM node:20
+
+# 📁 Set working directory inside container
+WORKDIR /usr/src/app
+
+# 📦 Copy package.json and package-lock.json first (for caching)
+COPY package*.json ./
+
+# 🔧 Install only production dependencies
+RUN npm install --production
+
+# 📂 Copy all source code into the container
+COPY . .
+
+# 🌍 Expose port 8080 (Cloud Run expects this)
+EXPOSE 8080
+
+# ▶️ Start the backend server
+CMD ["node", "server.js"]

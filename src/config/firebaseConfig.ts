@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from 'firebase/firestore';
 
 // Your Firebase configuration (keep as-is from your Firebase console)
 const firebaseConfig = {
@@ -20,10 +21,13 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase Auth
 const auth = getAuth(app);
 
-// Optional: analytics (won’t run on server-side)
+// Initialize Firestore
+const db = getFirestore(app);
+
+// Optional: analytics (won't run on server-side)
 let analytics;
 if (typeof window !== "undefined") {
   analytics = getAnalytics(app);
 }
 
-export { app, auth, analytics };
+export { app, auth, db, analytics };

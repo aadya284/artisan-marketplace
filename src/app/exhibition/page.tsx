@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
@@ -8,6 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Users, Eye, Plus, Star, Palette, Image } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useCart } from "@/contexts/CartContext";
+import RazorpayGPayButton from "@/components/ui/razorpay-gpay-button";
+import Link from "next/link";
 import { db } from "@/config/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 
@@ -82,6 +86,39 @@ export default function ExhibitionPage() {
       case "upcoming": return "Coming Soon";
       case "completed": return "Completed";
       default: return status;
+    }
+  };
+
+  // Cart & Payment state
+  const { addToCart } = useCart();
+  const [selectedExhibition, setSelectedExhibition] = useState<any | null>(null);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+
+  const handleAddToCartExhibition = (exhibition: any) => {
+    const item = {
+      id: exhibition.id,
+      name: exhibition.title,
+      artist: exhibition.artist,
+      state: exhibition.location || "",
+      price: exhibition.price ?? 0,
+      originalPrice: exhibition.price ?? 0,
+      image: exhibition.image,
+      rating: exhibition.rating ?? 0,
+      inStock: true,
+      stockCount: 1,
+    };
+    addToCart(item, 1);
+  };
+
+  const handleBuyNowExhibition = (exhibition: any) => {
+    // Add to cart and open payment if price > 0, else just add and confirm
+    handleAddToCartExhibition(exhibition);
+    if ((exhibition.price ?? 0) > 0) {
+      setSelectedExhibition(exhibition);
+      setIsPaymentOpen(true);
+    } else {
+      // Free reservation — simple confirmation flow
+      alert(`Reserved spot for ${exhibition.title}`);
     }
   };
 
@@ -233,17 +270,20 @@ export default function ExhibitionPage() {
                         </div>
 
                         <div className="space-y-2">
-                          <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold">
-                            <Eye className="w-4 h-4 mr-2" />
-                            {exhibition.status === "ongoing"
-                              ? "Visit Exhibition"
-                              : exhibition.status === "upcoming"
-                              ? "Reserve Spot"
-                              : "View Gallery"}
-                          </Button>
-                          <Button variant="outline" className="w-full border-amber-200 text-amber-700 hover:bg-amber-50">
-                            <Palette className="w-4 h-4 mr-2" /> View Portfolio
-                          </Button>
+                          <div className="flex flex-col gap-2">
+                            <Button onClick={() => handleBuyNowExhibition(exhibition)} className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold">
+                              <Eye className="w-4 h-4 mr-2" />
+                              {exhibition.status === "ongoing"
+                                ? "Visit Exhibition"
+                                : exhibition.status === "upcoming"
+                                ? "Reserve Spot"
+                                : "View Gallery"}
+                            </Button>
+
+                            <Button variant="outline" className="w-full border-amber-200 text-amber-700 hover:bg-amber-50" onClick={() => handleAddToCartExhibition(exhibition)}>
+                              <Palette className="w-4 h-4 mr-2" /> Add to Cart / View Portfolio
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -265,6 +305,38 @@ export default function ExhibitionPage() {
 
       <NewsletterFooter />
       <AiChatbotWidget />
+      {/* Payment Dialog for Exhibitions */}
+      <div>
+        {selectedExhibition && (
+          <div>
+            <Dialog open={isPaymentOpen} onOpenChange={setIsPaymentOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Complete Reservation / Ticket</DialogTitle>
+                </DialogHeader>
+                <div className="py-4">
+                  <p className="text-sm text-gray-600 mb-4">You're reserving a spot for <strong>{selectedExhibition.title}</strong>.</p>
+                  <RazorpayGPayButton
+                    amount={(selectedExhibition.price ?? 0)}
+                    onSuccess={(resp) => {
+                      console.log('Exhibition payment success', resp);
+                      setIsPaymentOpen(false);
+                      alert('Reservation confirmed!');
+                    }}
+                    onError={(err) => {
+                      console.error('Exhibition payment error', err);
+                      alert('Payment failed');
+                    }}
+                  />
+                </div>
+                <div className="p-4 text-right">
+                  <Button variant="outline" onClick={() => setIsPaymentOpen(false)}>Close</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
+      </div>
     </>
   );
 }

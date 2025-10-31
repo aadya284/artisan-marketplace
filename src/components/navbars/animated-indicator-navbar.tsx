@@ -3,7 +3,7 @@
 import { Menu, X, ShoppingCart, Store, Palette, Home, MapPin, Video } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +48,7 @@ const AnimatedIndicatorNavbar = () => {
   const { user, isAuthenticated } = useAuth();
   const { cartCount } = useCart();
   const pathname = usePathname();
+  const router = useRouter();
 
   const indicatorRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLUListElement>(null);
@@ -72,15 +73,35 @@ const AnimatedIndicatorNavbar = () => {
     return () => window.removeEventListener("resize", updateIndicator);
   }, [activeItem]);
 
+  // Sync active nav item with current pathname so active state persists across navigation
+  useEffect(() => {
+    if (!pathname) return;
+
+    const matched = NAV_ITEMS.find((item) => {
+      if (item.link === "/") return pathname === "/";
+      // match exact or nested routes (e.g. /exhibition or /exhibition/123)
+      return pathname === item.link || pathname.startsWith(item.link + "/");
+    });
+
+    if (matched) setActiveItem(matched.name);
+    else setActiveItem(NAV_ITEMS[0].name);
+  }, [pathname]);
+
   const handleNavigation = (item: typeof NAV_ITEMS[0]) => {
     setActiveItem(item.name);
-    
+
     // For regular navigation
     if (item.link.startsWith('#')) {
       const sectionId = item.link.replace('#', '') + '-section';
       scrollToSection(sectionId);
     } else {
-      window.location.href = item.link;
+      // use Next router to navigate client-side so the app router updates without full reload
+      try {
+        router.push(item.link);
+      } catch (e) {
+        // fallback to full navigation if router fails
+        window.location.href = item.link;
+      }
     }
   };
 

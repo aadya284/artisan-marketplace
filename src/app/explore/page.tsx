@@ -51,9 +51,20 @@ export default function ExplorePage() {
         const fetchedProducts = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           console.log(`📄 Artwork document ${doc.id}:`, data);
+          // Ensure all required fields are present with defaults
           return {
             id: doc.id,
-            ...data,
+            name: data.name || "Untitled",
+            description: data.description || "",
+            price: data.price || 0,
+            originalPrice: data.originalPrice || data.price || 0,
+            image: data.image || (data.images && data.images[0]) || "",
+            images: data.images || [data.image] || [],
+            artist: data.artistName || data.artist || "Unknown Artist",
+            rating: data.rating || 0,
+            category: data.category || "Uncategorized",
+            state: data.state || "Not Specified",
+            ...data
           };
         });
         
@@ -227,10 +238,22 @@ export default function ExplorePage() {
               <div className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-4" : "grid-cols-1"}`}>
                 {filteredProducts.map((product) => (
                   <div key={product.id} className="bg-white rounded-xl shadow-md overflow-hidden group hover:shadow-lg transition">
-                    <Link href={`/artwork/${product.id}`} className="block relative">
-                      <img src={product.image} alt={product.name} className="w-full h-64 object-cover group-hover:scale-105 transition" />
+                    <Link href={`/artwork/${product.id}`} className="block relative" onClick={() => console.log("🔗 Navigating to artwork:", product.id)}>
+                      <div className="relative w-full h-64">
+                        <img 
+                          src={product.image} 
+                          alt={product.name} 
+                          className="w-full h-full object-cover group-hover:scale-105 transition"
+                          onError={(e) => {
+                            console.log("🖼️ Image load error for artwork:", product.id);
+                            const img = e.target as HTMLImageElement;
+                            img.src = 'https://via.placeholder.com/400x300?text=Artwork+Image';
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                      </div>
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                        <Button className="bg-white text-gray-800 hover:bg-gray-100">
+                        <Button className="bg-white text-gray-800 hover:bg-gray-100 transform transition hover:scale-105">
                           <Eye className="w-4 h-4 mr-2" /> View Details
                         </Button>
                       </div>

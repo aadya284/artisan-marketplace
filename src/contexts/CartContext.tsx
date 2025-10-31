@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export interface CartItem {
-  id: number;
+  id: string | number;
   name: string;
   artist: string;
   state: string;
@@ -22,8 +22,8 @@ interface CartContextType {
   cartCount: number;
   cartTotal: number;
   addToCart: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
-  removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  removeFromCart: (id: string | number) => void;
+  updateQuantity: (id: string | number, quantity: number) => void;
   clearCart: () => void;
   isInCart: (id: number) => boolean;
 }
@@ -62,12 +62,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addToCart = (item: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(cartItem => cartItem.id === item.id);
+      const existingItem = prevItems.find(cartItem => String(cartItem.id) === String(item.id));
       
       if (existingItem) {
         // Item already in cart, update quantity
-        const newQuantity = existingItem.quantity + quantity;
-        const maxStock = item.stockCount || 99;
+  const newQuantity = existingItem.quantity + quantity;
+  const maxStock = item.stockCount ?? 99;
         
         if (newQuantity > maxStock) {
           toast.error(`Cannot add more items. Only ${maxStock} in stock.`);
@@ -76,7 +76,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         toast.success(`Updated ${item.name} quantity to ${newQuantity}`);
         return prevItems.map(cartItem =>
-          cartItem.id === item.id
+          String(cartItem.id) === String(item.id)
             ? { ...cartItem, quantity: newQuantity }
             : cartItem
         );
@@ -89,17 +89,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const removeFromCart = (id: number) => {
+  const removeFromCart = (id: string | number) => {
     setCartItems(prevItems => {
-      const item = prevItems.find(item => item.id === id);
+      const item = prevItems.find(item => String(item.id) === String(id));
       if (item) {
         toast.success(`${item.name} removed from cart`);
       }
-      return prevItems.filter(item => item.id !== id);
+      return prevItems.filter(item => String(item.id) !== String(id));
     });
   };
 
-  const updateQuantity = (id: number, quantity: number) => {
+  const updateQuantity = (id: string | number, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(id);
       return;
@@ -107,8 +107,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setCartItems(prevItems =>
       prevItems.map(item => {
-        if (item.id === id) {
-          const maxStock = item.stockCount || 99;
+        if (String(item.id) === String(id)) {
+          const maxStock = item.stockCount ?? 99;
           if (quantity > maxStock) {
             toast.error(`Cannot add more items. Only ${maxStock} in stock.`);
             return item;
@@ -125,8 +125,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.success("Cart cleared");
   };
 
-  const isInCart = (id: number) => {
-    return cartItems.some(item => item.id === id);
+  const isInCart = (id: string | number) => {
+    return cartItems.some(item => String(item.id) === String(id));
   };
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);

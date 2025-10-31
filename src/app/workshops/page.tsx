@@ -12,6 +12,10 @@ import { Slider } from "@/components/ui/slider";
 import { Search, Video, Users, Loader } from "lucide-react";
 import { db } from "@/config/firebaseConfig";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { useCart } from "@/contexts/CartContext";
+import RazorpayGPayButton from "@/components/ui/razorpay-gpay-button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function WorkshopsPage() {
   const [workshops, setWorkshops] = useState<any[]>([]);
@@ -19,6 +23,38 @@ export default function WorkshopsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [level, setLevel] = useState("All");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]); // widened default
+
+  // Cart & payment wiring
+  const { addToCart } = useCart();
+  const [selectedWorkshop, setSelectedWorkshop] = useState<any | null>(null);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const router = useRouter();
+
+  const handleAddToCartWorkshop = (workshop: any) => {
+    const item = {
+      id: workshop.id,
+      name: workshop.title,
+      artist: workshop.artisan,
+      state: workshop.duration,
+      price: workshop.price ?? 0,
+      originalPrice: workshop.price ?? 0,
+      image: workshop.poster,
+      rating: workshop.rating ?? 0,
+      inStock: true,
+      stockCount: 99,
+    };
+    addToCart(item, 1);
+  };
+
+  const handleBuyNowWorkshop = (workshop: any) => {
+    handleAddToCartWorkshop(workshop);
+    if ((workshop.price ?? 0) > 0) {
+      setSelectedWorkshop(workshop);
+      setIsPaymentOpen(true);
+    } else {
+      alert(`Registered for ${workshop.title}`);
+    }
+  };
 
   const levels = ["All", "Beginner", "Intermediate", "Advanced", "All Levels"];
 
@@ -307,16 +343,24 @@ export default function WorkshopsPage() {
                           {w.blurb}
                         </p>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                           <div className="flex items-baseline gap-2">
                             <span className="text-xl font-semibold">₹{w.price}</span>
                             <span className="text-xs text-gray-500">per seat</span>
                           </div>
-                          <Button asChild className="bg-orange-600 hover:bg-orange-700">
-                            <Link href={`/workshops/${w.id}`}>
-                              <Video className="w-4 h-4 mr-2" /> Join Workshop
-                            </Link>
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button asChild className="bg-orange-600 hover:bg-orange-700">
+                              <Link href={`/workshops/${w.id}`}>
+                                <Video className="w-4 h-4 mr-2" /> Details
+                              </Link>
+                            </Button>
+                            <Button className="bg-white border border-orange-200 text-orange-700" onClick={() => handleAddToCartWorkshop(w)}>
+                              Add to Cart
+                            </Button>
+                            <Button className="bg-orange-700 text-white" onClick={() => handleBuyNowWorkshop(w)}>
+                              Buy Now
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -340,6 +384,34 @@ export default function WorkshopsPage() {
 
       <NewsletterFooter />
       <AiChatbotWidget />
+          {/* Payment Dialog for Workshops */}
+          {selectedWorkshop && (
+            <Dialog open={isPaymentOpen} onOpenChange={setIsPaymentOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Complete Workshop Booking</DialogTitle>
+                </DialogHeader>
+                <div className="py-4">
+                  <p className="text-sm text-gray-600 mb-4">You're booking <strong>{selectedWorkshop.title}</strong> — ₹{selectedWorkshop.price}</p>
+                  <RazorpayGPayButton
+                    amount={selectedWorkshop.price}
+                    onSuccess={(resp) => {
+                      console.log('Workshop payment success', resp);
+                      setIsPaymentOpen(false);
+                      router.push('/orders');
+                    }}
+                    onError={(err) => {
+                      console.error('Workshop payment error', err);
+                      alert('Payment failed');
+                    }}
+                  />
+                </div>
+                <div className="p-4 text-right">
+                  <Button variant="outline" onClick={() => setIsPaymentOpen(false)}>Close</Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
     </>
   );
 }

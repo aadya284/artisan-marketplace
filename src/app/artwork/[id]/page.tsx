@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { db } from "@/config/firebaseConfig"; // use centralized config
-import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { db } from "@/config/firebaseConfig";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import { Button } from "@/components/ui/button";
@@ -10,91 +10,175 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Star,
   ShoppingCart,
-  Heart,
-  Share2,
   Truck,
   Shield,
   RotateCcw,
   ChevronLeft,
   Plus,
   Minus,
-  MessageCircle
+  MessageCircle,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
-import { notFound, useRouter, useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
+import RazorpayGPayButton from "@/components/ui/razorpay-gpay-button";
 
 export default function ArtworkDetailPage() {
-  const [artwork, setArtwork] = useState<any>(null);
+  const [artwork, setArtwork] = useState<any | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [contactMessage, setContactMessage] = useState("");
-  const [isCustomizeDialogOpen, setIsCustomizeDialogOpen] = useState(false);
-  const [designDetails, setDesignDetails] = useState("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
 
   const { addToCart, isInCart } = useCart();
   const router = useRouter();
-  const { id } = useParams<{ id: string }>();
+  const params = useParams();
+  const id = params?.id?.toString();
 
-  // ✅ Fetch artwork and reviews from Firebase
   useEffect(() => {
     async function fetchArtwork() {
-      try {
-        const docRef = doc(db, "artworks", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setArtwork({ id: docSnap.id, ...docSnap.data() });
+      if (!id) {
+        console.error("Artwork ID missing in route params", params);
+        setError("Artwork ID is missing");
+        setLoading(false);
+        return;
+      }
 
-          // Fetch reviews related to this artwork
-          const q = query(collection(db, "reviews"), where("artworkId", "==", id));
-          const querySnapshot = await getDocs(q);
-          const fetchedReviews = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          setReviews(fetchedReviews);
-        } else {
-          notFound();
+      if (!db) {
+        console.error("Firestore DB not initialized");
+        setError("Database connection error");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log("⏳ Fetching artwork doc with id:", id);
+
+        // Fetch all docs in artworks collection and find by doc.id === id
+        const artworksRef = collection(db, "artworks");
+        const qs = await getDocs(artworksRef);
+        console.log("📚 artworks collection size:", qs.size);
+
+        const doc = qs.docs.find(d => d.id === id || (d.data().id && d.data().id.toString() === id));
+        if (!doc) {
+          console.error("Artwork not found for id:", id);
+          setError("Artwork not found");
+          setLoading(false);
+          return;
         }
+
+        const data = doc.data();
+        console.log("✅ Artwork data:", { id: doc.id, ...data });
+
+        setArtwork({
+          id: doc.id,
+          name: data.name || "Untitled",
+          description: data.description || "",
+          price: data.price || 0,
+          originalPrice: data.originalPrice || data.price || 0,
+          images: data.images || (data.image ? [data.image] : []),
+          artistName: data.artistName || data.artist || "Unknown Artist",
+          artistImage: data.artistImage || null,
+          rating: data.rating || 0,
+          reviewsCount: data.reviewsCount || 0,
+          stockCount: data.stockCount ?? 1,
+          inStock: (data.stockCount ?? 1) > 0,
+          category: data.category || "Uncategorized",
+          state: data.state || "Not Specified",
+          ...data
+        });
+
+        // Fetch reviews (by artworkId field matching id or doc.id)
+        try {
+          const reviewsRef = collection(db, "reviews");
+          const q = query(reviewsRef, where("artworkId", "==", id));
+          const reviewsSnap = await getDocs(q);
+          const rv = reviewsSnap.docs.map(r => ({ id: r.id, ...r.data(), date: r.data().date ? new Date(r.data().date).toLocaleDateString() : "Unknown date" }));
+          console.log("📝 Reviews fetched:", rv.length);
+          setReviews(rv);
+        } catch (revErr) {
+          console.warn("Unable to fetch reviews:", revErr);
+          setReviews([]);
+        }
+
+        setLoading(false);
       } catch (err) {
         console.error("Error fetching artwork:", err);
+        setError(err instanceof Error ? err.message : "Failed to load artwork");
+        setLoading(false);
       }
     }
-    if (id) fetchArtwork();
+
+    fetchArtwork();
   }, [id]);
 
-  if (!artwork) {
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-gray-600">
-        Loading artwork details...
-      </div>
+      <>
+        <AnimatedIndicatorNavbar />
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 animate-spin text-orange-600 mx-auto mb-4" />
+            <p className="text-gray-600">Loading artwork details...</p>
+          </div>
+        </div>
+      </>
     );
   }
 
-  const discount = Math.round((1 - artwork.price / artwork.originalPrice) * 100);
+  if (error) {
+    return (
+      <>
+        <AnimatedIndicatorNavbar />
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+            <div className="mb-4 text-red-500">
+              <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">Failed to Load Artwork</h2>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <Link href="/explore">
+              <Button className="bg-orange-600 hover:bg-orange-700 text-white w-full">Return to Explore</Button>
+            </Link>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!artwork) return null;
+
+  const discount = artwork.originalPrice ? Math.round((1 - artwork.price / artwork.originalPrice) * 100) : 0;
 
   const increaseQuantity = () => {
-    if (quantity < artwork.stockCount) setQuantity(quantity + 1);
+    if (quantity < (artwork.stockCount ?? 1)) setQuantity(q => q + 1);
   };
   const decreaseQuantity = () => {
-    if (quantity > 1) setQuantity(quantity - 1);
+    if (quantity > 1) setQuantity(q => q - 1);
   };
 
   const handleAddToCart = () => {
-    if (!artwork.inStock) return;
+    if (!artwork.stockCount) return;
     addToCart(artwork, quantity);
   };
 
   const handleBuyNow = () => {
+    // Add to cart, then open payment modal for immediate checkout
     handleAddToCart();
-    router.push("/cart");
+    setIsPaymentOpen(true);
   };
 
   const handleContactArtisan = () => {
@@ -102,13 +186,6 @@ export default function ArtworkDetailPage() {
     alert("Your message has been sent to the artisan!");
     setContactMessage("");
     setIsContactDialogOpen(false);
-  };
-
-  const handleSubmitCustomization = () => {
-    if (!designDetails.trim()) return;
-    alert("Your customization request has been sent!");
-    setDesignDetails("");
-    setIsCustomizeDialogOpen(false);
   };
 
   return (
@@ -128,13 +205,16 @@ export default function ArtworkDetailPage() {
         </div>
 
         <div className="container mx-auto py-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Images */}
           <div>
             <div className="aspect-square overflow-hidden rounded-xl shadow-lg">
               <img
-                src={artwork.images?.[selectedImageIndex]}
+                src={artwork.images?.[selectedImageIndex] || artwork.images?.[0]}
                 alt={artwork.name}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.src = 'https://via.placeholder.com/400x400?text=Artwork+Image';
+                }}
               />
             </div>
             {artwork.images?.length > 1 && (
@@ -143,23 +223,17 @@ export default function ArtworkDetailPage() {
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                      selectedImageIndex === index ? "border-orange-600" : "border-gray-200"
-                    }`}
-                  >
-                    <img src={image} className="w-full h-full object-cover" />
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${selectedImageIndex === index ? "border-orange-600" : "border-gray-200"}`}>
+                    <img src={image} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/400x400?text=Artwork+Image')} />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Details */}
           <div className="space-y-6">
             <div>
-              <Badge variant="outline" className="text-orange-700 border-orange-200 mb-3">
-                {artwork.state} • {artwork.category}
-              </Badge>
+              <Badge variant="outline" className="text-orange-700 border-orange-200 mb-3">{artwork.state} • {artwork.category}</Badge>
               <h1 className="text-3xl font-bold text-gray-800">{artwork.name}</h1>
               <p className="text-gray-600">by {artwork.artistName}</p>
             </div>
@@ -180,26 +254,28 @@ export default function ArtworkDetailPage() {
               )}
             </div>
 
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">Quantity:</span>
+              <div className="flex items-center">
+                <Button variant="outline" size="icon" onClick={decreaseQuantity} disabled={quantity <= 1} className="h-8 w-8"><Minus className="h-4 w-4" /></Button>
+                <span className="w-12 text-center">{quantity}</span>
+                <Button variant="outline" size="icon" onClick={increaseQuantity} disabled={quantity >= artwork.stockCount} className="h-8 w-8"><Plus className="h-4 w-4" /></Button>
+              </div>
+              <span className="text-sm text-gray-500">{artwork.stockCount} pieces available</span>
+            </div>
+
             <div className="flex gap-3">
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white flex-1" onClick={handleBuyNow}>
-                Buy Now
-              </Button>
-              <Button
-                variant="outline"
-                className="border-orange-300 text-orange-700 flex-1"
-                onClick={handleAddToCart}
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                {isInCart(artwork.id) ? "Added to Cart" : "Add to Cart"}
+              <Button className="bg-orange-600 hover:bg-orange-700 text-white flex-1" onClick={handleBuyNow} disabled={!artwork.inStock}>Buy Now</Button>
+              <Button variant="outline" className="border-orange-300 text-orange-700 flex-1" onClick={handleAddToCart} disabled={!artwork.inStock}>
+                <ShoppingCart className="w-4 h-4 mr-2" />{isInCart(artwork.id) ? "Added to Cart" : "Add to Cart"}
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Tabs Section */}
         <div className="container mx-auto mt-16">
           <Tabs defaultValue="description">
-            <TabsList className="grid grid-cols-4">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specs">Specifications</TabsTrigger>
               <TabsTrigger value="artist">Artist</TabsTrigger>
@@ -207,40 +283,100 @@ export default function ArtworkDetailPage() {
             </TabsList>
 
             <TabsContent value="description">
-              <Card className="mt-4">
+              <Card>
                 <CardHeader>
                   <CardTitle>About the Product</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p>{artwork.description}</p>
+                  <p className="text-gray-600">{artwork.description}</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="specs">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Product Specifications</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium">Category</p>
+                      <p className="text-gray-600">{artwork.category}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">State</p>
+                      <p className="text-gray-600">{artwork.state}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Material</p>
+                      <p className="text-gray-600">{artwork.material || "Not specified"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Dimensions</p>
+                      <p className="text-gray-600">{artwork.dimensions || "Not specified"}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="artist">
+              <Card>
+                <CardHeader>
+                  <CardTitle>About the Artist</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-start gap-4">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage src={artwork.artistImage} />
+                      <AvatarFallback>{artwork.artistName?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="text-lg font-semibold">{artwork.artistName}</h3>
+                      <p className="text-gray-600">{artwork.artistBio || `Traditional artisan specializing in ${artwork.category}`}</p>
+                      <Button variant="outline" className="mt-4" onClick={() => setIsContactDialogOpen(true)}>
+                        <MessageCircle className="w-4 h-4 mr-2" />Contact Artisan
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
             <TabsContent value="reviews">
-              <Card className="mt-4">
+              <Card>
                 <CardHeader>
                   <CardTitle>Customer Reviews</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {reviews.length === 0 ? (
-                    <p>No reviews yet.</p>
+                    <p className="text-center text-gray-500 py-4">No reviews yet</p>
                   ) : (
-                    reviews.map((r) => (
-                      <div key={r.id} className="border-b py-3">
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarImage src={r.userImage} />
-                            <AvatarFallback>{r.userName[0]}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{r.userName}</p>
-                            <p className="text-sm text-gray-500">{r.date}</p>
+                    <div className="space-y-6">
+                      {reviews.map((review) => (
+                        <div key={review.id} className="border-b border-gray-100 pb-6">
+                          <div className="flex items-center gap-3">
+                            <Avatar>
+                              <AvatarImage src={review.userImage} />
+                              <AvatarFallback>{review.userName?.[0]}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{review.userName}</p>
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center text-yellow-400">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star key={i} className={`w-4 h-4 ${i < (review.rating || 0) ? "fill-yellow-400" : "fill-gray-200"}`} />
+                                  ))}
+                                </div>
+                                <span className="text-sm text-gray-500">{review.date}</span>
+                              </div>
+                            </div>
                           </div>
+                          <p className="mt-2 text-gray-600">{review.comment}</p>
                         </div>
-                        <p className="mt-2 text-gray-700">{r.comment}</p>
-                      </div>
-                    ))
+                      ))}
+                    </div>
                   )}
                 </CardContent>
               </Card>
@@ -248,6 +384,52 @@ export default function ArtworkDetailPage() {
           </Tabs>
         </div>
       </div>
+
+      <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Contact {artwork.artistName}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Your Message</Label>
+              <Textarea value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} placeholder="I'm interested in this artwork..." />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsContactDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleContactArtisan}>Send Message</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Payment Dialog (Razorpay + GPay) */}
+      <Dialog open={isPaymentOpen} onOpenChange={setIsPaymentOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Complete Payment</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-gray-600 mb-4">You're purchasing <strong>{artwork.name}</strong> — ₹{artwork.price} x {quantity} = <strong>₹{artwork.price * quantity}</strong></p>
+            <RazorpayGPayButton
+              amount={artwork.price * quantity}
+              onSuccess={(resp) => {
+                console.log('Payment success:', resp);
+                setIsPaymentOpen(false);
+                // Redirect to orders page (or any success UI)
+                router.push('/orders');
+              }}
+              onError={(err) => {
+                console.error('Payment error:', err);
+                alert('Payment failed. Please try again.');
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPaymentOpen(false)}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <NewsletterFooter />
     </>

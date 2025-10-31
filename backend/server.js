@@ -365,7 +365,12 @@ app.post('/translate', async (req, res) => {
 
         const response = await axios.post(url, body, { headers: { 'Content-Type': 'application/json' } });
         const translations = (response.data?.data?.translations || []).map(t => t.translatedText || '');
-        return res.status(200).json({ success: true, translations });
+        // Diagnostic logging when counts mismatch
+        if (translations.length !== contents.length) {
+          console.warn(`⚠️ Translate (API key) returned ${translations.length} translations for ${contents.length} inputs`);
+          console.warn('⚠️ Response data preview:', JSON.stringify(response.data?.data?.translations?.slice(0,5) || response.data, null, 2));
+        }
+        return res.status(200).json({ success: true, translations, sentCount: contents.length, translationsCount: translations.length });
       } catch (err) {
         console.error('❌ Translate (API key) error:', err.response?.data || err.message || err);
         return res.status(500).json({ success: false, error: err.response?.data?.error?.message || err.message || String(err) });
@@ -408,7 +413,11 @@ app.post('/translate', async (req, res) => {
     });
 
     const translations = (response.translations || []).map(t => t.translatedText || '');
-    return res.status(200).json({ success: true, translations });
+    if (translations.length !== contents.length) {
+      console.warn(`⚠️ TranslationServiceClient returned ${translations.length} translations for ${contents.length} inputs`);
+      try { console.warn('⚠️ Sample translations:', translations.slice(0,5)); } catch (e) {}
+    }
+    return res.status(200).json({ success: true, translations, sentCount: contents.length, translationsCount: translations.length });
   } catch (error) {
     console.error('❌ Translate error:', error?.message || error);
     return res.status(500).json({ success: false, error: error?.message || String(error) });

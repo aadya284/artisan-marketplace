@@ -37,3 +37,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Environment variables
+
+This project expects certain API keys and secrets to be provided via environment variables. For local development copy `.env.example` to `.env.local` and fill in the real values (do NOT commit `.env.local`). Example keys:
+
+- `GOOGLE_MAPS_API_KEY` (server-side Google Maps key). Prefer server-side usage — put this in `.env.local` and do not expose it as `NEXT_PUBLIC_...` unless strictly required.
+- `TRANSLATE_API_KEY` or `FIREBASE_ADMIN_SA_PATH` (for the backend translation endpoint).
+- `GEMINI_API_KEY` (if using the LLM/chat endpoint).
+
+If you accidentally committed an API key, rotate/revoke it immediately and replace it with an environment variable.

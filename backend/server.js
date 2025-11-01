@@ -12,6 +12,7 @@ const { LRUCache } = require("lru-cache"); // ✅ Correct import for Node.js v20
 // Google Cloud Translation client (v3)
 const { TranslationServiceClient } = require('@google-cloud/translate').v3;
 const multer = require('multer');
+const vertex = require('./vertex');
 
 // -------------------------
 // 1️⃣ Express setup
@@ -19,6 +20,22 @@ const multer = require('multer');
 const app = express();
 // Enable CORS for all routes
 app.use(cors());
+
+// Simple request logger to help debug 404s from the browser
+app.use((req, res, next) => {
+  console.log(`[REQ] ${req.method} ${req.originalUrl} - Host: ${req.headers.host}`);
+  next();
+});
+
+// Rewrite helper: forward requests from /api/recommendations to /recommendations
+// This covers frontend code that might call a relative /api path (Next.js style)
+app.use((req, res, next) => {
+  if (req.path === '/api/recommendations' || req.path.startsWith('/api/recommendations/')) {
+    // preserve query string
+    req.url = req.url.replace(/^\/api/, '');
+  }
+  next();
+});
 
 // Parse JSON bodies and handle parsing errors
 app.use(express.json());
@@ -477,6 +494,102 @@ app.post('/translate', async (req, res) => {
     return res.status(500).json({ success: false, error: error?.message || String(error) });
   }
 });
+// -------------------------
+// Recommendations endpoint
+// -------------------------
+app.get('/recommendations', async (req, res) => {
+  try {
+    const artworkId = req.query.artworkId;
+    if (!artworkId) return res.status(400).json({ success: false, error: 'artworkId query param is required' });
+
+    // Try to resolve the artwork by several strategies:
+    // 1) treat artworkId as a document id
+    // 2) treat artworkId as a numeric or string field `id` on the document
+    // 3) try other common fields like `artworkId` or `externalId`
+    const artworksRef = admin.firestore().collection('artworks');
+
+    let artwork = null;
+
+    // 1) direct doc lookup
+    try {
+      const artworkDoc = await artworksRef.doc(String(artworkId)).get();
+      if (artworkDoc.exists) {
+        artwork = { id: artworkDoc.id, ...artworkDoc.data() };
+        console.log('Found artwork by doc id:', artwork.id);
+      }
+    } catch (e) {
+      console.warn('Direct doc lookup failed:', e?.message || e);
+    }
+
+    // 2) lookup by field `id` (string or number)
+    if (!artwork) {
+      try {
+        let qs = await artworksRef.where('id', '==', artworkId).limit(1).get();
+        if (qs.empty && !isNaN(Number(artworkId))) {
+          qs = await artworksRef.where('id', '==', Number(artworkId)).limit(1).get();
+        }
+        if (!qs.empty) {
+          const d = qs.docs[0];
+          artwork = { id: d.id, ...d.data() };
+          console.log('Found artwork by field id:', artwork.id);
+        }
+      } catch (e) {
+        console.warn('Field id lookup failed:', e?.message || e);
+      }
+    }
+
+    // 3) other possible identifying fields
+    if (!artwork) {
+      try {
+        let qs = await artworksRef.where('artworkId', '==', artworkId).limit(1).get();
+        if (qs.empty) qs = await artworksRef.where('externalId', '==', artworkId).limit(1).get();
+        if (!qs.empty) {
+          const d = qs.docs[0];
+          artwork = { id: d.id, ...d.data() };
+          console.log('Found artwork by artworkId/externalId field:', artwork.id);
+        }
+      } catch (e) {
+        console.warn('artworkId/externalId lookup failed:', e?.message || e);
+      }
+    }
+
+    if (!artwork) {
+      return res.status(404).json({ success: false, error: 'Artwork not found' });
+    }
+
+    try {
+      // Try to get recommendations using Vertex AI
+      const recommendations = await require('./recommendations').getRecommendations(artwork);
+      
+      if (recommendations && recommendations.length > 0) {
+        return res.json({ 
+          success: true, 
+          recommendations,
+          source: 'vertex-ai'
+        });
+      }
+    } catch (err) {
+      console.error('Vertex AI recommendations failed, falling back to category-based:', err);
+    }
+
+    // Fallback to category-based recommendations
+    const allSnap = await admin.firestore().collection('artworks').get();
+    const allArtworks = allSnap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .filter(a => a.id !== artwork.id); // Exclude the current artwork
+
+    const fallbackRecs = await require('./recommendations').getFallbackRecommendations(artwork, allArtworks);
+    
+    return res.json({
+      success: true,
+      recommendations: fallbackRecs,
+      source: 'category-based'
+    });
+  } catch (error) {
+    console.error('Recommendations error:', error);
+    return res.status(500).json({ success: false, error: String(error) });
+  }
+});
+
 app.get("/", (req, res) => {
   res.send("🚀 KarigarSetu backend running successfully!");
 });

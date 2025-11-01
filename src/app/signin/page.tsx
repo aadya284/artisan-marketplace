@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/config/firebaseConfig";
@@ -21,6 +21,16 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const { signIn } = useAuth();
   const router = useRouter();
+  const [redirectUrl, setRedirectUrl] = useState<string>("/");
+  
+  useEffect(() => {
+    // Get the redirect URL from the query parameters
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get('redirect');
+    if (redirect) {
+      setRedirectUrl(redirect);
+    }
+  }, []);
 
   // Select user or artisan role
   const handleRoleSelection = (type: UserType) => setUserType(type);
@@ -62,7 +72,7 @@ export default function SignInPage() {
           email: user.email!,
           type: userType!,
         });
-        router.push("/");
+        router.push(redirectUrl);
       } else {
         alert(data.error || "Invalid credentials");
       }
@@ -109,7 +119,7 @@ export default function SignInPage() {
           email: user.email!,
           type: userType!,
         });
-        router.push("/");
+        router.push(redirectUrl);
       } else {
         alert(data.error || "Verification failed");
       }

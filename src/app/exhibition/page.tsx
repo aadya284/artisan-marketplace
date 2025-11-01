@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
+import { useAuth } from "@/contexts/AuthContext";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Button } from "@/components/ui/button";
@@ -13,10 +14,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useCart } from "@/contexts/CartContext";
 import RazorpayGPayButton from "@/components/ui/razorpay-gpay-button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { db } from "@/config/firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 
 export default function ExhibitionPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [exhibitions, setExhibitions] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -40,13 +44,28 @@ export default function ExhibitionPage() {
         
         const querySnapshot = await getDocs(exhibitionsRef);
         console.log(`✅ Retrieved ${querySnapshot.size} exhibitions`);
-        
+
+        if (querySnapshot.empty) {
+          console.warn("⚠️ No exhibitions found in Firestore. Falling back to local data.");
+          try {
+            const localModule = await import('@/data/exhibitions.json');
+            const local = localModule?.default || localModule;
+            const localData = local.map((item: any) => ({ id: item.id || item.title, ...item }));
+            console.log('📦 Loaded', localData.length, 'exhibitions from local data');
+            setExhibitions(localData);
+            console.log("✨ Successfully updated exhibitions state from local data", localData.length, "items");
+            return;
+          } catch (lfErr) {
+            console.error('❌ Failed to load local exhibitions fallback:', lfErr);
+          }
+        }
+
         const data = querySnapshot.docs.map((doc) => {
           const docData = doc.data();
           console.log(`📄 Exhibition document ${doc.id}:`, docData);
           return { id: doc.id, ...docData };
         });
-        
+
         setExhibitions(data);
         console.log("✨ Successfully updated exhibitions state with", data.length, "items");
       } catch (error) {
@@ -96,6 +115,10 @@ export default function ExhibitionPage() {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
 
   const handleAddToCartExhibition = (exhibition: any) => {
+    if (!user) {
+      router.push('/signin?redirect=' + encodeURIComponent(window.location.pathname));
+      return;
+    }
     const item = {
       id: exhibition.id,
       name: exhibition.title,

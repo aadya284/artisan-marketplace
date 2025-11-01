@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
@@ -19,6 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useRouter } from "next/navigation";
 
 export default function WorkshopsPage() {
+  const { user } = useAuth();
   const [workshops, setWorkshops] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,6 +34,10 @@ export default function WorkshopsPage() {
   const router = useRouter();
 
   const handleAddToCartWorkshop = (workshop: any) => {
+    if (!user) {
+      router.push('/signin?redirect=' + encodeURIComponent(window.location.pathname));
+      return;
+    }
     const item = {
       id: workshop.id,
       name: workshop.title,
@@ -91,8 +97,19 @@ export default function WorkshopsPage() {
         });
 
         if (querySnapshot.empty) {
-          console.warn("⚠️ No workshop documents found in Firestore.");
-          return;
+          console.warn("⚠️ No workshop documents found in Firestore. Falling back to local data.");
+          try {
+            // Fallback to bundled data to avoid blank UI when Firestore is not reachable
+            const localModule = await import('@/data/workshops.json');
+            const local = localModule?.default || localModule;
+            const localFetched = local.map((item: any) => ({ id: item.id || item.title, ...item }));
+            console.log('📦 Loaded', localFetched.length, 'workshops from local data');
+            setWorkshops(localFetched);
+            return;
+          } catch (lfErr) {
+            console.error('❌ Failed to load local workshops fallback:', lfErr);
+            return;
+          }
         }
 
         const fetched = querySnapshot.docs.map((doc) => {

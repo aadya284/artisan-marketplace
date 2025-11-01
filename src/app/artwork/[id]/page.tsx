@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { db } from "@/config/firebaseConfig";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { useAuth } from "@/contexts/AuthContext";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
 import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import { Button } from "@/components/ui/button";
@@ -34,8 +35,11 @@ import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
 import { useCart } from "@/contexts/CartContext";
 import RazorpayGPayButton from "@/components/ui/razorpay-gpay-button";
+import RecommendationCard from "@/components/RecommendationCard";
+import { usePathname } from 'next/navigation';
 
 export default function ArtworkDetailPage() {
+  const { user } = useAuth();
   const [artwork, setArtwork] = useState<any | null>(null);
   const [reviews, setReviews] = useState<any[]>([]);
   const [quantity, setQuantity] = useState<number>(1);
@@ -47,11 +51,18 @@ export default function ArtworkDetailPage() {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
   const [customizationMsg, setCustomizationMsg] = useState('');
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [recLoading, setRecLoading] = useState(false);
 
   const { addToCart, isInCart, toggleWishlist, isInWishlist } = useCart();
   const router = useRouter();
+  const pathname = usePathname();
   const params = useParams();
   const id = params?.id?.toString();
+
+  const redirectToSignIn = () => {
+    router.push(`/signin?redirect=${encodeURIComponent(pathname)}`);
+  };
 
   useEffect(() => {
     async function fetchArtwork() {
@@ -136,6 +147,30 @@ export default function ArtworkDetailPage() {
     fetchArtwork();
   }, [id]);
 
+  useEffect(() => {
+    // Fetch recommendations from backend after artwork loads
+    async function fetchRecs() {
+      if (!artwork?.id) return;
+      try {
+        setRecLoading(true);
+        const res = await fetch(`http://localhost:5000/recommendations?artworkId=${artwork.id}`);
+        const json = await res.json();
+        if (json?.success && Array.isArray(json.recommendations)) {
+          setRecommendations(json.recommendations);
+        } else {
+          setRecommendations([]);
+        }
+      } catch (e) {
+        console.error('Failed to load recommendations', e);
+        setRecommendations([]);
+      } finally {
+        setRecLoading(false);
+      }
+    }
+
+    fetchRecs();
+  }, [artwork?.id]);
+
   if (loading) {
     return (
       <>
@@ -184,17 +219,29 @@ export default function ArtworkDetailPage() {
   };
 
   const handleAddToCart = () => {
+    if (!user) {
+      redirectToSignIn();
+      return;
+    }
     if (!artwork.stockCount) return;
     addToCart(artwork, quantity);
   };
 
   const handleBuyNow = () => {
+    if (!user) {
+      redirectToSignIn();
+      return;
+    }
     // Add to cart, then open payment modal for immediate checkout
     handleAddToCart();
     setIsPaymentOpen(true);
   };
 
   const handleContactArtisan = () => {
+    if (!user) {
+      redirectToSignIn();
+      return;
+    }
     if (!contactMessage.trim()) return;
     alert("Your message has been sent to the artisan!");
     setContactMessage("");
@@ -203,6 +250,10 @@ export default function ArtworkDetailPage() {
 
   // Wishlist toggle
   const handleToggleWishlist = () => {
+    if (!user) {
+      redirectToSignIn();
+      return;
+    }
     try {
       toggleWishlist({ id: artwork.id, name: artwork.name, artist: artwork.artistName, price: artwork.price, image: artwork.images?.[0] });
     } catch (e) {
@@ -233,6 +284,10 @@ export default function ArtworkDetailPage() {
 
   // Request customization
   const handleRequestCustomization = () => {
+    if (!user) {
+      router.push('/signin?redirect=' + encodeURIComponent(window.location.pathname));
+      return;
+    }
     if (!customizationMsg.trim()) {
       alert('Please add a customization message');
       return;
@@ -242,6 +297,10 @@ export default function ArtworkDetailPage() {
     setCustomizationMsg('');
     setIsCustomizationOpen(false);
   };
+
+  // Show the number of reviews based on fetched reviews first (authoritative),
+  // fallback to artwork.reviewsCount stored on the document if reviews not fetched yet.
+  const displayedReviewsCount = (Array.isArray(reviews) && reviews.length) ? reviews.length : (artwork?.reviewsCount || 0);
 
   return (
     <>
@@ -297,7 +356,7 @@ export default function ArtworkDetailPage() {
             <div className="flex items-center gap-2">
               <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
               <span>{artwork.rating}</span>
-              <span className="text-gray-500">({artwork.reviewsCount || 0} reviews)</span>
+              <span className="text-gray-500">({displayedReviewsCount} reviews)</span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -322,10 +381,19 @@ export default function ArtworkDetailPage() {
 
             <div className="space-y-4">
               <div className="flex gap-3">
-                <Button className="bg-amber-600 hover:bg-amber-700 text-white flex-1 h-12 rounded-md shadow-sm" onClick={handleBuyNow} disabled={!artwork.inStock}>Buy Now</Button>
-                <Button variant="outline" className="border-amber-300 text-amber-700 flex-1 h-12 rounded-md" onClick={handleAddToCart} disabled={!artwork.inStock}>
-                  <ShoppingCart className="w-4 h-4 mr-2" />{isInCart(artwork.id) ? "Added to Cart" : "Add to Cart"}
-                </Button>
+                {user ? (
+                  <>
+                    <Button className="bg-amber-600 hover:bg-amber-700 text-white flex-1 h-12 rounded-md shadow-sm" onClick={handleBuyNow} disabled={!artwork.inStock}>Buy Now</Button>
+                    <Button variant="outline" className="border-amber-300 text-amber-700 flex-1 h-12 rounded-md" onClick={handleAddToCart} disabled={!artwork.inStock}>
+                      <ShoppingCart className="w-4 h-4 mr-2" />{isInCart(artwork.id) ? "Added to Cart" : "Add to Cart"}
+                    </Button>
+                  </>
+                ) : (
+                  <Button className="bg-amber-600 hover:bg-amber-700 text-white w-full h-12 rounded-md shadow-sm" 
+                    onClick={redirectToSignIn}>
+                    Sign in to Purchase
+                  </Button>
+                )}
               </div>
 
               <div className="flex items-center gap-2">
@@ -358,6 +426,26 @@ export default function ArtworkDetailPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Recommendations section */}
+        <div className="container mx-auto mt-6">
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold">You may also like</h3>
+              {recLoading ? <span className="text-sm text-gray-500">Loading…</span> : <span className="text-sm text-gray-500">Based on this artwork</span>}
+            </div>
+            {recommendations.length === 0 && !recLoading ? (
+              <p className="text-sm text-gray-500">No recommendations available</p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {recommendations.map((r) => (
+                  <RecommendationCard key={r.id} id={r.id} name={r.name} artist={r.artistName} image={r.image} price={r.price} />
+                ))}
+              </div>
+            )}
+            {/* end recommendations */}
           </div>
         </div>
 
@@ -510,7 +598,7 @@ export default function ArtworkDetailPage() {
       </Dialog>
 
       {/* Payment Dialog (Razorpay + GPay) */}
-      <Dialog open={isPaymentOpen} onOpenChange={setIsPaymentOpen}>
+      <Dialog open={isPaymentOpen && !!user} onOpenChange={setIsPaymentOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Complete Payment</DialogTitle>

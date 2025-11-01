@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, type ChangeEvent } from "react";
+import React, { useState, type ChangeEvent, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatedIndicatorNavbar } from "@/components/navbars/animated-indicator-navbar";
 import { useCart } from "@/contexts/CartContext";
 import RazorpayGPayButton from "@/components/ui/razorpay-gpay-button";
@@ -9,12 +10,28 @@ import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { BackButton } from "@/components/ui/back-button";
 import { ShoppingCart, ArrowRight, CreditCard, Gift, Shield } from "lucide-react";
 
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, cartCount, clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState<"online" | "cod">("online");
   const [promoCode, setPromoCode] = useState("");
+  const [autoStartPayment, setAutoStartPayment] = useState(false);
+  const { placeOrder } = useCart();
+  const [codAddress, setCodAddress] = useState({ name: '', phone: '', line1: '', city: '', state: '', pincode: '' });
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    try {
+      const buyNow = searchParams.get('buyNow');
+      if (buyNow) {
+        // Ensure we're on the online payment path and auto-start the Razorpay flow
+        setPaymentMethod('online');
+        setAutoStartPayment(true);
+      }
+    } catch (e) {}
+  }, [searchParams]);
 
   const subtotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
   const shipping = subtotal > 10000 ? 0 : 199;
@@ -56,6 +73,9 @@ export default function CartPage() {
       <AnimatedIndicatorNavbar />
 
       <main className="container mx-auto py-10">
+        <div className="mb-6">
+          <BackButton />
+        </div>
         <div className="grid lg:grid-cols-3 gap-8">
           <section className="lg:col-span-2 space-y-6">
             <h1 className="text-2xl font-bold">Shopping Cart ({cartCount})</h1>
@@ -110,6 +130,7 @@ export default function CartPage() {
                     <div className="mt-3">
                       <RazorpayGPayButton
                         amount={total}
+                            autoStart={autoStartPayment}
                         onSuccess={(res) => {
                           alert('Payment successful (demo)');
                           clearCart();
@@ -132,9 +153,24 @@ export default function CartPage() {
                     <Badge variant="outline">₹50 Extra</Badge>
                   </div>
                   {paymentMethod === 'cod' && (
-                    <div className="mt-3">
+                    <div className="mt-3 space-y-3">
+                      <div className="space-y-2">
+                        <input className="w-full border rounded px-3 py-2" placeholder="Full name" value={codAddress.name} onChange={(e) => setCodAddress(prev => ({ ...prev, name: e.target.value }))} />
+                        <input className="w-full border rounded px-3 py-2" placeholder="Phone" value={codAddress.phone} onChange={(e) => setCodAddress(prev => ({ ...prev, phone: e.target.value }))} />
+                        <input className="w-full border rounded px-3 py-2" placeholder="Address line" value={codAddress.line1} onChange={(e) => setCodAddress(prev => ({ ...prev, line1: e.target.value }))} />
+                        <div className="grid grid-cols-3 gap-2">
+                          <input className="border rounded px-3 py-2 col-span-2" placeholder="City" value={codAddress.city} onChange={(e) => setCodAddress(prev => ({ ...prev, city: e.target.value }))} />
+                          <input className="border rounded px-3 py-2" placeholder="Pincode" value={codAddress.pincode} onChange={(e) => setCodAddress(prev => ({ ...prev, pincode: e.target.value }))} />
+                        </div>
+                        <input className="w-full border rounded px-3 py-2" placeholder="State" value={codAddress.state} onChange={(e) => setCodAddress(prev => ({ ...prev, state: e.target.value }))} />
+                      </div>
                       <Button className="w-full bg-orange-600 text-white" onClick={() => {
-                        alert('Order placed with Cash on Delivery (demo)');
+                        // basic validation
+                        if (!codAddress.name || !codAddress.phone || !codAddress.line1) {
+                          alert('Please provide name, phone and address');
+                          return;
+                        }
+                        const order = placeOrder({ items: cartItems, total, paymentMethod: 'cod', address: { ...codAddress } });
                         clearCart();
                         window.location.href = '/orders';
                       }}>Place Order (Cash on Delivery)</Button>

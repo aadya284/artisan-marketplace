@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import StoreLocator from '@/components/map/google-maps-store-locator';
+import { BackButton } from "@/components/ui/back-button";
 import { MapPin, Clock } from "lucide-react";
 // If a LanguageContext isn't present in this repo, provide a tiny local stub so
 // the page falls back to the default strings already present in the JSX.
@@ -76,6 +77,9 @@ export default function NearbyStoresPage() {
       <AnimatedIndicatorNavbar />
       
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+        <div className="container mx-auto py-4">
+          <BackButton />
+        </div>
         {/* Hero Section — simplified to surface the map immediately */}
         <section className="py-8">
           <div className="container mx-auto text-center">

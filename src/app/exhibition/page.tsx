@@ -6,6 +6,7 @@ import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BackButton } from "@/components/ui/back-button";
 import { Calendar, MapPin, Users, Eye, Plus, Star, Palette, Image } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -127,6 +128,9 @@ export default function ExhibitionPage() {
       <AnimatedIndicatorNavbar />
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50">
+        <div className="container mx-auto px-4 py-4">
+          <BackButton />
+        </div>
         {/* Hero Section */}
         <section className="py-16 bg-gradient-to-r from-amber-100 to-amber-200 text-center">
           <h1 className="text-4xl lg:text-6xl font-bold mb-4 text-gray-800" style={{ fontFamily: "Rajdhani, sans-serif" }}>

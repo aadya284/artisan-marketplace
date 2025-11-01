@@ -11,6 +11,7 @@ const axios = require("axios");
 const { LRUCache } = require("lru-cache"); // ✅ Correct import for Node.js v20+ (CommonJS)
 // Google Cloud Translation client (v3)
 const { TranslationServiceClient } = require('@google-cloud/translate').v3;
+const multer = require('multer');
 
 // -------------------------
 // 1️⃣ Express setup
@@ -28,6 +29,53 @@ app.use((err, req, res, next) => {
     return res.status(400).json({ error: 'Invalid JSON' });
   }
   next();
+});
+
+// Multer setup for handling multipart/form-data uploads
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } }); // 15MB limit per file
+
+// Endpoint: upload images via backend to Firebase Storage using Admin SDK
+// Middleware to verify Firebase Auth token
+const verifyAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, error: 'No token provided' });
+    }
+
+    const token = authHeader.split('Bearer ')[1];
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.error('Auth error:', error);
+    return res.status(401).json({ success: false, error: 'Invalid token' });
+  }
+};
+
+app.post('/upload-artworks', verifyAuth, upload.array('files', 6), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) return res.status(400).json({ success: false, error: 'No files uploaded' });
+    const bucket = admin.storage().bucket('karigarsetu.firebasestorage.app');
+    console.log('Using bucket:', bucket.name); // Debug log
+    console.log('User:', req.user); // Log authenticated user
+    const uploaded = [];
+    for (let i = 0; i < req.files.length; i++) {
+      const f = req.files[i];
+      const filename = `artworks/${Date.now()}_${i}_${f.originalname.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`;
+      const file = bucket.file(filename);
+      await file.save(f.buffer, { contentType: f.mimetype });
+      // Make the file publicly readable (optional) — safer to generate signed URLs instead
+      // await file.makePublic();
+      // Generate signed URL
+      const [url] = await file.getSignedUrl({ action: 'read', expires: Date.now() + 1000 * 60 * 60 * 24 * 7 }); // 7 days
+      uploaded.push(url);
+    }
+    return res.status(200).json({ success: true, urls: uploaded });
+  } catch (err) {
+    console.error('Upload to storage failed:', err);
+    return res.status(500).json({ success: false, error: String(err) });
+  }
 });
 
 // Verify environment variables
@@ -64,8 +112,14 @@ try {
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
+    storageBucket: "karigarsetu.firebasestorage.app",
+    projectId: "karigarsetu"
   });
+  
+  // Verify storage is initialized
+  const bucket = admin.storage().bucket('karigarsetu.firebasestorage.app');
   console.log("✅ Firebase Admin initialized successfully");
+  console.log("📦 Storage bucket configured:", bucket.name);
 } catch (error) {
   console.error("❌ Error initializing Firebase Admin:", error.message);
 }

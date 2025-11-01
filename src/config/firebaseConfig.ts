@@ -9,7 +9,8 @@ const firebaseConfig = {
   apiKey: "AIzaSyAIfHAADkFetBGWuEfdniK3-xqzKCkyqrA",
   authDomain: "karigarsetu.firebaseapp.com",
   projectId: "karigarsetu",
-  storageBucket: "karigarsetu.firebasestorage.app",
+  // Use the project's default storage bucket (usually <project-id>.appspot.com)
+  storageBucket: "karigarsetu.appspot.com",
   messagingSenderId: "518096117495",
   appId: "1:518096117495:web:a614379facd82ed4197df2",
   measurementId: "G-MB9M9HC65L"

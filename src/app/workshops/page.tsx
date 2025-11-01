@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
+import { BackButton } from "@/components/ui/back-button";
 import { Search, Video, Users, Loader } from "lucide-react";
 import { db } from "@/config/firebaseConfig";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
@@ -181,6 +182,9 @@ export default function WorkshopsPage() {
       <AnimatedIndicatorNavbar />
 
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
+        <div className="container mx-auto py-4">
+          <BackButton />
+        </div>
         {/* Hero */}
         <section className="py-16 bg-gradient-to-r from-orange-100 to-amber-100">
           <div className="container mx-auto text-center">

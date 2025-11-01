@@ -6,26 +6,45 @@ import { NewsletterFooter } from "@/components/footers/newsletter-footer";
 import AiChatbotWidget from "@/components/ui/ai-chatbot-widget";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Star, Grid, List, Heart, Eye, MapPin, Navigation, Loader, Search } from "lucide-react";
+import { BackButton } from "@/components/ui/back-button";
+import { type DocumentData, type QueryDocumentSnapshot, collection, onSnapshot } from 'firebase/firestore';
+import { db } from "@/config/firebaseConfig";
+import { Star, Grid, List, Heart, Eye, MapPin, Navigation, Loader, Search, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
-import { db } from "@/config/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import { useCart } from "@/contexts/CartContext";
+import { useRouter } from "next/navigation";
+
+// Types
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  originalPrice: number;
+  image: string;
+  images: string[];
+  artist: string;
+  rating: number;
+  category: string;
+  state: string;
+  [key: string]: any;
+}
 
 // Categories & States
 const categories = ["All", "Paintings", "Textiles", "Ceramics", "Sculptures", "Jewelry", "Woodwork"];
 const states = ["All States", "Bihar", "Rajasthan", "Uttar Pradesh", "West Bengal", "Odisha", "Kerala", "Tamil Nadu", "Maharashtra", "Punjab", "Gujarat", "Chhattisgarh"];
 
 export default function ExplorePage() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedState, setSelectedState] = useState("All States");
   const [viewMode, setViewMode] = useState("grid");
   const [searchQuery, setSearchQuery] = useState("");
-  const [favorites, setFavorites] = useState(new Set());
+  // wishlist moved to CartContext
 
   // Location states
   const [locationEnabled, setLocationEnabled] = useState(false);
@@ -33,63 +52,80 @@ export default function ExplorePage() {
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [locationError, setLocationError] = useState("");
 
-  // ✅ Fetch artworks from Firestore
+  // ✅ Fetch artworks from Firestore with real-time updates
   useEffect(() => {
     const fetchProducts = async () => {
-      console.log("🔄 Fetching artworks data...");
-      try {
-        if (!db) {
-          throw new Error("Firestore DB instance not initialized");
-        }
-        
-        const artworksRef = collection(db, "artworks");
-        console.log("📑 Querying 'artworks' collection...");
-        
-        const querySnapshot = await getDocs(artworksRef);
-        console.log(`✅ Retrieved ${querySnapshot.size} artworks`);
-        
-        const fetchedProducts = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          console.log(`📄 Artwork document ${doc.id}:`, data);
-          // Ensure all required fields are present with defaults
-          return {
-            id: doc.id,
-            name: data.name || "Untitled",
-            description: data.description || "",
-            price: data.price || 0,
-            originalPrice: data.originalPrice || data.price || 0,
-            image: data.image || (data.images && data.images[0]) || "",
-            images: data.images || [data.image] || [],
-            artist: data.artistName || data.artist || "Unknown Artist",
-            rating: data.rating || 0,
-            category: data.category || "Uncategorized",
-            state: data.state || "Not Specified",
-            ...data
-          };
-        });
-        
-        setProducts(fetchedProducts);
-        console.log("✨ Successfully updated products state with", fetchedProducts.length, "items");
-      } catch (error) {
-        console.error("❌ Error fetching artworks:", error);
-        if (error instanceof Error) {
-          console.error("Error details:", error.message);
-          console.error("Stack trace:", error.stack);
-        }
-      } finally {
-        setLoading(false);
-        console.log("🏁 Finished loading artworks data");
+      console.log("🔄 Setting up real-time artwork updates...");
+      if (!db) {
+        console.error("Firestore DB instance not initialized");
+        return;
       }
+
+      const artworksRef = collection(db, "artworks");
+      
+      // Set up real-time listener
+      const unsubscribe = onSnapshot(artworksRef, (snapshot) => {
+        try {
+          const fetchedProducts = snapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              name: data.name || "Untitled",
+              description: data.description || "",
+              price: data.price || 0,
+              originalPrice: data.originalPrice || data.price || 0,
+              image: data.image || (data.images && data.images[0]) || "",
+              images: data.images || [data.image] || [],
+              artist: data.artistName || data.artist || "Unknown Artist",
+              rating: data.rating || 0,
+              category: data.category || "Uncategorized",
+              state: data.state || "Not Specified",
+              ...data
+            } as Product;
+          });
+          
+          setProducts(fetchedProducts);
+          console.log("✨ Updated products:", fetchedProducts.length);
+        } catch (err) {
+          console.error("❌ Error fetching artworks:", err);
+        } finally {
+          setLoading(false);
+        }
+      });
+
+      return () => unsubscribe();
     };
 
     fetchProducts();
   }, []);
 
-  // 🔁 Favorites toggle
-  const toggleFavorite = (productId: string) => {
-    const newFavorites = new Set(favorites);
-    newFavorites.has(productId) ? newFavorites.delete(productId) : newFavorites.add(productId);
-    setFavorites(newFavorites);
+  // wishlist handled via context
+
+  // Cart wiring
+  const { addToCart, isInCart, toggleWishlist, isInWishlist } = useCart();
+  const router = useRouter();
+
+  const handleAddToCart = (product: any) => {
+    // Normalize item shape expected by CartContext
+    const item = {
+      id: product.id,
+      name: product.name,
+      artist: product.artist,
+      state: product.state || 'Not Specified',
+      price: product.price || 0,
+      originalPrice: product.originalPrice || product.price || 0,
+      image: product.image || (product.images && product.images[0]) || '',
+      rating: product.rating || 0,
+      inStock: product.inStock !== undefined ? product.inStock : true,
+      stockCount: product.stockCount || 99,
+    };
+    addToCart(item, 1);
+  };
+
+  const handleBuyNow = (product: any) => {
+    handleAddToCart(product);
+    // Navigate user to cart for checkout and auto-start the quick checkout flow
+    router.push(`/cart?buyNow=${encodeURIComponent(String(product.id))}`);
   };
 
   // 🔎 Filter products
@@ -111,17 +147,33 @@ export default function ExplorePage() {
 
     setIsDetectingLocation(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position: GeolocationPosition) => {
         const { latitude, longitude } = position.coords;
-        // Simple placeholder for now
-        setDetectedState("Maharashtra");
-        setLocationEnabled(true);
-        setIsDetectingLocation(false);
+        try {
+          // Call the server-side reverse geocode endpoint (uses server key)
+          const res = await fetch(`/api/geocode?lat=${encodeURIComponent(String(latitude))}&lng=${encodeURIComponent(String(longitude))}`);
+          if (!res.ok) {
+            const t = await res.text();
+            throw new Error(`Server geocode failed: ${res.status} ${t}`);
+          }
+          const json = await res.json();
+          const stateName = json?.state || null;
+
+          setDetectedState(stateName || 'Unknown');
+          setLocationEnabled(true);
+          if (stateName) setSelectedState(stateName);
+        } catch (err) {
+          console.error('Server reverse geocoding error', err);
+          setLocationError('Unable to resolve location to a state');
+        } finally {
+          setIsDetectingLocation(false);
+        }
       },
       () => {
         setIsDetectingLocation(false);
         setLocationError("Unable to fetch location.");
-      }
+      },
+      { timeout: 10000, enableHighAccuracy: true }
     );
   };
 
@@ -129,6 +181,8 @@ export default function ExplorePage() {
     setLocationEnabled(false);
     setDetectedState("");
     setLocationError("");
+    // Reset selectedState back to showing all states
+    setSelectedState("All States");
   };
 
   // 🧾 UI Rendering
@@ -137,6 +191,9 @@ export default function ExplorePage() {
       <AnimatedIndicatorNavbar />
 
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50">
+        <div className="container mx-auto px-4 py-4">
+          <BackButton />
+        </div>
         {/* Hero Section */}
         <section className="py-16 bg-gradient-to-r from-amber-100 to-amber-200">
           <div className="container mx-auto text-center">
@@ -253,7 +310,15 @@ export default function ExplorePage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                       </div>
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
-                        <Button className="bg-white text-gray-800 hover:bg-gray-100 transform transition hover:scale-105">
+                        <Button
+                          className="bg-white text-gray-800 hover:bg-gray-100 transform transition hover:scale-105"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            router.push(`/artwork/${product.id}`);
+                          }}
+                          aria-label={`View details for ${product.name}`}
+                        >
                           <Eye className="w-4 h-4 mr-2" /> View Details
                         </Button>
                       </div>
@@ -261,11 +326,43 @@ export default function ExplorePage() {
                     <div className="p-4">
                       <h3 className="font-semibold text-lg text-gray-800">{product.name}</h3>
                       <p className="text-sm text-gray-500 mb-2">by {product.artist}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="font-bold text-amber-700">₹{product.price}</span>
-                        <div className="flex items-center gap-1 text-yellow-500">
-                          <Star className="w-4 h-4 fill-yellow-400" />
-                          <span>{product.rating}</span>
+                      <div className="flex flex-col gap-3">
+                        <div className="flex justify-between items-center">
+                          <span className="font-bold text-amber-700">₹{product.price}</span>
+                          <div className="flex items-center gap-1 text-yellow-500">
+                            <Star className="w-4 h-4 fill-yellow-400" />
+                            <span>{product.rating}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button
+                            className="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold"
+                            onClick={() => handleAddToCart(product)}
+                          >
+                            <ShoppingCart className="w-4 h-4 mr-1" />
+                            {isInCart(product.id) ? "Added" : "Add to Cart"}
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            className="w-32 border-amber-300 text-amber-700 hover:bg-amber-50"
+                            onClick={() => handleBuyNow(product)}
+                          >
+                            Buy Now
+                          </Button>
+
+                          <Button
+                            variant="ghost"
+                            className="ml-2 flex items-center gap-2"
+                            onClick={() => toggleWishlist({ id: product.id, name: product.name, artist: product.artist, state: product.state, price: product.price, image: product.image })}
+                            aria-pressed={isInWishlist(product.id)}
+                            aria-label={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                            title={isInWishlist(product.id) ? 'Remove from wishlist' : 'Add to wishlist'}
+                          >
+                            <Heart className={`w-6 h-6 ${isInWishlist(product.id) ? 'text-rose-500' : 'text-gray-400'}`} strokeWidth={1.5} />
+                            {isInWishlist(product.id) && <span className="text-xs text-rose-600">Saved</span>}
+                          </Button>
                         </div>
                       </div>
                     </div>

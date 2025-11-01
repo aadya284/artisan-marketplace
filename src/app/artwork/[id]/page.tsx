@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { BackButton } from "@/components/ui/back-button";
 import {
   Star,
   ShoppingCart,
@@ -22,6 +23,10 @@ import {
   ChevronLeft,
   Plus,
   Minus,
+  Heart,
+  Share2,
+  UserPlus,
+  Scissors,
   MessageCircle,
   Loader2
 } from "lucide-react";
@@ -40,8 +45,10 @@ export default function ArtworkDetailPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
+  const [customizationMsg, setCustomizationMsg] = useState('');
 
-  const { addToCart, isInCart } = useCart();
+  const { addToCart, isInCart, toggleWishlist, isInWishlist } = useCart();
   const router = useRouter();
   const params = useParams();
   const id = params?.id?.toString();
@@ -102,10 +109,16 @@ export default function ArtworkDetailPage() {
         // Fetch reviews (by artworkId field matching id or doc.id)
         try {
           const reviewsRef = collection(db, "reviews");
-          const q = query(reviewsRef, where("artworkId", "==", id));
+          // Use an OR condition to match both string and number IDs
+          const q = query(reviewsRef, where("artworkId", "in", [id, Number(id), doc.id]));
           const reviewsSnap = await getDocs(q);
-          const rv = reviewsSnap.docs.map(r => ({ id: r.id, ...r.data(), date: r.data().date ? new Date(r.data().date).toLocaleDateString() : "Unknown date" }));
-          console.log("📝 Reviews fetched:", rv.length);
+          const rv = reviewsSnap.docs.map(r => ({ 
+            id: r.id, 
+            ...r.data(), 
+            date: r.data().date ? new Date(r.data().date).toLocaleDateString() : "Unknown date" 
+          }));
+          console.log("📝 Reviews fetched:", rv.length, "reviews for artwork", id);
+          console.log("Sample review:", rv[0]); // Log the first review for debugging
           setReviews(rv);
         } catch (revErr) {
           console.warn("Unable to fetch reviews:", revErr);
@@ -188,25 +201,67 @@ export default function ArtworkDetailPage() {
     setIsContactDialogOpen(false);
   };
 
+  // Wishlist toggle
+  const handleToggleWishlist = () => {
+    try {
+      toggleWishlist({ id: artwork.id, name: artwork.name, artist: artwork.artistName, price: artwork.price, image: artwork.images?.[0] });
+    } catch (e) {
+      console.error('Wishlist toggle failed', e);
+    }
+  };
+
+  // Share action (Web Share API fallback to copy)
+  const handleShare = async () => {
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    const data = {
+      title: artwork.name,
+      text: `Check out ${artwork.name} on Artisan Marketplace`,
+      url,
+    };
+    try {
+      if ((navigator as any).share) {
+        await (navigator as any).share(data);
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert('Link copied to clipboard');
+      }
+    } catch (err) {
+      console.error('Share failed', err);
+      alert('Unable to share this item');
+    }
+  };
+
+  // Request customization
+  const handleRequestCustomization = () => {
+    if (!customizationMsg.trim()) {
+      alert('Please add a customization message');
+      return;
+    }
+    // For now, just simulate sending the request
+    alert('Customization request sent to the artisan');
+    setCustomizationMsg('');
+    setIsCustomizationOpen(false);
+  };
+
   return (
     <>
       <AnimatedIndicatorNavbar />
 
       <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-amber-50">
         <div className="container mx-auto py-4">
-          <nav className="flex items-center gap-2 text-sm text-gray-600">
-            <Link href="/explore" className="hover:text-orange-600 flex items-center gap-1">
-              <ChevronLeft className="w-4 h-4" />
-              Back to Explore
-            </Link>
-            <span>/</span>
-            <span className="text-gray-800">{artwork.name}</span>
-          </nav>
+          <div className="flex items-center justify-between">
+            <BackButton />
+            <nav className="flex items-center gap-2 text-sm text-gray-600">
+              <span>/</span>
+              <span className="text-gray-800">{artwork.name}</span>
+            </nav>
+          </div>
         </div>
 
-        <div className="container mx-auto py-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div>
-            <div className="aspect-square overflow-hidden rounded-xl shadow-lg">
+        <div className="container mx-auto py-8 grid grid-cols-1 lg:grid-cols-12 gap-16">
+          <div className="lg:col-span-7">
+            <div className="bg-white p-6 rounded-2xl shadow-xl">
+              <div className="aspect-[1/1] overflow-hidden rounded-xl">
               <img
                 src={artwork.images?.[selectedImageIndex] || artwork.images?.[0]}
                 alt={artwork.name}
@@ -216,26 +271,27 @@ export default function ArtworkDetailPage() {
                   img.src = 'https://via.placeholder.com/400x400?text=Artwork+Image';
                 }}
               />
+              </div>
             </div>
             {artwork.images?.length > 1 && (
-              <div className="flex gap-3 mt-3 overflow-x-auto">
+              <div className="flex gap-3 mt-4 overflow-x-auto items-center">
                 {artwork.images.map((image: string, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${selectedImageIndex === index ? "border-orange-600" : "border-gray-200"}`}>
-                    <img src={image} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/400x400?text=Artwork+Image')} />
+                    className={`w-16 h-16 rounded-md overflow-hidden border-2 ${selectedImageIndex === index ? "border-orange-500 ring-2 ring-orange-100" : "border-gray-200"}`}>
+                    <img alt={`thumbnail-${index}`} src={image} className="w-full h-full object-cover" onError={(e) => (e.currentTarget.src = 'https://via.placeholder.com/400x400?text=Artwork+Image')} />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          <div className="space-y-6">
+          <div className="lg:col-span-5 space-y-6">
             <div>
-              <Badge variant="outline" className="text-orange-700 border-orange-200 mb-3">{artwork.state} • {artwork.category}</Badge>
-              <h1 className="text-3xl font-bold text-gray-800">{artwork.name}</h1>
-              <p className="text-gray-600">by {artwork.artistName}</p>
+              <Badge variant="outline" className="text-amber-700 bg-amber-50 border-amber-100 mb-3">{artwork.state} • {artwork.category}</Badge>
+              <h1 className="text-4xl lg:text-3xl font-extrabold text-gray-900 leading-tight">{artwork.name}</h1>
+              <p className="text-sm text-gray-600 mt-1">by {artwork.artistName}</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -245,10 +301,10 @@ export default function ArtworkDetailPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-3xl font-bold text-gray-800">₹{artwork.price}</span>
+              <span className="text-4xl font-extrabold text-amber-700">₹{artwork.price}</span>
               {artwork.originalPrice > artwork.price && (
                 <>
-                  <span className="text-xl text-gray-500 line-through">₹{artwork.originalPrice}</span>
+                  <span className="text-lg text-gray-500 line-through">₹{artwork.originalPrice}</span>
                   <Badge className="bg-green-600 text-white">{discount}% OFF</Badge>
                 </>
               )}
@@ -264,18 +320,50 @@ export default function ArtworkDetailPage() {
               <span className="text-sm text-gray-500">{artwork.stockCount} pieces available</span>
             </div>
 
-            <div className="flex gap-3">
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white flex-1" onClick={handleBuyNow} disabled={!artwork.inStock}>Buy Now</Button>
-              <Button variant="outline" className="border-orange-300 text-orange-700 flex-1" onClick={handleAddToCart} disabled={!artwork.inStock}>
-                <ShoppingCart className="w-4 h-4 mr-2" />{isInCart(artwork.id) ? "Added to Cart" : "Add to Cart"}
-              </Button>
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <Button className="bg-amber-600 hover:bg-amber-700 text-white flex-1 h-12 rounded-md shadow-sm" onClick={handleBuyNow} disabled={!artwork.inStock}>Buy Now</Button>
+                <Button variant="outline" className="border-amber-300 text-amber-700 flex-1 h-12 rounded-md" onClick={handleAddToCart} disabled={!artwork.inStock}>
+                  <ShoppingCart className="w-4 h-4 mr-2" />{isInCart(artwork.id) ? "Added to Cart" : "Add to Cart"}
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border" onClick={handleToggleWishlist}>
+                  <Heart className={`w-4 h-4 ${isInWishlist(artwork.id) ? 'text-rose-500' : ''}`} /> Wishlist
+                </Button>
+
+                <Button variant="outline" className="flex items-center gap-2 text-sm px-3 py-2 rounded-md" onClick={() => setIsContactDialogOpen(true)}>
+                  <UserPlus className="w-4 h-4" /> Connect with Artisan
+                </Button>
+
+                <Button variant="outline" className="flex items-center gap-2 text-sm px-3 py-2 rounded-md" onClick={() => setIsCustomizationOpen(true)}>
+                  <Scissors className="w-4 h-4" /> Customize
+                </Button>
+
+                <Button variant="ghost" className="ml-auto text-sm px-3 py-2 rounded-md" onClick={handleShare}>
+                  <Share2 className="w-4 h-4" /> Share
+                </Button>
+              </div>
+
+              {/* Delivery / Policies box */}
+              <div className="mt-4 p-4 rounded-lg bg-amber-50 border border-amber-100 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <Truck className="w-5 h-5 text-amber-600" />
+                  <div className="text-sm text-gray-700">
+                    <p className="font-medium">Delivery Options</p>
+                    <p className="text-xs text-gray-600">Standard: 5-7 business days • Express: 2-3 business days</p>
+                    <p className="text-xs text-gray-600 mt-2">7-day return policy • Secure payments</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="container mx-auto mt-16">
           <Tabs defaultValue="description">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-4 bg-amber-50 rounded-md p-1">
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specs">Specifications</TabsTrigger>
               <TabsTrigger value="artist">Artist</TabsTrigger>
@@ -399,6 +487,24 @@ export default function ArtworkDetailPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsContactDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleContactArtisan}>Send Message</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isCustomizationOpen} onOpenChange={setIsCustomizationOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request Customization</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Customization Details</Label>
+              <Textarea value={customizationMsg} onChange={(e) => setCustomizationMsg(e.target.value)} placeholder="Describe the customization you need (size, color, finish, etc.)" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCustomizationOpen(false)}>Cancel</Button>
+            <Button onClick={handleRequestCustomization}>Send Request</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -7,9 +7,10 @@ interface RazorpayGPayButtonProps {
   amount: number; // amount in rupees
   onSuccess?: (response: any) => void;
   onError?: (error: any) => void;
+  autoStart?: boolean;
 }
 
-export default function RazorpayGPayButton({ amount, onSuccess, onError }: RazorpayGPayButtonProps) {
+export default function RazorpayGPayButton({ amount, onSuccess, onError, autoStart }: RazorpayGPayButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -98,6 +99,14 @@ export default function RazorpayGPayButton({ amount, onSuccess, onError }: Razor
       setLoading(false);
     }
   };
+
+  // Auto-start payment when requested (useful for Buy Now -> checkout flow)
+  useEffect(() => {
+    if (autoStart) {
+      // Kick off payment asynchronously without blocking render
+      initializePayment();
+    }
+  }, [autoStart]);
 
   return (
     <div>

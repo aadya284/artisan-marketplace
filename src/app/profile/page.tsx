@@ -6,6 +6,7 @@ import { User as UserIcon, Mail, Badge } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import MessageInbox from "@/components/messaging/message-inbox";
+import MyArtworks from "@/components/artisan/my-artworks";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -80,9 +81,13 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Message Inbox for Artisans */}
+            {/* Artisan Features */}
             {user.type === 'artisan' && (
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2 space-y-8">
+                {/* My Artworks Section */}
+                <MyArtworks />
+                
+                {/* Message Inbox */}
                 <MessageInbox />
               </div>
             )}

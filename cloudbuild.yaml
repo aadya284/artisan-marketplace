@@ -1,0 +1,39 @@
+steps:
+  # Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/artisan-next:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/artisan-next:latest'
+      - '.'
+
+  # Push to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/artisan-next'
+
+  # Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/run'
+    args:
+      - 'deploy'
+      - 'artisan-next'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/artisan-next:$SHORT_SHA'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--concurrency'
+      - '80'
+      - '--memory'
+      - '512Mi'
+
+images:
+  - 'gcr.io/$PROJECT_ID/artisan-next:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/artisan-next:latest'
+
+timeout: '1800s'

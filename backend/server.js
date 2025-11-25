@@ -3,6 +3,16 @@
 const path = require("path");
 // Load .env.local placed next to this file (robust regardless of cwd)
 require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
+// If a .env.local wasn't provided, fall back to .env for local development
+if (!process.env.GEMINI_API_KEY) {
+  const fallback = path.resolve(__dirname, '.env');
+  try {
+    require('dotenv').config({ path: fallback });
+    console.log(`Loaded fallback env from ${fallback}`);
+  } catch (e) {
+    // ignore - dotenv will throw only on programming errors
+  }
+}
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");

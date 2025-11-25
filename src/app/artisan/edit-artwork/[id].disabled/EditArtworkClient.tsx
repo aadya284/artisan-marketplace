@@ -10,18 +10,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Image as ImageIcon, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/config/firebaseConfig';
 import { useAuth } from '@/contexts/AuthContext';
 
-interface Params {
-  params: {
-    id: string;
-  };
+interface Props {
+  id: string;
 }
 
-export default function EditArtworkPage({ params }: Params) {
+export default function EditArtworkClient({ id }: Props) {
   const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -41,13 +39,13 @@ export default function EditArtworkPage({ params }: Params) {
   useEffect(() => {
     const fetchArtwork = async () => {
       try {
-        const artworkRef = doc(db, 'artworks', params.id);
+        const artworkRef = doc(db, 'artworks', id);
         const artworkSnap = await getDoc(artworkRef);
-        
+
         if (artworkSnap.exists()) {
           const data = artworkSnap.data();
           setArtwork(data);
-          
+
           // Populate form fields
           setTitle(data.name || '');
           setDescription(data.description || '');
@@ -68,17 +66,17 @@ export default function EditArtworkPage({ params }: Params) {
       }
     };
 
-    if (params.id) {
+    if (id) {
       fetchArtwork();
     }
-  }, [params.id, router]);
+  }, [id, router]);
 
   const handleSave = async () => {
     if (!user || !artwork) return;
 
     setSaving(true);
     try {
-      const artworkRef = doc(db, 'artworks', params.id);
+      const artworkRef = doc(db, 'artworks', id);
       await updateDoc(artworkRef, {
         name: title,
         description,
@@ -124,7 +122,7 @@ export default function EditArtworkPage({ params }: Params) {
           <div className="mb-6">
             <BackButton />
           </div>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Edit Artwork</CardTitle>
@@ -217,7 +215,7 @@ export default function EditArtworkPage({ params }: Params) {
                 <Input 
                   id="tags" 
                   value={tags} 
-                  onChange={(e) => setTags(e.target.value)} 
+                  onChange={(e) => setTags(e.target.value)}
                   placeholder="e.g., handmade, traditional, modern (separate with commas)" 
                 />
               </div>

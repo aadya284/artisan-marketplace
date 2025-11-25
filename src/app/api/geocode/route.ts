@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+export const dynamic = 'force-static';
+
 // Server-side proxy for reverse geocoding using the server-only key
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;

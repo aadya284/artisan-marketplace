@@ -108,7 +108,8 @@ function RegisterPageContent() {
       const idToken = await user.getIdToken();
 
       // 2️⃣ Verify token in backend
-      await fetch("http://localhost:5000/verify-token", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      await fetch(`${apiUrl}/verify-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
@@ -133,7 +134,8 @@ function RegisterPageContent() {
       const user = result.user;
       const idToken = await user.getIdToken();
 
-      await fetch("http://localhost:5000/verify-token", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      await fetch(`${apiUrl}/verify-token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),

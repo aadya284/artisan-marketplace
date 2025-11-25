@@ -129,7 +129,8 @@ export default function AddArtworkPage() {
       }
       const token = await currentUser.getIdToken();
 
-      const backendUrl = (process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000') + '/upload-artworks';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+      const backendUrl = apiUrl + '/upload-artworks';
       const uploadResp = await fetch(backendUrl, { 
         method: 'POST', 
         body: form,

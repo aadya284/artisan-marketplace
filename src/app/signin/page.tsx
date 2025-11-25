@@ -47,7 +47,8 @@ export default function SignInPage() {
       const idToken = await user.getIdToken();
 
       // 3️⃣ Send token to backend for verification
-      const res = await fetch("http://localhost:5000/verify-token", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/verify-token`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -95,7 +96,8 @@ export default function SignInPage() {
       const idToken = await user.getIdToken();
 
       // Send token to backend for verification
-      const res = await fetch("http://localhost:5000/verify-token", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/verify-token`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

@@ -119,7 +119,18 @@ const saPath = process.env.FIREBASE_ADMIN_SA_PATH || "./config/serviceAccountKey
 const saPathResolved = path.isAbsolute(saPath) ? saPath : path.resolve(__dirname, saPath);
 try {
   let serviceAccount;
-  if (fs.existsSync(saPathResolved)) {
+  
+  // Try base64-encoded service account first (for Vercel/production)
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_BASE64) {
+    try {
+      const decodedJson = Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64, 'base64').toString('utf-8');
+      serviceAccount = JSON.parse(decodedJson);
+      console.log("ℹ️ Using base64-encoded FIREBASE_SERVICE_ACCOUNT_BASE64 from environment");
+    } catch (err) {
+      console.error("❌ Failed to decode base64 service account:", err.message);
+      throw err;
+    }
+  } else if (fs.existsSync(saPathResolved)) {
     serviceAccount = JSON.parse(fs.readFileSync(saPathResolved, "utf8"));
     console.log("ℹ️ Using service account file:", saPathResolved);
   } else if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
@@ -134,7 +145,7 @@ try {
       console.log("ℹ️ Parsed FIREBASE_SERVICE_ACCOUNT_KEY after normalizing newlines");
     }
   } else {
-    throw new Error(`Service account not found at ${saPathResolved} and FIREBASE_SERVICE_ACCOUNT_KEY not set`);
+    throw new Error(`Service account not found at ${saPathResolved} and no FIREBASE_SERVICE_ACCOUNT_KEY or FIREBASE_SERVICE_ACCOUNT_BASE64 env var set`);
   }
 
   admin.initializeApp({

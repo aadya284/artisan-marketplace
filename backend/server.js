@@ -1,23 +1,70 @@
 // server.js
 
 const path = require("path");
-// Load .env.local placed next to this file (robust regardless of cwd)
-require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
-// If a .env.local wasn't provided, fall back to .env for local development
-if (!process.env.GEMINI_API_KEY) {
-  const fallback = path.resolve(__dirname, '.env');
-  try {
-    require('dotenv').config({ path: fallback });
-    console.log(`Loaded fallback env from ${fallback}`);
-  } catch (e) {
-    // ignore - dotenv will throw only on programming errors
-  }
-}
+const dotenv = require("dotenv");
+
+// Load env files in order of precedence, with the repo-root .env included.
+[
+  path.resolve(__dirname, "..", ".env.local"),
+  path.resolve(__dirname, "..", ".env"),
+  path.resolve(process.cwd(), ".env.local"),
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(__dirname, ".env.local"),
+  path.resolve(__dirname, ".env"),
+].forEach((envPath) => {
+  dotenv.config({ path: envPath, override: false });
+});
+
+// Normalize env aliases so the existing code can use one stable set of names.
+process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.Gemini_API_Key || "";
+process.env.TRANSLATE_API_KEY =
+  process.env.TRANSLATE_API_KEY ||
+  process.env.google_translation_api_key ||
+  process.env.speech_to_text_vice_versa_api_key ||
+  "";
+process.env.GOOGLE_MAPS_API_KEY =
+  process.env.GOOGLE_MAPS_API_KEY ||
+  process.env.find_nearby_stores_api_key ||
+  process.env.Places_API_key ||
+  process.env.browser_key ||
+  "";
+process.env.RAZORPAY_KEY_ID =
+  process.env.RAZORPAY_KEY_ID ||
+  process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+  process.env.razorpay_live_key ||
+  "";
+process.env.RAZORPAY_KEY_SECRET =
+  process.env.RAZORPAY_KEY_SECRET ||
+  process.env.razorpay_secret_key ||
+  "";
+process.env.SMTP_HOST =
+  process.env.SMTP_HOST ||
+  process.env.smtp_host ||
+  "";
+process.env.SMTP_PORT =
+  process.env.SMTP_PORT ||
+  process.env.smtp_port ||
+  "";
+process.env.SMTP_USER =
+  process.env.SMTP_USER ||
+  process.env.smtp_user ||
+  "";
+process.env.SMTP_PASS =
+  process.env.SMTP_PASS ||
+  process.env.smtp_pass ||
+  "";
+process.env.SMTP_FROM =
+  process.env.SMTP_FROM ||
+  process.env.smtp_from ||
+  process.env.SMTP_USER ||
+  process.env.smtp_user ||
+  "";
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const admin = require("firebase-admin");
 const axios = require("axios");
+const nodemailer = require("nodemailer");
 const { LRUCache } = require("lru-cache"); // ✅ Correct import for Node.js v20+ (CommonJS)
 // Google Cloud Translation client (v3)
 const { TranslationServiceClient } = require('@google-cloud/translate').v3;
@@ -61,6 +108,105 @@ app.use((err, req, res, next) => {
 // Multer setup for handling multipart/form-data uploads
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 15 * 1024 * 1024 } }); // 15MB limit per file
 
+function getMailTransporter() {
+  const host = (process.env.SMTP_HOST || '').trim();
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = (process.env.SMTP_USER || '').trim();
+  const pass = (process.env.SMTP_PASS || '').trim();
+
+  if (!host || !user || !pass) {
+    return null;
+  }
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: {
+      user,
+      pass,
+    },
+  });
+}
+
+app.post('/orders/confirmation-email', async (req, res) => {
+  try {
+    const {
+      customerEmail,
+      customerName,
+      orderId,
+      trackingId,
+      paymentMethod,
+      total,
+      items = [],
+      address,
+    } = req.body || {};
+
+    if (!customerEmail || !orderId || !trackingId) {
+      return res.status(400).json({ success: false, error: 'customerEmail, orderId and trackingId are required' });
+    }
+
+    const transporter = getMailTransporter();
+    if (!transporter) {
+      return res.status(503).json({ success: false, error: 'SMTP is not configured' });
+    }
+
+    const itemLines = Array.isArray(items)
+      ? items.map((item) => `- ${item.name} x ${item.quantity} - Rs. ${Number(item.price || 0).toLocaleString()}`).join('\n')
+      : '';
+
+    const addressBlock = address
+      ? `${address.line1}, ${address.city}, ${address.state} - ${address.pincode}`
+      : 'No shipping address provided';
+
+    const mailText = [
+      `Hi ${customerName || 'Customer'},`,
+      '',
+      'Thank you for your order with KarigarSetu.',
+      '',
+      `Order ID: ${orderId}`,
+      `Tracking ID: ${trackingId}`,
+      `Payment Method: ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid Online'}`,
+      `Order Total: Rs. ${Number(total || 0).toLocaleString()}`,
+      '',
+      'Order Items:',
+      itemLines || '- No items listed',
+      '',
+      `Shipping Address: ${addressBlock}`,
+      '',
+      'You can use your tracking ID on the tracking page to follow your package updates.',
+      '',
+      'Thank you for supporting artisans through KarigarSetu.',
+    ].join('\n');
+
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM,
+      to: customerEmail,
+      subject: `KarigarSetu Order Confirmation - ${orderId}`,
+      text: mailText,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1f2937;">
+          <p>Hi ${customerName || 'Customer'},</p>
+          <p>Thank you for your order with <strong>KarigarSetu</strong>.</p>
+          <p><strong>Order ID:</strong> ${orderId}<br />
+          <strong>Tracking ID:</strong> ${trackingId}<br />
+          <strong>Payment Method:</strong> ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'Paid Online'}<br />
+          <strong>Order Total:</strong> Rs. ${Number(total || 0).toLocaleString()}</p>
+          <p><strong>Order Items</strong><br />${Array.isArray(items) ? items.map((item) => `${item.name} x ${item.quantity} - Rs. ${Number(item.price || 0).toLocaleString()}`).join('<br />') : 'No items listed'}</p>
+          <p><strong>Shipping Address:</strong><br />${addressBlock}</p>
+          <p>You can use your tracking ID on the tracking page to follow your package updates.</p>
+          <p>Thank you for supporting artisans through KarigarSetu.</p>
+        </div>
+      `,
+    });
+
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Order confirmation email failed:', error?.message || error);
+    return res.status(500).json({ success: false, error: error?.message || String(error) });
+  }
+});
+
 // Endpoint: upload images via backend to Firebase Storage using Admin SDK
 // Middleware to verify Firebase Auth token
 const verifyAuth = async (req, res, next) => {
@@ -83,7 +229,7 @@ const verifyAuth = async (req, res, next) => {
 app.post('/upload-artworks', verifyAuth, upload.array('files', 6), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) return res.status(400).json({ success: false, error: 'No files uploaded' });
-    const bucket = admin.storage().bucket('karigarsetu.firebasestorage.app');
+    const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET || 'karigarsetu.firebasestorage.app');
     console.log('Using bucket:', bucket.name); // Debug log
     console.log('User:', req.user); // Log authenticated user
     const uploaded = [];
@@ -150,12 +296,12 @@ try {
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    storageBucket: "karigarsetu.firebasestorage.app",
-    projectId: "karigarsetu"
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "karigarsetu.firebasestorage.app",
+    projectId: process.env.FIREBASE_PROJECT_ID || serviceAccount.project_id || "karigarsetu"
   });
   
   // Verify storage is initialized
-  const bucket = admin.storage().bucket('karigarsetu.firebasestorage.app');
+  const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET || 'karigarsetu.firebasestorage.app');
   console.log("✅ Firebase Admin initialized successfully");
   console.log("📦 Storage bucket configured:", bucket.name);
 } catch (error) {
@@ -184,7 +330,7 @@ try {
 // -------------------------
 // Helper: Retry with exponential backoff
 // -------------------------
-async function retryWithBackoff(fn, maxRetries = 3, initialDelay = 1000) {
+async function retryWithBackoff(fn, maxRetries = 2, initialDelay = 300) {
   let retries = 0;
   let delay = initialDelay;
 
@@ -210,7 +356,7 @@ async function retryWithBackoff(fn, maxRetries = 3, initialDelay = 1000) {
 // -------------------------
 // Helper: Call Gemini API with different models
 // -------------------------
-async function callGeminiAPI(payload, apiKey, models = ['gemini-flash-latest', 'gemini-pro-latest', 'gemini-2.5-flash']) {
+async function callGeminiAPI(payload, apiKey, models = ['gemini-2.5-flash']) {
   let lastError;
 
   for (const model of models) {
@@ -218,12 +364,13 @@ async function callGeminiAPI(payload, apiKey, models = ['gemini-flash-latest', '
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
       console.log(`🔄 Trying model: ${model}`);
 
-      const response = await retryWithBackoff(() => 
+      const response = await retryWithBackoff(() =>
         axios.post(apiUrl, payload, {
           headers: {
             "Content-Type": "application/json",
             "x-goog-api-key": apiKey
           },
+          timeout: 15000,
           validateStatus: false
         })
       );
@@ -245,6 +392,74 @@ async function callGeminiAPI(payload, apiKey, models = ['gemini-flash-latest', '
 // -------------------------
 // 5️⃣ Gemini Chat Endpoint
 // -------------------------
+app.post("/chat", async (req, res, next) => {
+  const { message } = req.body || {};
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!message) return res.status(400).json({ error: "Message is required" });
+  if (!apiKey) return res.status(500).json({ error: "Missing Gemini API key." });
+
+  const cacheKey = String(message).trim().toLowerCase();
+  if (cache.has(cacheKey)) {
+    return res.json({ success: true, reply: cache.get(cacheKey) });
+  }
+
+  const relatedArtisans = artisanData
+    .filter((artisan) => artisan.description?.toLowerCase().includes(cacheKey))
+    .slice(0, 3)
+    .map((artisan) => `${artisan.name} (${artisan.artType}) from ${artisan.city}`);
+
+  const context = relatedArtisans.length
+    ? `Related artisans: ${relatedArtisans.join(", ")}.`
+    : "";
+
+  try {
+    const response = await axios.post(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      {
+        contents: [
+          {
+            parts: [
+              {
+                text: `You are Kalabandhu for Artisan Marketplace. Reply directly and briefly with no greeting. ${context ? `Use this marketplace context when helpful: ${context}\n` : ""}User: ${message}\nAnswer:`
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 220,
+          thinkingConfig: {
+            thinkingBudget: 0
+          }
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey
+        },
+        timeout: 15000,
+        validateStatus: false
+      }
+    );
+
+    if (response.status !== 200) {
+      return next();
+    }
+
+    const reply =
+      response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
+      "I'm sorry, I couldn't process that right now.";
+
+    cache.set(cacheKey, reply);
+    return res.status(200).json({ success: true, reply });
+  } catch (error) {
+    console.error("Fast chat route failed:", error?.message || error);
+    return next();
+  }
+});
+
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
@@ -437,17 +652,58 @@ app.get("/list-models", async (req, res) => {
 // -------------------------
 // 9️⃣ Google Translate endpoint
 // -------------------------
+const translationResponseCache = new Map();
+const TRANSLATE_BATCH_SIZE = 20;
+
+function getTranslationCacheKey(target, text) {
+  return `${target || 'en'}::${String(text || '').trim()}`;
+}
+
+async function translateContentsInChunks(client, projectId, contents, targetLanguageCode) {
+  const translations = new Array(contents.length).fill('');
+  const pending = [];
+
+  contents.forEach((content, index) => {
+    const cacheKey = getTranslationCacheKey(targetLanguageCode, content);
+    if (translationResponseCache.has(cacheKey)) {
+      translations[index] = translationResponseCache.get(cacheKey);
+      return;
+    }
+
+    pending.push({ content, index, cacheKey });
+  });
+
+  for (let i = 0; i < pending.length; i += TRANSLATE_BATCH_SIZE) {
+    const chunk = pending.slice(i, i + TRANSLATE_BATCH_SIZE);
+    const [response] = await client.translateText({
+      parent: `projects/${projectId}/locations/global`,
+      contents: chunk.map((item) => item.content),
+      mimeType: 'text/plain',
+      targetLanguageCode
+    });
+
+    const chunkTranslations = (response.translations || []).map((item) => item.translatedText || '');
+    chunk.forEach((item, index) => {
+      const translated = chunkTranslations[index] || item.content;
+      translationResponseCache.set(item.cacheKey, translated);
+      translations[item.index] = translated;
+    });
+  }
+
+  return translations;
+}
+
 app.post('/translate', async (req, res) => {
   try {
     const { text, target } = req.body;
     if (!text) return res.status(400).json({ success: false, error: 'text is required' });
+    const contents = Array.isArray(text) ? text : [String(text)];
 
     // Mode A: API key via TRANSLATE_API_KEY (simpler, less permissions work for quick tests)
     const apiKey = process.env.TRANSLATE_API_KEY;
     if (apiKey) {
       try {
         console.log('ℹ️ Using TRANSLATE_API_KEY for translation (REST v2)');
-        const contents = Array.isArray(text) ? text : [String(text)];
         const url = `https://translation.googleapis.com/language/translate/v2?key=${encodeURIComponent(apiKey)}`;
         const body = {
           q: contents,
@@ -493,18 +749,7 @@ app.post('/translate', async (req, res) => {
     if (!projectId) return res.status(500).json({ success: false, error: 'project_id not found in service account' });
 
     const client = new TranslationServiceClient({ credentials: creds, projectId });
-    const parent = `projects/${projectId}/locations/global`;
-
-    const contents = Array.isArray(text) ? text : [String(text)];
-
-    const [response] = await client.translateText({
-      parent,
-      contents,
-      mimeType: 'text/plain',
-      targetLanguageCode: target || 'en'
-    });
-
-    const translations = (response.translations || []).map(t => t.translatedText || '');
+    const translations = await translateContentsInChunks(client, projectId, contents, target || 'en');
     if (translations.length !== contents.length) {
       console.warn(`⚠️ TranslationServiceClient returned ${translations.length} translations for ${contents.length} inputs`);
       try { console.warn('⚠️ Sample translations:', translations.slice(0,5)); } catch (e) {}

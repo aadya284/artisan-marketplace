@@ -864,11 +864,6 @@ app.get("/", (req, res) => {
 // 8️⃣ Start the server
 // -------------------------
 const PORT = process.env.PORT || 5000;
-
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`🌐 KarigarSetu backend running at http://localhost:${PORT}`);
-  });
-}
-
-module.exports = app;
+app.listen(PORT, () => {
+  console.log(`🌐 KarigarSetu backend running at http://localhost:${PORT}`);
+});

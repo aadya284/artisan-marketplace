@@ -1,10 +1,6 @@
 {
   "name": "artisan-marketplace",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
   "scripts": {
     "dev": "npm --prefix frontend run dev",
     "build": "npm --prefix frontend run build",
@@ -16,10 +12,5 @@
     "frontend:lint": "npm --prefix frontend run lint",
     "backend:dev": "npm --prefix backend run dev",
     "backend:start": "npm --prefix backend run start"
-  },
-  "devDependencies": {
-    "next": "15.5.14",
-    "react": "^19.1.1",
-    "react-dom": "^19.0.0"
   }
 }

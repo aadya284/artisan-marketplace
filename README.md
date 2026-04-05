@@ -38,6 +38,15 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
+## Project deployment layout
+
+Deploy this repository as two separate Vercel projects:
+
+- Frontend project: Root Directory `frontend`, Framework Preset `Next.js`
+- Backend project: Root Directory `backend`, Framework Preset `Other`
+
+The backend now includes a Vercel entrypoint at `backend/api/index.js` plus `backend/vercel.json`, which routes all incoming requests to the Express app. Put browser-facing `NEXT_PUBLIC_*` variables in the frontend project, and keep backend-only secrets such as Firebase service-account credentials in the backend project.
+
 ## Environment variables
 
 This project expects certain API keys and secrets to be provided via environment variables. For local development copy `.env.example` to `.env.local` and fill in the real values (do NOT commit `.env.local`). Example keys:

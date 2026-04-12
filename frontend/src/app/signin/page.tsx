@@ -27,6 +27,7 @@ import {
   getPhoneValidationMessage,
   normalizePhoneNumber,
 } from "@/lib/auth-form-utils";
+import { saveVerifiedUserSession } from "@/lib/firebase-auth-session";
 
 type UserType = "user" | "artisan" | null;
 type AuthMode = "email" | "phone";
@@ -67,37 +68,12 @@ export default function SignInPage() {
 
   const handleRoleSelection = (type: UserType) => setUserType(type);
 
-  const getApiUrl = () => process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-
   const saveVerifiedUser = async (firebaseUser: { uid: string; displayName: string | null; email: string | null; phoneNumber: string | null; getIdToken: () => Promise<string> }) => {
-    const idToken = await firebaseUser.getIdToken();
-    const res = await fetch(`${getApiUrl()}/verify-token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({ idToken }),
+    await saveVerifiedUserSession({
+      firebaseUser,
+      signIn,
+      userType: userType!,
     });
-
-    const contentType = res.headers.get("content-type");
-    if (!contentType || !contentType.includes("application/json")) {
-      throw new Error("Server returned non-JSON response");
-    }
-
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.error || "Verification failed");
-    }
-
-    signIn({
-      id: firebaseUser.uid,
-      name: firebaseUser.displayName || firebaseUser.email?.split("@")[0] || firebaseUser.phoneNumber || "User",
-      email: firebaseUser.email || undefined,
-      phone: firebaseUser.phoneNumber || undefined,
-      type: userType!,
-    });
-
     router.push(redirectUrl);
   };
 

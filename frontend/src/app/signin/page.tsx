@@ -28,6 +28,7 @@ import {
   normalizePhoneNumber,
 } from "@/lib/auth-form-utils";
 import { saveVerifiedUserSession } from "@/lib/firebase-auth-session";
+import { trackAuthAction } from "@/lib/gtag";
 
 type UserType = "user" | "artisan" | null;
 type AuthMode = "email" | "phone";
@@ -68,12 +69,16 @@ export default function SignInPage() {
 
   const handleRoleSelection = (type: UserType) => setUserType(type);
 
-  const saveVerifiedUser = async (firebaseUser: { uid: string; displayName: string | null; email: string | null; phoneNumber: string | null; getIdToken: () => Promise<string> }) => {
+  const saveVerifiedUser = async (
+    firebaseUser: { uid: string; displayName: string | null; email: string | null; phoneNumber: string | null; getIdToken: () => Promise<string> },
+    method = authMode
+  ) => {
     await saveVerifiedUserSession({
       firebaseUser,
       signIn,
       userType: userType!,
     });
+    trackAuthAction("login", method, userType || undefined);
     router.push(redirectUrl);
   };
 
@@ -171,7 +176,7 @@ export default function SignInPage() {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      await saveVerifiedUser(result.user);
+      await saveVerifiedUser(result.user, "google");
     } catch (err: unknown) {
       const error = err as Error;
       console.error("Google Sign-in Error:", error);

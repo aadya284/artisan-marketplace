@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
+import { trackProductClick } from "@/lib/gtag";
 
 // Types
 interface Product {
@@ -315,6 +316,7 @@ export default function ExplorePage() {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            trackProductClick(product.id, product.name, "explore_view_details");
                             router.push(`/artwork/${product.id}`);
                           }}
                           aria-label={`View details for ${product.name}`}

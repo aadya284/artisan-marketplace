@@ -7,12 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Package, Search, Truck, CheckCircle, Clock } from "lucide-react";
+import { trackSearchClick } from "@/lib/gtag";
 
 export default function TrackPackagePage() {
   const [trackingId, setTrackingId] = useState("");
 
   const handleTrack = (e: React.FormEvent) => {
     e.preventDefault();
+    trackSearchClick(trackingId, "track_package");
     // TODO: Implement actual tracking logic
     console.log("Tracking package:", trackingId);
   };

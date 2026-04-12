@@ -30,6 +30,7 @@ import {
   normalizePhoneNumber,
 } from "@/lib/auth-form-utils";
 import { saveVerifiedUserSession } from "@/lib/firebase-auth-session";
+import { trackAuthAction } from "@/lib/gtag";
 
 type UserType = "user" | "artisan";
 type AuthMode = "email" | "phone";
@@ -134,7 +135,10 @@ function RegisterPageContent() {
     ? userFormData.name
     : artisanFormData.brandName || artisanFormData.name;
 
-  const saveVerifiedUser = async (firebaseUser: { uid: string; displayName: string | null; email: string | null; phoneNumber: string | null; getIdToken: () => Promise<string> }) => {
+  const saveVerifiedUser = async (
+    firebaseUser: { uid: string; displayName: string | null; email: string | null; phoneNumber: string | null; getIdToken: () => Promise<string> },
+    method = authMode
+  ) => {
     await saveVerifiedUserSession({
       firebaseUser,
       signIn,
@@ -143,6 +147,7 @@ function RegisterPageContent() {
       fallbackEmail: currentFormData.email,
       fallbackPhone: `${currentFormData.countryCode}${normalizePhoneNumber(currentFormData.phone)}`,
     });
+    trackAuthAction("register", method, userType);
     router.push("/");
   };
 
@@ -237,7 +242,7 @@ function RegisterPageContent() {
       setLoading(true);
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      await saveVerifiedUser(result.user);
+      await saveVerifiedUser(result.user, "google");
     } catch (err: unknown) {
       alert(getFirebaseAuthErrorMessage(err));
       console.error(err);

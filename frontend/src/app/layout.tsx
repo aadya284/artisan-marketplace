@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Rajdhani } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -47,7 +48,9 @@ export default function RootLayout({
         <ErrorReporter />
         <AuthProvider>
           <CartProvider>
-            <GoogleAnalyticsPageTracker />
+            <Suspense fallback={null}>
+              <GoogleAnalyticsPageTracker />
+            </Suspense>
             {children}
             <Toaster position="top-right" richColors closeButton />
             <AiChatbotWidget />

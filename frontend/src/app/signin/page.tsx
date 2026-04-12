@@ -71,7 +71,7 @@ export default function SignInPage() {
 
   const saveVerifiedUser = async (
     firebaseUser: { uid: string; displayName: string | null; email: string | null; phoneNumber: string | null; getIdToken: () => Promise<string> },
-    method = authMode
+    method: string = authMode
   ) => {
     await saveVerifiedUserSession({
       firebaseUser,

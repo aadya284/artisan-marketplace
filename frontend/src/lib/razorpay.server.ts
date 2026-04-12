@@ -1,15 +1,22 @@
-import Razorpay from 'razorpay';
+import Razorpay from "razorpay";
 
-const keyId = process.env.RAZORPAY_KEY_ID || process.env.razorpay_live_key;
-const keySecret = process.env.RAZORPAY_KEY_SECRET || process.env.razorpay_secret_key;
+function getRazorpayCredentials() {
+  const keyId = process.env.RAZORPAY_KEY_ID || process.env.razorpay_live_key;
+  const keySecret =
+    process.env.RAZORPAY_KEY_SECRET || process.env.razorpay_secret_key;
 
-if (!keyId || !keySecret) {
-  throw new Error("Missing Razorpay server credentials in environment");
+  if (!keyId || !keySecret) {
+    throw new Error("Missing Razorpay server credentials in environment");
+  }
+
+  return { keyId, keySecret };
 }
 
-const razorpay = new Razorpay({
-  key_id: keyId,
-  key_secret: keySecret,
-});
+export function getRazorpayClient() {
+  const { keyId, keySecret } = getRazorpayCredentials();
 
-export default razorpay;
+  return new Razorpay({
+    key_id: keyId,
+    key_secret: keySecret,
+  });
+}

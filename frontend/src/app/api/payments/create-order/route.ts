@@ -1,12 +1,12 @@
-import razorpay from '@/lib/razorpay.server';
+import { getRazorpayClient } from '@/lib/razorpay.server';
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { amount, currency = 'INR', receipt = 'order_receipt_1' } = body;
 
+    const razorpay = getRazorpayClient();
     const order = await razorpay.orders.create({
       amount: Math.round(amount * 100), // Convert to paise
       currency,

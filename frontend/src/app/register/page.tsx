@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
-  ConfirmationResult,
   GoogleAuthProvider,
   RecaptchaVerifier,
   createUserWithEmailAndPassword,
@@ -11,6 +10,7 @@ import {
   signInWithPopup,
   updateProfile,
 } from "firebase/auth";
+import type { ConfirmationResult } from "firebase/auth";
 import { auth } from "@/config/firebaseConfig";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";

@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ConfirmationResult,
   GoogleAuthProvider,
   RecaptchaVerifier,
   signInWithEmailAndPassword,
   signInWithPhoneNumber,
   signInWithPopup,
 } from "firebase/auth";
+import type { ConfirmationResult } from "firebase/auth";
 import { auth } from "@/config/firebaseConfig";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
